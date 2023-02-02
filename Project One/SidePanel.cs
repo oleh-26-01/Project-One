@@ -10,16 +10,16 @@ using System.Windows.Controls;
 
 namespace Project_One;
 
-public class CurveListViewModel
+public class SidePanel
 {
     public ObservableCollection<CurveViewModel> CurveViewModels;
     public string FilesPath { get; set; }
     private readonly string _filesType = "crv";
     private readonly ItemsControl _curvesList;
-    private WpfCurve _curve;
+    private readonly WpfCurve _curve;
     private CurveViewModel? _selectedCurve;
 
-    public CurveListViewModel(string filesPath, ItemsControl curvesList, WpfCurve curve)
+    public SidePanel(string filesPath, ItemsControl curvesList, WpfCurve curve)
     {
         FilesPath = filesPath;
         _curvesList = curvesList;

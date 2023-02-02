@@ -8,7 +8,7 @@ using System.Windows.Shapes;
 
 namespace Project_One;
 
-internal class WPFObjects
+internal class WpfObjects
 {
     /// <summary>Creates new WPF Line object and stylize it.</summary>
     /// <returns>Stylized WPF Line.</returns>
@@ -23,6 +23,13 @@ internal class WPFObjects
             Stroke = System.Windows.Media.Brushes.Black,
             StrokeThickness = 2
         };
+    }
+
+    public static Line CrosshairLine(double x1 = 0, double y1 = 0, double x2 = 0, double y2 = 0)
+    {
+        var line = Line(x1, y1, x2, y2);
+        line.Stroke = System.Windows.Media.Brushes.Red;
+        return line;
     }
 
     public static Polyline Polyline() => new()

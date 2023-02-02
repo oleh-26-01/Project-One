@@ -14,7 +14,7 @@ internal class EventHandler
     private readonly Grid _canvasGrid;
     private readonly Grid _firstTopPanelGrid;
     private readonly CanvasUpdater _canvasUpdater;
-    private readonly CurveListViewModel _curveListViewModel;
+    private readonly SidePanel _sidePanel;
     private readonly Camera[] _cameraArray;
     private readonly WpfCurve _curve;
     public int _canvasIndex = 0;
@@ -31,7 +31,7 @@ internal class EventHandler
 
     public EventHandler(
         Grid windowGrid, Grid canvasGrid, Grid firstFirstTopPanelGrid,
-        CanvasUpdater canvasUpdater, CurveListViewModel curveListViewModel, 
+        CanvasUpdater canvasUpdater, SidePanel sidePanel, 
         Camera[] cameraArray, WpfCurve curve)
     {
         _windowGrid = windowGrid;
@@ -39,7 +39,7 @@ internal class EventHandler
         _firstTopPanelGrid = firstFirstTopPanelGrid;
 
         _canvasUpdater = canvasUpdater;
-        _curveListViewModel = curveListViewModel;
+        _sidePanel = sidePanel;
 
         _cameraArray = cameraArray;
         _curve = curve;
@@ -56,7 +56,7 @@ internal class EventHandler
 
         if (_firstTopPanelGrid.FindName("SaveCurve") is Button saveCurveButton)
         {
-            saveCurveButton.Click += _curveListViewModel.SaveActiveCurve;
+            saveCurveButton.Click += _sidePanel.SaveActiveCurve;
         }
     }
 
@@ -188,15 +188,12 @@ internal class EventHandler
 
     private void CanvasSizeChanged(object sender, SizeChangedEventArgs e)
     {
-        var screenSize = new Vector2((float)e.NewSize.Width, (float)e.NewSize.Height);
+        var canvasSize = new Vector2((float)e.NewSize.Width, (float)e.NewSize.Height);
+        var newCenter = canvasSize / 2;
         foreach (var camera in _cameraArray)
         {
-            if (camera._center != new Vector2(0, 0))
-            {
-                camera.Move(camera._center - screenSize / 2);
-            }
-
-            camera._center = screenSize / 2;
+            camera.Move(camera.Center - newCenter);
+            camera.Center = newCenter;
         }
     }
 

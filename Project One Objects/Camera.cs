@@ -6,14 +6,12 @@ namespace Project_One_Objects;
 
 public class Camera
 {
-    private Vector2 _size;
-    public Vector2 _center;
+    private Vector2 _center;
     private float _zoom;
 
-    public Camera(Vector2 size, Vector2 position, float zoom = 1)
+    public Camera(Vector2 center, Vector2 position, float zoom = 1)
     {
-        _size = size;
-        _center = _size / 2;
+        _center = center;
         Position = position;
         _zoom = zoom;
     }
@@ -63,6 +61,22 @@ public class Camera
 
     /// <summary>Convert an array of points from world space to screen space.</summary>
     /// <param name="points">Array of points to convert.</param>
+    /// <returns>New array with converted points.</returns>
+    public Vector2[] ConvertIn(Vector2[] points)
+    {
+        var result = new Vector2[points.Length];
+        points.CopyTo(result, 0);
+        for (var i = 0; i < points.Length; i++)
+        {
+            result[i] -= _center;
+            result[i] /= _zoom;
+            result[i] += _center + Position;
+        }
+        return result;
+    }
+
+    /// <summary>Convert a list of points from world space to screen space.</summary>
+    /// <param name="points">List of points to convert.</param>
     /// <returns>New List with converted points.</returns>
     public List<Vector2> ConvertIn(List<Vector2> points)
     {
@@ -90,6 +104,22 @@ public class Camera
 
     /// <summary>Convert an array of points from absolute values to camera relative values.</summary>
     /// <param name="points">Array of points to convert.</param>
+    /// <returns>New array with converted points.</returns>
+    public Vector2[] ConvertOut(Vector2[] points)
+    {
+        var result = new Vector2[points.Length];
+        points.CopyTo(result, 0);
+        for (var i = 0; i < points.Length; i++)
+        {
+            result[i] -= Position + _center;
+            result[i] *= _zoom;
+            result[i] += _center;
+        }
+        return result;
+    }
+
+    /// <summary>Convert a list of points from absolute values to camera relative values.</summary>
+    /// <param name="points">List of points to convert.</param>
     /// <returns>New List with converted points.</returns>
     public List<Vector2> ConvertOut(List<Vector2> points)
     {
@@ -103,20 +133,6 @@ public class Camera
         return result;
     }
 
-    public Vector2 Size
-    {
-        get => _size;
-        set
-        {
-            if (value.X <= 0 || value.Y <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(value), "Size must be positive");
-            }
-
-            _size = value;
-        }
-    }
-    
     public Vector2 Position { get; set; }
     
     /// <summary>Zoom level of the camera.</summary>
@@ -133,6 +149,22 @@ public class Camera
             }
 
             _zoom = value;
+        }
+    }
+
+    /// <summary>Centering relative coordinates.</summary>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    public Vector2 Center
+    {
+        get => _center;
+        set
+        {
+            if (value.X < 0 || value.Y < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(value), "Center must be positive");
+            }
+
+            _center = value;
         }
     }
 }

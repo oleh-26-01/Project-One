@@ -17,20 +17,19 @@ public class WpfCurve : Project_One_Objects.Curve
 
     public WpfCurve(string filePath = "")
     {
-        _polyLine = WPFObjects.Polyline();
+        _polyLine = WpfObjects.Polyline();
         if (filePath != "")
         {
             Load(filePath);
         }
     }
 
-    public void Draw(Canvas canvas, Camera camera)
+    public void DrawOn(Canvas canvas)
     {
         if (!canvas.Children.Contains(_polyLine))
         {
             canvas.Children.Add(_polyLine);
         }
-        Update(camera);
     }
 
     public void RemoveFrom(Canvas canvas)

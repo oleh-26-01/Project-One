@@ -24,20 +24,20 @@ namespace Project_One_Tests
         [Test]
         public void ConvertIn_Point()
         {
-            var camera = new Camera(new Vector2(1280, 720), new Vector2(100, 100), 1);
+            var camera = new Camera(new Vector2(640, 360), new Vector2(100, 100), 1);
             Assert.IsTrue(camera.ConvertIn(new Vector2(300, 200)) == new Vector2(400, 300));
             
             camera.Zoom = 2;
-            Assert.IsTrue(camera.ConvertIn(new Vector2(300, 200)) == new Vector2(250, 200));
-            
+            Assert.IsTrue(camera.ConvertIn(new Vector2(300, 200)) == new Vector2(570, 380));
+
             camera.Move(new Vector2(100, 100));
-            Assert.IsTrue(camera.ConvertIn(new Vector2(300, 200)) == new Vector2(350, 300));
+            Assert.IsTrue(camera.ConvertIn(new Vector2(300, 200)) == new Vector2(670, 480));
         }
 
         [Test]
         public void ConvertOut_Point()
         {
-            var camera = new Camera(new Vector2(1280, 720), new Vector2(100, 100), 1);
+            var camera = new Camera(new Vector2(640, 360), new Vector2(100, 100), 1);
             Assert.IsTrue(camera.ConvertOut(new Vector2(400, 300)) == new Vector2(300, 200));
             
             camera.Zoom = 2;

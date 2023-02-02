@@ -19,6 +19,7 @@ internal class CanvasUpdater
     private Canvas[] _canvasArray;
     private Camera[] _cameraArray;
     private WpfCurve _curve;
+    private WpfCrosshair _crosshair;
     private int _canvasIndex = 0;
 
     private int _tickRate = 90;
@@ -42,7 +43,10 @@ internal class CanvasUpdater
         _canvasArray = canvasArrayArray;
         _cameraArray = cameraArray;
         _curve = curve;
-        _curve.Draw(_canvasArray[_canvasIndex], _cameraArray[_canvasIndex]);
+        _curve.DrawOn(_canvasArray[_canvasIndex]);
+
+        _crosshair = new WpfCrosshair(new Vector2(0, 0));
+        _crosshair.DrawOn(_canvasArray[_canvasIndex]);
 
         _lastUpdate = Environment.TickCount;
         _thread = new Thread(Parallel);
@@ -58,7 +62,8 @@ internal class CanvasUpdater
                 switch (_canvasIndex)
                 {
                     case 0:
-                        _curve.Update(_cameraArray[_canvasIndex]);
+                        _curve.Update(_cameraArray[0]);
+                        _crosshair.Update(_cameraArray[0]);
                         break;
                     case 1:
                         break;

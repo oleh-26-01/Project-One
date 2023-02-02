@@ -26,29 +26,19 @@ public partial class MainWindow
 
     private CanvasUpdater _canvasUpdater;
     private EventHandler _eventHandler;
-    private CurveListViewModel _curveListViewModel;
+    private SidePanel _sidePanel;
 
-    private string _filesFolder = "C:\\Coding\\C#\\Project One\\Curves\\";
+    private string _filesFolder = "C:\\Coding\\C#\\Project One\\Project One\\Curves\\";
     private WpfCurve _curve;
 
     public MainWindow()
     {
         InitializeComponent();
-        _curve = new WpfCurve();
-        //_curve.Load(_filesFolder + "file.txt");
-        Loaded += OnLoaded;
-    }
-
-    private void OnLoaded(object sender, RoutedEventArgs e)
-    {
+        
         _partIndex = 0;
-        var cameraSize = new Vector2((float)CanvasGrid.ActualWidth, (float)CanvasGrid.ActualHeight);
-        _cameraArray = new Camera[3];
-        for (var i = 0; i < 3; i++)
-        {
-            _cameraArray[i] = new Camera(cameraSize, new Vector2(0, 0));
-        }
+        _curve = new WpfCurve();
 
+        _cameraArray = new Camera[3];
         _canvasArray = new Canvas[]
         {
             FirstCanvas,
@@ -56,20 +46,37 @@ public partial class MainWindow
             ThirdCanvas
         };
 
+        var cameraSize = new Vector2((float)CanvasGrid.ActualWidth, (float)CanvasGrid.ActualHeight);
+        for (var i = 0; i < 3; i++)
+        {
+            _cameraArray[i] = new Camera(cameraSize, new Vector2(0, 0));
+        }
+
         Dispatcher dispatcher = Dispatcher;
         _canvasUpdater = new CanvasUpdater(dispatcher, _canvasArray, _cameraArray, _curve);
         
-        // ----------------------------change to SidePanel------------------------------------
-        _curveListViewModel = new CurveListViewModel(_filesFolder, CurveList, _curve); 
-        // -----------------------------------------------------------------------------------
+        _sidePanel = new SidePanel(_filesFolder, CurvesList, _curve);
         
         _eventHandler = new EventHandler(
             WindowGrid, CanvasGrid, FirstTopPanel,
-            _canvasUpdater, _curveListViewModel,
+            _canvasUpdater, _sidePanel,
             _cameraArray, _curve);
+        
         Closing += _eventHandler.WindowClosing;
-
         WindowGrid.Focus();
+
+        //Loaded += OnLoaded;
+    }
+
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    { 
+        var canvasSize = new Vector2((float)CanvasGrid.ActualWidth, (float)CanvasGrid.ActualHeight);
+        var actualCenter = canvasSize / 2;
+        for (var i = 0; i < 3; i++)
+        {
+            _cameraArray[i].Center = actualCenter;
+        }
+        
     }
 
     private void ChangePart(object sender, RoutedEventArgs e)
@@ -97,11 +104,11 @@ public partial class MainWindow
 
     private void DeleteCurve_OnClick(object sender, RoutedEventArgs e)
     {
-        _curveListViewModel.DeleteCurve(sender, e);
+        _sidePanel.DeleteCurve(sender, e);
     }
 
     private void SelectCurve_OnClick(object sender, RoutedEventArgs e)
     {
-        _curveListViewModel.SelectCurve(sender, e);
+        _sidePanel.SelectCurve(sender, e);
     }
 }

@@ -9,40 +9,46 @@
     <Window.Resources>
         <DataTemplate x:Key="CurveListItemTemplate" 
                       DataType="{x:Type local:CurveViewModel}">
-            <Grid ShowGridLines="True">
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
+            <Border BorderThickness="1" BorderBrush="Black">
+                <Grid ShowGridLines="False" Background="LightGray" Margin="0 0 0 1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" Grid.Row="0" Text="{Binding DisplayFileName}"
-                           FontSize="16" Margin="4 2 2 2"></TextBlock>
-                <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding PointCount}"
-                           FontSize="16" Margin="4 2 2 2"></TextBlock>
-                <Button Grid.Column="0" Grid.Row="1" Content="Select" Focusable="False"
-                        Click="SelectCurve_OnClick"></Button>
-                <Button Grid.Column="1" Grid.Row="1" Content="Delete" Focusable="False"
-                        Click="DeleteCurve_OnClick"></Button>
-            </Grid>
+                    <TextBlock Grid.Column="0" Grid.Row="0" Text="{Binding DisplayFileName}"
+                               FontSize="16" Margin="4 2 2 2"></TextBlock>
+                    <TextBlock Grid.Column="0" Grid.Row="1" Text="{Binding DisplayPointCount}"
+                               FontSize="16" Margin="4 2 2 2"></TextBlock>
+                    <Button Grid.Column="1" Grid.Row="0" Content="Select" Focusable="False"
+                            Click="SelectCurve_OnClick" FontSize="16" Margin="1 1 0 1"
+                            Foreground="#CC9900"></Button>
+                    <Button Grid.Column="1" Grid.Row="1" Content="Delete" Focusable="False"
+                            Click="DeleteCurve_OnClick" FontSize="16" Margin="1"
+                            Foreground="#CC0000">
+                    </Button>
+                </Grid>
+            </Border>
         </DataTemplate>
     </Window.Resources>
-    <Grid x:Name="WindowGrid" ShowGridLines="True" Focusable="True">
+    <Grid x:Name="WindowGrid" ShowGridLines="False" Focusable="True" Background="DarkSlateGray">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="8*"/>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="2*" MinWidth="250"/>
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="5*"/>
+            <RowDefinition Height="5*" MinHeight="30" MaxHeight="40"/>
             <RowDefinition Height="95*"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Column="0" Grid.Row="0" x:Name="TopPanel"
-              ShowGridLines="True" Background="WhiteSmoke">
+              ShowGridLines="True" Background="WhiteSmoke"
+              Margin="0 0 1 1">
             <Grid x:Name="FirstTopPanel">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
@@ -50,11 +56,13 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
 
-                <Button Content="Save" x:Name="SaveCurve"></Button>
+                <Button Content="Save" x:Name="SaveCurve"
+                        Focusable="False"></Button>
             </Grid>
         </Grid>
 
-        <Grid Grid.Column="1" Grid.Row="0" Background="WhiteSmoke">
+        <Grid Grid.Column="1" Grid.Row="0" Background="WhiteSmoke"
+              Margin="0 0 0 1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="5*"/>
@@ -62,17 +70,20 @@
                 <ColumnDefinition Width="0*"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Content="◀" x:Name="PrevPartControl"
-                    Cursor="Hand" Click="ChangePart" Focusable="False"></Button>
+            <Button Grid.Column="0" Content="Prev" x:Name="PrevPartControl"
+                    Cursor="Hand" Click="ChangePart" Focusable="False"
+                    Margin="1" FontSize="14"></Button>
             <TextBlock Grid.Column="1" FontSize="18"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
                        x:Name="PartTitle">First Part</TextBlock>
-            <Button Grid.Column="2" Content="▶" x:Name="NextPartControl"
-                    Cursor="Hand" Click="ChangePart" Focusable="False"></Button>
+            <Button Grid.Column="2" Content="Next" x:Name="NextPartControl"
+                    Cursor="Hand" Click="ChangePart" Focusable="False"
+                    Margin="1" FontSize="14"></Button>
         </Grid>
 
-        <Grid Grid.Column="0" Grid.Row="1" x:Name="CanvasGrid">
+        <Grid Grid.Column="0" Grid.Row="1" x:Name="CanvasGrid"
+              Margin="0 0 1 0">
             <Canvas x:Name="FirstCanvas" Background="LightGray"
                     ClipToBounds="True"
                     Visibility="Visible"/>
@@ -86,8 +97,8 @@
             </Canvas>
         </Grid>
 
-        <Grid Grid.Column="1" Grid.Row="1" x:Name="SidePanel">
-            <ItemsControl x:Name="CurveList">
+        <Grid Grid.Column="1" Grid.Row="1" x:Name="SidePanel" Background="WhiteSmoke">
+            <ItemsControl x:Name="CurvesList" Focusable="False">
                 <ItemsControl.ItemTemplate>
                     <StaticResource ResourceKey="CurveListItemTemplate"></StaticResource>
                 </ItemsControl.ItemTemplate>
