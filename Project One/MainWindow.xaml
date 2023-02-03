@@ -42,22 +42,83 @@
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="5*" MinHeight="30" MaxHeight="40"/>
+            <RowDefinition Height="5*" MinHeight="33.33" MaxHeight="40"/>
             <RowDefinition Height="95*"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Column="0" Grid.Row="0" x:Name="TopPanel"
-              ShowGridLines="True" Background="WhiteSmoke"
               Margin="0 0 1 1">
-            <Grid x:Name="FirstTopPanel">
+            <Grid x:Name="FirstTopPanel" ShowGridLines="False"
+                  Background="DarkSlateGray">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
+                    <ColumnDefinition Width="4*" MinWidth="120"/>
+                    <ColumnDefinition Width="8*" MinWidth="240"/>
+                    <ColumnDefinition Width="5*" MinWidth="150"/>
+                    <ColumnDefinition Width="16*"/>
                 </Grid.ColumnDefinitions>
 
-                <Button Content="Save" x:Name="SaveCurve"
-                        Focusable="False"></Button>
+                <Grid.RowDefinitions>
+                    <RowDefinition MinHeight="33"/>
+                </Grid.RowDefinitions>
+                
+                <Grid Grid.Column="0" Background="WhiteSmoke"
+                      Margin="0,0,1,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <RadioButton Grid.Column="0" FontSize="16" Margin="3,0,3,0"
+                                 HorizontalAlignment="Center" VerticalContentAlignment="Center"
+                                 IsChecked="True">
+                        Draw
+                    </RadioButton>
+                    <RadioButton Grid.Column="1" FontSize="16" Margin="0,0,3,0"
+                                 HorizontalAlignment="Center" VerticalContentAlignment="Center">
+                        Erase
+                    </RadioButton>
+                </Grid>
+                
+                <Grid Grid.Column="1" Background="WhiteSmoke"
+                      Margin="0,0,1,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="4*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Label Grid.Column="0" FontSize="16"
+                           HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                        OptAngle:
+                    </Label>
+                    <Grid Grid.Column="1" Margin="0,3,3,3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Grid.Column="0" Content="-" FontSize="16"></Button>
+                        <TextBox Grid.Column="1" Text="0" FontSize="16"
+                                 HorizontalContentAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                        <Button Grid.Column="2" Content="+" FontSize="16"></Button>
+                    </Grid>
+                </Grid>
+
+                <Grid Grid.Column="2" Background="WhiteSmoke"
+                      Margin="0,0,1,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0" Content="Clear" x:Name="ClearCurve"
+                            Focusable="False" FontSize="16" Margin="3"></Button>
+
+                    <Button Grid.Column="1" Content="Save" x:Name="SaveCurve"
+                            Focusable="False" FontSize="16" Margin="0 3 3 3"></Button>
+                </Grid>
+
+                <Grid Grid.Column="3" Background="WhiteSmoke"></Grid>
             </Grid>
         </Grid>
 
