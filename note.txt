@@ -1,0 +1,17 @@
+- changing accuracy
+- saving accuracy
+- eraser selection
+- clear curve
+- save curve
+
+
+| draw or erase | accuracy "-" n "+" | clear | save |
+
+accuracy is "blue"
+clear is "red"
+save is "green"
+
+- if draw: can clear or save
+- if change accuracy: can clear, can't draw or erase, save become "blue"
+- if clear: clear curve, set accuracy as default, select draw mode
+- if save: save curve

@@ -16,6 +16,8 @@ using Project_One_Objects;
 
 namespace Project_One;
 
+// better is to use curve as wpf control and raise event when curve is changed
+
 public partial class MainWindow
 {
     string[] _parts = { "First", "Second", "Third" };
@@ -26,10 +28,12 @@ public partial class MainWindow
 
     private CanvasUpdater _canvasUpdater;
     private EventHandler _eventHandler;
+    private TopPanel _topPanel;
     private SidePanel _sidePanel;
 
     private string _filesFolder = "C:\\Coding\\C#\\Project One\\Project One\\Curves\\";
     private WpfCurve _curve;
+    private WpfCurveEraser _curveEraser;
 
     public MainWindow()
     {
@@ -37,6 +41,7 @@ public partial class MainWindow
         
         _partIndex = 0;
         _curve = new WpfCurve();
+        _curveEraser = new WpfCurveEraser();
 
         _cameraArray = new Camera[3];
         _canvasArray = new Canvas[]
@@ -53,15 +58,18 @@ public partial class MainWindow
         }
 
         Dispatcher dispatcher = Dispatcher;
-        _canvasUpdater = new CanvasUpdater(dispatcher, _canvasArray, _cameraArray, _curve);
-        
+        _canvasUpdater = new CanvasUpdater(
+            dispatcher, _canvasArray, _cameraArray, 
+            _curve, _curveEraser);
+
+        _topPanel = new TopPanel(FirstTopPanel, _curve, _curveEraser);
         _sidePanel = new SidePanel(_filesFolder, CurvesList, _curve);
-        
+
         _eventHandler = new EventHandler(
             WindowGrid, CanvasGrid, FirstTopPanel,
-            _canvasUpdater, _sidePanel,
-            _cameraArray, _curve);
-        
+            _canvasUpdater, _topPanel, _sidePanel,
+            _cameraArray, _curve, _curveEraser);
+
         Closing += _eventHandler.WindowClosing;
         WindowGrid.Focus();
 
@@ -104,11 +112,11 @@ public partial class MainWindow
 
     private void DeleteCurve_OnClick(object sender, RoutedEventArgs e)
     {
-        _sidePanel.DeleteCurve(sender, e);
+        _eventHandler.DeleteCurve_OnClick(sender, e);
     }
 
     private void SelectCurve_OnClick(object sender, RoutedEventArgs e)
     {
-        _sidePanel.SelectCurve(sender, e);
+        _eventHandler.SelectCurve_OnClick(sender, e);
     }
 }

@@ -8,8 +8,13 @@ public class Curve
 {
     private List<Vector2> _points;
     private List<Vector2> _tempPoints;
+    private bool _isTempPointsSaved = true;
     private double _optAngle;
-    
+
+    public const double OneRad = Math.PI / 180;
+    public const double ToDeg = 180 / Math.PI;
+    public const double ToRad = Math.PI / 180;
+
     /// <param name="optimizationAngle">1 rad</param>
     public Curve(double optimizationAngle = Math.PI / 180 * 5)
     {
@@ -19,13 +24,40 @@ public class Curve
     }
 
     /// <summary>Adds a point to the curve.</summary>
-    public void AddPoint(Vector2 point) => _points.Add(point);
+    public void AddPoint(Vector2 point)
+    {
+        if (_points.Count > 1)
+        {
+            var angleA = Math.Atan2(_points[^1].Y - _points[^2].Y, _points[^1].X - _points[^2].X);
+            var angleB = Math.Atan2(point.Y - _points[^1].Y, point.X - _points[^1].X);
+            if (Math.Abs(angleB - angleA) > OptAngle)
+            {
+                _points.Add(point);
+            }
+        }
+        else
+        {
+            _points.Add(point);
+        }
+    }
 
     /// <summary>Adds points to the curve.</summary>
     public void AddPoints(List<Vector2> points) => _points.AddRange(points);
 
+    /// <summary>Clear lists of temporary and actual points.</summary>
+    public void Clear()
+    {
+        _points.Clear();
+        _tempPoints.Clear();
+        _isTempPointsSaved = true;
+    }
+
     /// <summary>Save copy of temporary points as actual points.</summary>
-    public void ApplyChanges() => _points = new List<Vector2>(_tempPoints);
+    public void ApplyChanges()
+    {
+        _points = new List<Vector2>(_tempPoints);
+        _isTempPointsSaved = true;
+    }
 
     /// <summary>Load points from file.</summary>
     /// <param name="path">Path to file.</param>
@@ -66,6 +98,7 @@ public class Curve
     public void ApplyAngleToCurve(double optAngle)
     {
         OptAngle = optAngle;
+        _isTempPointsSaved = false;
 
         if (_points.Count < 3) return;
 
@@ -111,7 +144,7 @@ public class Curve
     /// <summary>Actual points of the curve.</summary>
     public List<Vector2> Points
     {
-        get => _points;
+        get => _isTempPointsSaved ? _points : _tempPoints;
         set => _points = value;
     }
 

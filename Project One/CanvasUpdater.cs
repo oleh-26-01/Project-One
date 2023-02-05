@@ -14,12 +14,13 @@ using Project_One_Objects;
 
 namespace Project_One;
 
-internal class CanvasUpdater
+public class CanvasUpdater
 {
-    private Canvas[] _canvasArray;
-    private Camera[] _cameraArray;
-    private WpfCurve _curve;
-    private WpfCrosshair _crosshair;
+    private readonly Canvas[] _canvasArray;
+    private readonly Camera[] _cameraArray;
+    private readonly WpfCurve _curve;
+    private readonly WpfCurveEraser _curveEraser;
+    private readonly WpfCrosshair _crosshair;
     private int _canvasIndex = 0;
 
     private int _tickRate = 90;
@@ -28,15 +29,12 @@ internal class CanvasUpdater
 
     private Thread _thread;
     private bool _threadRunning = true;
-    private Dispatcher _dispatcher;
+    private readonly Dispatcher _dispatcher;
 
-    /// <summary>
-    /// Creates a new CanvasUpdater. Runs in a separate thread.
-    /// </summary>
-    /// <param name="canvasArrayArray"></param>
-    /// <param name="cameraArray"></param>
-    /// <param name="curve"></param>
-    public CanvasUpdater(Dispatcher dispatcher, Canvas[] canvasArrayArray, Camera[] cameraArray, WpfCurve curve)
+    /// <summary>Creates a new CanvasUpdater. Runs in a separate thread.</summary>
+    public CanvasUpdater(
+        Dispatcher dispatcher, Canvas[] canvasArrayArray, Camera[] cameraArray, 
+        WpfCurve curve, WpfCurveEraser curveEraser)
     {
         _dispatcher = dispatcher;
 
@@ -44,6 +42,8 @@ internal class CanvasUpdater
         _cameraArray = cameraArray;
         _curve = curve;
         _curve.DrawOn(_canvasArray[_canvasIndex]);
+        _curveEraser = curveEraser;
+        _curveEraser.DrawOn(_canvasArray[_canvasIndex]);
 
         _crosshair = new WpfCrosshair(new Vector2(0, 0));
         _crosshair.DrawOn(_canvasArray[_canvasIndex]);
@@ -64,6 +64,7 @@ internal class CanvasUpdater
                     case 0:
                         _curve.Update(_cameraArray[0]);
                         _crosshair.Update(_cameraArray[0]);
+                        _curveEraser.Update(_cameraArray[0]);
                         break;
                     case 1:
                         break;
@@ -100,6 +101,9 @@ internal class CanvasUpdater
         }
     }
 
+    /// <summary>The number of times per second the canvas will be updated.</summary>
+    /// <exception cref="ArgumentOutOfRangeException">TickRate must be greater than 0.</exception>
+    /// <remarks>TickRate is not guaranteed to be accurate.</remarks>
     public int TickRate
     {
         get => _tickRate;

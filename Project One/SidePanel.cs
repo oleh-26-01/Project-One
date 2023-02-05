@@ -34,7 +34,7 @@ public class SidePanel
     public void Update()
     {
         CurveViewModels.Clear();
-        var files = System.IO.Directory.GetFiles(FilesPath);
+        var files = Directory.GetFiles(FilesPath);
         foreach (var file in files)
         {
             if (!file.EndsWith(_filesType)) continue;
@@ -50,16 +50,9 @@ public class SidePanel
 
     public void SaveActiveCurve(object sender, RoutedEventArgs e)
     {
-        string curveFileName;
+        var curveFileName = FindFreeCurveName();
         if (_selectedCurve == null)
         {
-            var index = 1;
-            while (true)
-            {
-                curveFileName = FilesPath + "curve" + index.ToString().PadLeft(3, '0') + "." + _filesType;
-                if (!File.Exists(curveFileName)) break;
-                index++;
-            }
             _selectedCurve = new CurveViewModel
             {
                 FileName = curveFileName,
@@ -73,6 +66,33 @@ public class SidePanel
 
         _curve.Save(curveFileName);
         Update();
+    }
+
+    public void SaveNewCurve(object sender, RoutedEventArgs e)
+    {
+        var curveFileName = FindFreeCurveName();
+        _selectedCurve = new CurveViewModel
+        {
+            FileName = curveFileName,
+            PointCount = _curve.Points.Count
+        };
+        
+        _curve.Save(curveFileName);
+        Update();
+    }
+
+    public string FindFreeCurveName()
+    {
+        var index = 1;
+        var curveFileName = "";
+        while (true)
+        {
+            curveFileName = FilesPath + "curve" + index.ToString().PadLeft(3, '0') + "." + _filesType;
+            if (!File.Exists(curveFileName)) break;
+            index++;
+        }
+
+        return curveFileName;
     }
 
     public void SelectCurve(object sender, RoutedEventArgs e)
@@ -101,7 +121,6 @@ public class SidePanel
                 break;
             }
             case MessageBoxResult.No:
-                Console.WriteLine("No");
                 break;
         }
     }

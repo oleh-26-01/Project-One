@@ -37,10 +37,14 @@ public class WpfCurve : Project_One_Objects.Curve
         canvas.Children.Remove(_polyLine);
     }
 
+    public void SetVisibility(bool visible)
+    {
+        _polyLine.Visibility = visible ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden;
+    }
+
     public void Update(Camera camera)
     {
         var points = camera.ConvertOut(Points);
-        if (points.Count < 2) return;
 
         var pointsCollection = _polyLine.Points;
         pointsCollection.Clear();

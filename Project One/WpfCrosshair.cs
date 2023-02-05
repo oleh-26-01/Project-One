@@ -45,6 +45,12 @@ public class WpfCrosshair
         canvas.Children.Remove(_line2);
     }
 
+    public void SetVisibility(bool visible)
+    {
+        _line1.Visibility = visible ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden;
+        _line2.Visibility = visible ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden;
+    }
+
     public void Update(Camera camera)
     {
         var position = camera.ConvertOut(_position);

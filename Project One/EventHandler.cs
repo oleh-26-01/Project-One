@@ -8,15 +8,17 @@ using Project_One_Objects;
 
 namespace Project_One;
 
-internal class EventHandler
+public class EventHandler
 {
     private readonly Grid _windowGrid;
     private readonly Grid _canvasGrid;
     private readonly Grid _firstTopPanelGrid;
     private readonly CanvasUpdater _canvasUpdater;
+    private readonly TopPanel _topPanel;
     private readonly SidePanel _sidePanel;
     private readonly Camera[] _cameraArray;
     private readonly WpfCurve _curve;
+    private readonly WpfCurveEraser _curveEraser;
     public int _canvasIndex = 0;
 
     private bool _isCanvasLeftMouseDown;
@@ -27,22 +29,25 @@ internal class EventHandler
     private bool _isArrowRightPressed;
 
     public Vector2 MousePosition = new(-1, -1);
-    private Vector2 _cameraMoveDirection = new();
+    public Vector2 CameraRelativeMousePosition = new(-1, -1);
+    private Vector2 _cameraMoveDirection;
 
     public EventHandler(
         Grid windowGrid, Grid canvasGrid, Grid firstFirstTopPanelGrid,
-        CanvasUpdater canvasUpdater, SidePanel sidePanel, 
-        Camera[] cameraArray, WpfCurve curve)
+        CanvasUpdater canvasUpdater, TopPanel topPanel, SidePanel sidePanel,
+        Camera[] cameraArray, WpfCurve curve, WpfCurveEraser curveEraser)
     {
         _windowGrid = windowGrid;
         _canvasGrid = canvasGrid;
         _firstTopPanelGrid = firstFirstTopPanelGrid;
 
         _canvasUpdater = canvasUpdater;
+        _topPanel = topPanel;
         _sidePanel = sidePanel;
 
         _cameraArray = cameraArray;
         _curve = curve;
+        _curveEraser = curveEraser;
 
         _windowGrid.MouseMove += MouseMove;
         _windowGrid.MouseWheel += MouseWheel;
@@ -54,10 +59,22 @@ internal class EventHandler
         _windowGrid.PreviewKeyDown += WindowGridKeyDown;
         _windowGrid.PreviewKeyUp += WindowGridKeyUp;
 
-        if (_firstTopPanelGrid.FindName("SaveCurve") is Button saveCurveButton)
+        _topPanel.NewCurveButton.Click += (object sender, RoutedEventArgs e) =>
         {
-            saveCurveButton.Click += _sidePanel.SaveActiveCurve;
-        }
+            _topPanel.ClearActiveCurve(sender, e);
+            _topPanel.SaveCurveOptAngle(sender, e);
+            _sidePanel.SaveNewCurve(sender, e);
+        };
+        _topPanel.SaveCurveButton.Click += (object sender, RoutedEventArgs e) =>
+        {
+            _topPanel.SaveCurveOptAngle(sender, e);
+            _sidePanel.SaveActiveCurve(sender, e);
+        };
+        _topPanel.ClearCurveButton.Click += (object sender, RoutedEventArgs e) =>
+        {
+            _topPanel.ClearActiveCurve(sender, e);
+            _topPanel.SaveCurveOptAngle(sender, e);
+        };
     }
 
     public void WindowClosing(object? sender, System.ComponentModel.CancelEventArgs e)
@@ -91,7 +108,17 @@ internal class EventHandler
         {
             _cameraArray[_canvasIndex].ZoomOut(0.2f);
         }
+        else if (e.Key is Key.Q or Key.Escape)
+        {
+            Exit();
+        }
         UpdateCamera();
+    }
+
+    private void Exit()
+    {
+        _canvasUpdater.StopThread();
+        Application.Current.Shutdown();
     }
 
     private void WindowGridKeyUp(object sender, KeyEventArgs e)
@@ -137,14 +164,38 @@ internal class EventHandler
         var newMousePosition = new Vector2((float)position.X, (float)position.Y);
         if (newMousePosition == MousePosition) return;
 
-        if (_isCanvasLeftMouseDown && _canvasIndex == 0)
+        CameraRelativeMousePosition = _cameraArray[_canvasIndex].ConvertIn(newMousePosition);
+
+        switch (_canvasIndex)
         {
-            _curve.AddPoint(_cameraArray[0].ConvertIn(newMousePosition));
+            case 0:
+                _curveEraser.MoveToNearPoint(_curve.Points, CameraRelativeMousePosition);
+                if (_isCanvasLeftMouseDown)
+                {
+                    switch (_topPanel.OnCurveAction)
+                    {
+                        case "Draw":
+                            _curve.AddPoint(CameraRelativeMousePosition);
+                            break;
+                        case "Erase":
+                            _curveEraser.ErasePoints(_curve.Points, CameraRelativeMousePosition, _cameraArray[0].Zoom);
+                            break;
+                    }
+                    
+                    _topPanel.Update();
+                }
+                else if (_isCanvasRightMouseDown)
+                {
+                    _cameraArray[_canvasIndex].Move((MousePosition - newMousePosition) / _cameraArray[0].Zoom);
+                }
+                break;
+
+            case 1:
+                break;
+            case 2:
+                break;
         }
-        else if (_isCanvasRightMouseDown)
-        {
-            _cameraArray[_canvasIndex].Move((MousePosition - newMousePosition) / _cameraArray[_canvasIndex].Zoom);
-        }
+
         MousePosition = newMousePosition;
     }
 
@@ -170,8 +221,11 @@ internal class EventHandler
                 _isCanvasLeftMouseDown = e.ButtonState == MouseButtonState.Pressed;
                 if (!_isCanvasLeftMouseDown && _canvasIndex == 0)
                 {
-                    _curve.ApplyAngleToCurve(_curve.OptAngle);
-                    _curve.ApplyChanges();
+                        //_curve.ApplyAngleToCurve(_curve.OptAngle);
+                        //_curve.ApplyChanges();
+                        _curveEraser.EraseNearestPoint(_curve.Points);
+                        _curveEraser.MoveToNearPoint(_curve.Points, CameraRelativeMousePosition);
+                        _topPanel.Update();
                 }
 
                 break;
@@ -211,4 +265,15 @@ internal class EventHandler
         }
     }
 
+    public void DeleteCurve_OnClick(object sender, RoutedEventArgs routedEventArgs)
+    {
+        _sidePanel.DeleteCurve(sender, routedEventArgs);
+    }
+
+    public void SelectCurve_OnClick(object sender, RoutedEventArgs routedEventArgs)
+    {
+        _sidePanel.SelectCurve(sender, routedEventArgs);
+        _topPanel.Update();
+        _topPanel.SaveCurveOptAngle(sender, routedEventArgs);
+    }
 }
