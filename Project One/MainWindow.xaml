@@ -9,7 +9,7 @@
     <Window.Resources>
         <DataTemplate x:Key="CurveListItemTemplate" 
                       DataType="{x:Type local:CurveViewModel}">
-            <Border BorderThickness="1" BorderBrush="Black">
+            <Border BorderThickness="0 0 0 1" BorderBrush="Black">
                 <Grid ShowGridLines="False" Background="LightGray" Margin="0 0 0 1">
                     <Grid.RowDefinitions>
                         <RowDefinition/>
@@ -24,12 +24,12 @@
                                FontSize="16" Margin="4 2 2 2"></TextBlock>
                     <TextBlock Grid.Column="0" Grid.Row="1" Text="{Binding DisplayPointCount}"
                                FontSize="16" Margin="4 2 2 2"></TextBlock>
-                    <Button Grid.Column="1" Grid.Row="0" Content="Select" Focusable="False"
-                            Click="SelectCurve_OnClick" FontSize="16" Margin="1 1 0 1"
-                            Foreground="#CC9900"></Button>
-                    <Button Grid.Column="1" Grid.Row="1" Content="Delete" Focusable="False"
-                            Click="DeleteCurve_OnClick" FontSize="16" Margin="1"
-                            Foreground="#CC0000">
+                    <Button Grid.Column="1" Grid.Row="0" Focusable="False" Click="SelectCurve_OnClick"
+                            Foreground="#CC9900" FontSize="16" FontWeight="SemiBold"
+                            Content="Select" Margin="1 1 0 1"></Button>
+                    <Button Grid.Column="1" Grid.Row="1" Focusable="False" Click="DeleteCurve_OnClick" 
+                            Foreground="#CC0000" FontSize="16" FontWeight="SemiBold"
+                            Content="Delete" Margin="1">
                     </Button>
                 </Grid>
             </Border>
@@ -51,15 +51,12 @@
             <Grid x:Name="FirstTopPanel" ShowGridLines="False"
                   Background="DarkSlateGray">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="4*" MinWidth="120"/>
-                    <ColumnDefinition Width="8*" MinWidth="240"/>
-                    <ColumnDefinition Width="5*" MinWidth="150"/>
-                    <ColumnDefinition Width="16*"/>
+                    <ColumnDefinition Width="2*" MinWidth="130"/>
+                    <ColumnDefinition Width="3.4*" MinWidth="195"/>
+                    <ColumnDefinition Width="1.4*" MinWidth="105"/>
+                    <ColumnDefinition Width="3*" MinWidth="195"/>
+                    <ColumnDefinition Width="3.2*"/>
                 </Grid.ColumnDefinitions>
-
-                <Grid.RowDefinitions>
-                    <RowDefinition MinHeight="33"/>
-                </Grid.RowDefinitions>
                 
                 <Grid Grid.Column="0" Background="WhiteSmoke"
                       Margin="0,0,1,0">
@@ -68,13 +65,14 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
 
-                    <RadioButton Grid.Column="0" FontSize="16" Margin="3,0,3,0"
+                    <RadioButton Grid.Column="0" x:Name="DrawCurve" FontSize="16" Margin="3,0,3,0"
                                  HorizontalAlignment="Center" VerticalContentAlignment="Center"
-                                 IsChecked="True">
+                                 IsChecked="True" Focusable="False">
                         Draw
                     </RadioButton>
-                    <RadioButton Grid.Column="1" FontSize="16" Margin="0,0,3,0"
-                                 HorizontalAlignment="Center" VerticalContentAlignment="Center">
+                    <RadioButton Grid.Column="1" x:Name="EraseCurve" FontSize="16" Margin="0,0,3,0"
+                                 HorizontalAlignment="Center" VerticalContentAlignment="Center"
+                                 Focusable="False">
                         Erase
                     </RadioButton>
                 </Grid>
@@ -83,10 +81,10 @@
                       Margin="0,0,1,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="3*"/>
-                        <ColumnDefinition Width="4*"/>
+                        <ColumnDefinition Width="5*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Label Grid.Column="0" FontSize="16"
+                    <Label Grid.Column="0" FontSize="16" x:Name="CurveOptAngleLabel"
                            HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
                         OptAngle:
                     </Label>
@@ -95,30 +93,45 @@
                             <ColumnDefinition Width="1*"/>
                             <ColumnDefinition Width="2*"/>
                             <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
                         </Grid.ColumnDefinitions>
 
-                        <Button Grid.Column="0" Content="-" FontSize="16"></Button>
-                        <TextBox Grid.Column="1" Text="0" FontSize="16"
+                        <Button Grid.Column="0" x:Name="DecreaseTextBox" Content="-" FontSize="16" Focusable="False"></Button>
+                        <TextBox Grid.Column="1" x:Name="CurveOptAngle" Text="0" FontSize="16"
                                  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"></TextBox>
-                        <Button Grid.Column="2" Content="+" FontSize="16"></Button>
+                        <Button Grid.Column="2" x:Name="IncreaseTextBox" Content="+" FontSize="16" Focusable="False"></Button>
+                        <Button Grid.Column="3" x:Name="ConfirmTextBox" Content="✓" Visibility="Visible"
+                                FontSize="16" FontWeight="Bold" Focusable="False" Foreground="Black"
+                                Margin="3 0 0 0"></Button>
                     </Grid>
                 </Grid>
 
-                <Grid Grid.Column="2" Background="WhiteSmoke"
+                <Label Grid.Column="2" Background="WhiteSmoke"
+                       FontSize="16" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                       Margin="0,0,1,0">Points: 0</Label>
+
+                <Grid Grid.Column="3" Background="WhiteSmoke"
                       Margin="0,0,1,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
                         <ColumnDefinition/>
+                        <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
 
-                    <Button Grid.Column="0" Content="Clear" x:Name="ClearCurve"
-                            Focusable="False" FontSize="16" Margin="3"></Button>
+                    <Button Grid.Column="0" Content="New" x:Name="NewCurve" Focusable="False" 
+                            Foreground="#CC9900" FontSize="16" FontWeight="SemiBold"
+                            Margin="3"></Button>
 
-                    <Button Grid.Column="1" Content="Save" x:Name="SaveCurve"
-                            Focusable="False" FontSize="16" Margin="0 3 3 3"></Button>
+                    <Button Grid.Column="1" Content="Save" x:Name="SaveCurve"  Focusable="False"
+                            Foreground="#339900" FontSize="16" FontWeight="SemiBold"
+                            Margin="0 3 3 3"></Button>
+
+                    <Button Grid.Column="2" Content="Clear" x:Name="ClearCurve" Focusable="False" 
+                            Foreground="#CC0000" FontSize="16" FontWeight="SemiBold"
+                            Margin="0 3 3 3"></Button>
                 </Grid>
 
-                <Grid Grid.Column="3" Background="WhiteSmoke"></Grid>
+                <Grid Grid.Column="4" Background="WhiteSmoke"></Grid>
             </Grid>
         </Grid>
 
@@ -159,7 +172,7 @@
         </Grid>
 
         <Grid Grid.Column="1" Grid.Row="1" x:Name="SidePanel" Background="WhiteSmoke">
-            <ItemsControl x:Name="CurvesList" Focusable="False">
+            <ItemsControl  x:Name="CurvesList" Focusable="False">
                 <ItemsControl.ItemTemplate>
                     <StaticResource ResourceKey="CurveListItemTemplate"></StaticResource>
                 </ItemsControl.ItemTemplate>
