@@ -1,0 +1,95 @@
+﻿<UserControl x:Class="Project_One.FirstTopPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Project_One"
+             mc:Ignorable="d" 
+             d:DesignHeight="45" d:DesignWidth="1000">
+        <Grid ShowGridLines="False"
+              Background="DarkSlateGray">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" MinWidth="130"/>
+                <ColumnDefinition Width="3.4*" MinWidth="195"/>
+                <ColumnDefinition Width="1.4*" MinWidth="105"/>
+                <ColumnDefinition Width="3*" MinWidth="195"/>
+                <ColumnDefinition Width="3.2*"/>
+            </Grid.ColumnDefinitions>
+            
+            <Grid Grid.Column="0" Background="WhiteSmoke"
+                  Margin="0,0,1,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <RadioButton Grid.Column="0" x:Name="DrawCurve" FontSize="16" Margin="3,0,3,0"
+                             HorizontalAlignment="Center" VerticalContentAlignment="Center"
+                             IsChecked="True" Focusable="False">
+                    Draw
+                </RadioButton>
+                <RadioButton Grid.Column="1" x:Name="EraseCurve" FontSize="16" Margin="0,0,3,0"
+                             HorizontalAlignment="Center" VerticalContentAlignment="Center"
+                             Focusable="False">
+                    Erase
+                </RadioButton>
+            </Grid>
+            
+            <Grid Grid.Column="1" Background="WhiteSmoke"
+                  Margin="0,0,1,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="5*"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Column="0" FontSize="16" x:Name="CurveOptAngleLabel"
+                       HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                    OptAngle:
+                </Label>
+                <Grid Grid.Column="1" Margin="0,3,3,3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0" x:Name="DecreaseTextBox" Content="-" FontSize="16" Focusable="False"></Button>
+                    <TextBox Grid.Column="1" x:Name="CurveOptAngle" Text="0" FontSize="16"
+                             HorizontalContentAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                    <Button Grid.Column="2" x:Name="IncreaseTextBox" Content="+" FontSize="16" Focusable="False"></Button>
+                    <Button Grid.Column="3" x:Name="ConfirmTextBox" Content="✓" Visibility="Visible"
+                            FontSize="16" FontWeight="Bold" Focusable="False" Foreground="Black"
+                            Margin="3 0 0 0"></Button>
+                </Grid>
+            </Grid>
+
+            <Label Grid.Column="2" x:Name="CurvePointsLabel" Background="WhiteSmoke"
+                   FontSize="16" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                   Margin="0,0,1,0">Points: 0</Label>
+
+            <Grid Grid.Column="3" Background="WhiteSmoke"
+                  Margin="0,0,1,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0" Content="New" x:Name="NewCurve" Focusable="False" 
+                        Foreground="#CC9900" FontSize="16" FontWeight="SemiBold"
+                        Margin="3"></Button>
+
+                <Button Grid.Column="1" Content="Save" x:Name="SaveCurve"  Focusable="False"
+                        Foreground="#339900" FontSize="16" FontWeight="SemiBold"
+                        Margin="0 3 3 3"></Button>
+
+                <Button Grid.Column="2" Content="Clear" x:Name="ClearCurve" Focusable="False" 
+                        Foreground="#CC0000" FontSize="16" FontWeight="SemiBold"
+                        Margin="0 3 3 3"></Button>
+            </Grid>
+
+            <Grid Grid.Column="4" Background="WhiteSmoke"></Grid>
+    </Grid>
+
+</UserControl>

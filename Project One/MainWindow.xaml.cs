@@ -28,7 +28,7 @@ public partial class MainWindow
 
     private CanvasUpdater _canvasUpdater;
     private EventHandler _eventHandler;
-    private TopPanel _topPanel;
+    private FirstTopPanel _firstTopPanel;
     private SidePanel _sidePanel;
 
     private string _filesFolder = "C:\\Coding\\C#\\Project One\\Project One\\Curves\\";
@@ -62,16 +62,17 @@ public partial class MainWindow
             dispatcher, _canvasArray, _cameraArray, 
             _curve, _curveEraser);
 
-        _topPanel = new TopPanel(FirstTopPanel, _curve, _curveEraser);
+        _firstTopPanel = FirstTopPanel;
+        _firstTopPanel.Init(_curve, _curveEraser);
         _sidePanel = new SidePanel(_filesFolder, CurvesList, _curve);
 
         _eventHandler = new EventHandler(
-            WindowGrid, CanvasGrid, FirstTopPanel,
-            _canvasUpdater, _topPanel, _sidePanel,
+            this,
+            WindowGrid, CanvasGrid,
+            _canvasUpdater, _firstTopPanel, _sidePanel,
             _cameraArray, _curve, _curveEraser);
 
         Closing += _eventHandler.WindowClosing;
-        WindowGrid.Focus();
 
         //Loaded += OnLoaded;
     }

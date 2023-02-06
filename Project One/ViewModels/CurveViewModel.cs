@@ -12,4 +12,5 @@ public class CurveViewModel
     public string DisplayFileName => "name: " + FileName.Split("\\").Last();
     public int PointCount { get; set; }
     public string DisplayPointCount => "points: " + PointCount.ToString();
+    public bool IsSelected { get; set; }
 }

@@ -18,6 +18,7 @@ public class SidePanel
     private readonly ItemsControl _curvesList;
     private readonly WpfCurve _curve;
     private CurveViewModel? _selectedCurve;
+    private string _lastCurveFileName = "";
 
     public SidePanel(string filesPath, ItemsControl curvesList, WpfCurve curve)
     {
@@ -42,41 +43,36 @@ public class SidePanel
             var curveViewModel = new CurveViewModel
             {
                 FileName = file,
-                PointCount = curve.Points.Count
+                PointCount = curve.Points.Count,
+                IsSelected = false
             };
+
+            if (_selectedCurve != null)
+            {
+                if (_selectedCurve.FileName == file)
+                    curveViewModel = _selectedCurve;
+            }
+            
             CurveViewModels.Add(curveViewModel);
         }
     }
 
-    public void SaveActiveCurve(object sender, RoutedEventArgs e)
+    public void SaveCurve(object sender, RoutedEventArgs e, string type)
     {
         var curveFileName = FindFreeCurveName();
-        if (_selectedCurve == null)
+        if (_selectedCurve != null && type == "Active")
         {
-            _selectedCurve = new CurveViewModel
-            {
-                FileName = curveFileName,
-                PointCount = _curve.Points.Count
-            };
-        }
-        else
-        {
+            _selectedCurve.IsSelected = false;
             curveFileName = _selectedCurve.FileName;
         }
 
-        _curve.Save(curveFileName);
-        Update();
-    }
-
-    public void SaveNewCurve(object sender, RoutedEventArgs e)
-    {
-        var curveFileName = FindFreeCurveName();
         _selectedCurve = new CurveViewModel
         {
             FileName = curveFileName,
-            PointCount = _curve.Points.Count
+            PointCount = _curve.Points.Count,
+            IsSelected = true
         };
-        
+
         _curve.Save(curveFileName);
         Update();
     }
@@ -97,11 +93,15 @@ public class SidePanel
 
     public void SelectCurve(object sender, RoutedEventArgs e)
     {
-        if (((Button)sender).DataContext is CurveViewModel curveViewModel)
+        if (((Button)sender).DataContext is not CurveViewModel curveViewModel) return;
+        
+        _curve.Load(curveViewModel.FileName);
+        if (_selectedCurve != null)
         {
-            _curve.Load(curveViewModel.FileName);
-            _selectedCurve = curveViewModel;
+            _selectedCurve.IsSelected = false;
         }
+        _selectedCurve = curveViewModel;
+        curveViewModel.IsSelected = true;
     }
 
     public void DeleteCurve(object sender, RoutedEventArgs e)

@@ -15,3 +15,7 @@ save is "green"
 - if change accuracy: can clear, can't draw or erase, save become "blue"
 - if clear: clear curve, set accuracy as default, select draw mode
 - if save: save curve
+
+винести стрічки в окремий статичний клас
+use wrap panel
+use KeyBoard.IsKey... to check if key is pressed
