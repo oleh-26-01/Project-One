@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Shapes;
 using Project_One_Objects;
@@ -14,9 +12,9 @@ public class WpfCrosshair
 {
     private readonly Line _line1;
     private readonly Line _line2;
-    private int _size;
-    private Vector2 _position;
+    private readonly Vector2 _position;
     private Vector2[] _relativePositions;
+    private int _size;
 
     public WpfCrosshair(Vector2 position, int size = 10)
     {
@@ -27,16 +25,27 @@ public class WpfCrosshair
         _position = position;
     }
 
+    public int Size
+    {
+        get => _size;
+        set
+        {
+            if (value < 1) throw new ArgumentOutOfRangeException(nameof(value), "Size must be greater than 0.");
+            _size = value;
+            _relativePositions = new[]
+            {
+                new(-value, 0),
+                new Vector2(value, 0),
+                new Vector2(0, -value),
+                new Vector2(0, value)
+            };
+        }
+    }
+
     public void DrawOn(Canvas canvas)
     {
-        if (!canvas.Children.Contains(_line1))
-        {
-            canvas.Children.Add(_line1);
-        }
-        if (!canvas.Children.Contains(_line2))
-        {
-            canvas.Children.Add(_line2);
-        }
+        if (!canvas.Children.Contains(_line1)) canvas.Children.Add(_line1);
+        if (!canvas.Children.Contains(_line2)) canvas.Children.Add(_line2);
     }
 
     public void RemoveFrom(Canvas canvas)
@@ -47,8 +56,8 @@ public class WpfCrosshair
 
     public void SetVisibility(bool visible)
     {
-        _line1.Visibility = visible ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden;
-        _line2.Visibility = visible ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden;
+        _line1.Visibility = visible ? Visibility.Visible : Visibility.Hidden;
+        _line2.Visibility = visible ? Visibility.Visible : Visibility.Hidden;
     }
 
     public void Update(Camera camera)
@@ -63,25 +72,5 @@ public class WpfCrosshair
         _line2.Y1 = points[2].Y;
         _line2.X2 = points[3].X;
         _line2.Y2 = points[3].Y;
-    }
-
-    public int Size
-    {
-        get => _size;
-        set
-        {
-            if (value < 1)
-            {
-                throw new ArgumentOutOfRangeException(nameof(value), "Size must be greater than 0.");
-            }
-            _size = value;
-            _relativePositions = new Vector2[]
-            {
-                new Vector2(-value, 0),
-                new Vector2(value, 0),
-                new Vector2(0, -value),
-                new Vector2(0, value)
-            };
-        }
     }
 }

@@ -1,17 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Markup;
-using System.Windows.Shapes;
-using System.Windows.Threading;
-using CommandLine.Text;
-using Perfolizer.Mathematics.Randomization;
 using Project_One_Objects;
 
 namespace Project_One;
@@ -20,28 +10,28 @@ namespace Project_One;
 
 public partial class MainWindow
 {
-    string[] _parts = { "First", "Second", "Third" };
-    int _partIndex = 0;
+    private readonly Camera[] _cameraArray;
 
-    private Canvas[] _canvasArray;
-    private Camera[] _cameraArray;
+    private readonly Canvas[] _canvasArray;
 
-    private CanvasUpdater _canvasUpdater;
-    private EventsHandler _eventHandler;
-    private string _filesPath = "C:\\Coding\\C#\\Project One\\Project One\\Curves\\";
-    private WpfCurve _curve;
-    private WpfCurveEraser _curveEraser;
+    private readonly CanvasUpdater _canvasUpdater;
+    private readonly WpfCurve _curve;
+    private readonly WpfCurveEraser _curveEraser;
+    private readonly EventsHandler _eventHandler;
+    private readonly string _filesPath = "C:\\Coding\\C#\\Project One\\Project One\\Curves\\";
+    private int _partIndex;
+    private readonly string[] _parts = { "First", "Second", "Third" };
 
     public MainWindow()
     {
         InitializeComponent();
-        
+
         _partIndex = 0;
         _curve = new WpfCurve();
         _curveEraser = new WpfCurveEraser();
 
         _cameraArray = new Camera[3];
-        _canvasArray = new Canvas[]
+        _canvasArray = new[]
         {
             FirstCanvas,
             SecondCanvas,
@@ -49,14 +39,11 @@ public partial class MainWindow
         };
 
         var cameraSize = new Vector2((float)CanvasGrid.ActualWidth, (float)CanvasGrid.ActualHeight);
-        for (var i = 0; i < 3; i++)
-        {
-            _cameraArray[i] = new Camera(cameraSize, new Vector2(0, 0));
-        }
+        for (var i = 0; i < 3; i++) _cameraArray[i] = new Camera(cameraSize, new Vector2(0, 0));
 
         var dispatcher = Dispatcher;
         _canvasUpdater = new CanvasUpdater(
-            dispatcher, _canvasArray, _cameraArray, 
+            dispatcher, _canvasArray, _cameraArray,
             _curve, _curveEraser);
 
         FirstTopPanel.Init(FirstSidePanel, _curve, _curveEraser, this);
@@ -82,13 +69,9 @@ public partial class MainWindow
     {
         _canvasArray[_partIndex].Visibility = Visibility.Hidden;
         if ((Button)sender == NextPartControl)
-        {
             _partIndex++;
-        }
-        else if ((Button)sender == PrevPartControl)
-        {
+        else if ((Button)sender == PrevPartControl) 
             _partIndex--;
-        }
 
         _partIndex += _parts.Length;
         _partIndex %= _parts.Length;

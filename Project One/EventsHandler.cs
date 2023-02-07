@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
+using System.ComponentModel;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,31 +11,31 @@ namespace Project_One;
 
 public class EventsHandler
 {
-    private readonly Grid _windowGrid;
-    private readonly Grid _canvasGrid;
-    private readonly Grid _firstTopPanelGrid;
-    private readonly CanvasUpdater _canvasUpdater;
-    private readonly FirstTopPanel _firstTopPanel;
-    private readonly FirstSidePanel _firstSidePanel;
     private readonly Camera[] _cameraArray;
+    private readonly Grid _canvasGrid;
+    private readonly CanvasUpdater _canvasUpdater;
     private readonly WpfCurve _curve;
     private readonly WpfCurveEraser _curveEraser;
-    public int _canvasIndex = 0;
-
-    private bool _isCanvasLeftMouseDown;
-    private bool _isCanvasRightMouseDown;
-    private bool _isArrowUpPressed;
+    private readonly FirstSidePanel _firstSidePanel;
+    private readonly FirstTopPanel _firstTopPanel;
+    private readonly Grid _firstTopPanelGrid;
+    private readonly Grid _windowGrid;
+    private Vector2 _cameraMoveDirection;
+    public int _canvasIndex;
     private bool _isArrowDownPressed;
     private bool _isArrowLeftPressed;
     private bool _isArrowRightPressed;
+    private bool _isArrowUpPressed;
+
+    private bool _isCanvasLeftMouseDown;
+    private bool _isCanvasRightMouseDown;
+    public Vector2 CameraRelativeMousePosition = new(-1, -1);
 
     public Vector2 MousePosition = new(-1, -1);
-    public Vector2 CameraRelativeMousePosition = new(-1, -1);
-    private Vector2 _cameraMoveDirection;
 
     public EventsHandler(
         UIElement window,
-        Grid windowGrid, Grid canvasGrid, 
+        Grid windowGrid, Grid canvasGrid,
         CanvasUpdater canvasUpdater, FirstTopPanel firstTopPanel, FirstSidePanel firstSidePanel,
         Camera[] cameraArray, WpfCurve curve, WpfCurveEraser curveEraser)
     {
@@ -60,7 +60,20 @@ public class EventsHandler
         window.AddHandler(Keyboard.KeyUpEvent, new KeyEventHandler(WindowGridKeyUp), true);
     }
 
-    public void WindowClosing(object? sender, System.ComponentModel.CancelEventArgs e)
+    public int CanvasIndex
+    {
+        get => _canvasIndex;
+        set
+        {
+            if (value >= _cameraArray.Length || value < 0)
+                throw new ArgumentOutOfRangeException(nameof(value),
+                    "CanvasIndex must be less than the number of canvases.");
+
+            _canvasIndex = value;
+        }
+    }
+
+    public void WindowClosing(object? sender, CancelEventArgs e)
     {
         _canvasUpdater.StopThread();
     }
@@ -74,54 +87,30 @@ public class EventsHandler
     private void WindowGridKeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.Up)
-        {
             _isArrowUpPressed = true;
-        }
         else if (e.Key == Key.Down)
-        {
             _isArrowDownPressed = true;
-        }
         else if (e.Key == Key.Left)
-        {
             _isArrowLeftPressed = true;
-        }
         else if (e.Key == Key.Right)
-        {
             _isArrowRightPressed = true;
-        }
         else if (e.Key == Key.Add)
-        {
             _cameraArray[_canvasIndex].ZoomIn(0.2f);
-        }
         else if (e.Key == Key.Subtract)
-        {
             _cameraArray[_canvasIndex].ZoomOut(0.2f);
-        }
-        else if (e.Key is Key.Q or Key.Escape)
-        {
-            Exit();
-        }
+        else if (e.Key is Key.Q or Key.Escape) Exit();
         UpdateCamera();
     }
 
     private void WindowGridKeyUp(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.Up)
-        {
             _isArrowUpPressed = false;
-        }
         else if (e.Key == Key.Down)
-        {
             _isArrowDownPressed = false;
-        }
         else if (e.Key == Key.Left)
-        {
             _isArrowLeftPressed = false;
-        }
-        else if (e.Key == Key.Right)
-        {
-            _isArrowRightPressed = false;
-        }
+        else if (e.Key == Key.Right) _isArrowRightPressed = false;
         //UpdateCamera();
     }
 
@@ -133,12 +122,10 @@ public class EventsHandler
         _cameraMoveDirection.Y += _isArrowDownPressed ? 1 : 0;
         _cameraMoveDirection.Y -= _isArrowUpPressed ? 1 : 0;
         if (_cameraMoveDirection.Length() > 0)
-        {
             _cameraArray[_canvasIndex].MoveSync(
                 Vector2.Normalize(_cameraMoveDirection),
                 _canvasUpdater.TargetRefreshTime,
                 1000);
-        }
     }
 
     private void MouseMove(object sender, MouseEventArgs e)
@@ -164,13 +151,14 @@ public class EventsHandler
                             _curveEraser.ErasePoints(_curve.Points, CameraRelativeMousePosition, _cameraArray[0].Zoom);
                             break;
                     }
-                    
+
                     _firstTopPanel.Update();
                 }
                 else if (_isCanvasRightMouseDown)
                 {
                     _cameraArray[_canvasIndex].Move((MousePosition - newMousePosition) / _cameraArray[0].Zoom);
                 }
+
                 break;
 
             case 1:
@@ -188,9 +176,7 @@ public class EventsHandler
         var position = e.GetPosition(_canvasGrid);
         if (position.X < 0 || position.X > _canvasGrid.ActualWidth ||
             position.Y < 0 || position.Y > _canvasGrid.ActualHeight)
-        {
             return;
-        }
         switch (e.Delta)
         {
             case > 0:
@@ -216,16 +202,15 @@ public class EventsHandler
                     _curveEraser.MoveToNearPoint(_curve.Points, CameraRelativeMousePosition);
                     _firstTopPanel.Update();
                 }
+
                 break;
             }
             case MouseButton.Right:
                 _isCanvasRightMouseDown = e.ButtonState == MouseButtonState.Pressed;
                 break;
         }
-        if (e.ButtonState == MouseButtonState.Released)
-        {
-            Mouse.Capture(null);
-        }
+
+        if (e.ButtonState == MouseButtonState.Released) Mouse.Capture(null);
     }
 
     private void CanvasSizeChanged(object sender, SizeChangedEventArgs e)
@@ -236,20 +221,6 @@ public class EventsHandler
         {
             camera.Move(camera.Center - newCenter);
             camera.Center = newCenter;
-        }
-    }
-
-    public int CanvasIndex
-    {
-        get => _canvasIndex;
-        set
-        {
-            if (value >= _cameraArray.Length || value < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(value), "CanvasIndex must be less than the number of canvases.");
-            }
-
-            _canvasIndex = value;
         }
     }
 }

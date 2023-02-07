@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Media;
 
@@ -13,16 +10,13 @@ internal class BoolToColorConverter : IValueConverter
     public Brush SelectedBrush { get; set; }
     public Brush NotSelectedBrush { get; set; }
 
-    public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        if (value is bool)
-        {
-            return (bool)value ? SelectedBrush : NotSelectedBrush;
-        }
+        if (value is bool) return (bool)value ? SelectedBrush : NotSelectedBrush;
         return NotSelectedBrush;
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
         throw new NotImplementedException();
     }

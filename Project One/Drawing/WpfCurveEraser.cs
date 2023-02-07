@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Shapes;
 using Project_One_Objects;
@@ -14,24 +12,36 @@ public class WpfCurveEraser
 {
     private readonly Ellipse _ellipse;
     private int _radius;
-    private Vector2 _position;
 
-    public WpfCurveEraser(Vector2 position = new Vector2(), int radius = 10)
+    public WpfCurveEraser(Vector2 position = new(), int radius = 10)
     {
         _ellipse = WpfObjects.EraserEllipse();
         Radius = radius;
-        _position = position;
+        Position = position;
     }
+
+    public int Radius
+    {
+        get => _radius;
+        set
+        {
+            _radius = value;
+            _ellipse.Width = _radius * 2;
+            _ellipse.Height = _radius * 2;
+        }
+    }
+
+    public Vector2 Position { get; private set; }
 
     public void MoveToNearPoint(List<Vector2> points, Vector2 mousePosition)
     {
         if (points.Count == 0) return;
-        _position = points.MinBy(p => Vector2.Distance(p, mousePosition));
+        Position = points.MinBy(p => Vector2.Distance(p, mousePosition));
     }
 
     public void EraseNearestPoint(List<Vector2> points)
     {
-        var index = points.IndexOf(_position);
+        var index = points.IndexOf(Position);
         if (index == -1) return;
         points.RemoveAt(index);
     }
@@ -47,10 +57,7 @@ public class WpfCurveEraser
 
     public void DrawOn(Canvas canvas)
     {
-        if (!canvas.Children.Contains(_ellipse))
-        {
-            canvas.Children.Add(_ellipse);
-        }
+        if (!canvas.Children.Contains(_ellipse)) canvas.Children.Add(_ellipse);
     }
 
     public void RemoveFrom(Canvas canvas)
@@ -60,26 +67,13 @@ public class WpfCurveEraser
 
     public void SetVisibility(bool visible)
     {
-        _ellipse.Visibility = visible ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden;
+        _ellipse.Visibility = visible ? Visibility.Visible : Visibility.Hidden;
     }
 
     public void Update(Camera camera)
     {
-        var position = camera.ConvertOut(_position);
+        var position = camera.ConvertOut(Position);
         Canvas.SetLeft(_ellipse, position.X - _radius);
         Canvas.SetTop(_ellipse, position.Y - _radius);
     }
-
-    public int Radius
-    {
-        get => _radius;
-        set
-        {
-            _radius = value;
-            _ellipse.Width = _radius * 2;
-            _ellipse.Height = _radius * 2;
-        }
-    }
-
-    public Vector2 Position => _position;
 }

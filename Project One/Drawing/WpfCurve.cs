@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using System.Windows.Shapes;
 using Project_One_Objects;
 
@@ -18,18 +12,12 @@ public class WpfCurve : Curve
     public WpfCurve(string filePath = "")
     {
         _polyLine = WpfObjects.Polyline();
-        if (filePath != "")
-        {
-            Load(filePath);
-        }
+        if (filePath != "") Load(filePath);
     }
 
     public void DrawOn(Canvas canvas)
     {
-        if (!canvas.Children.Contains(_polyLine))
-        {
-            canvas.Children.Add(_polyLine);
-        }
+        if (!canvas.Children.Contains(_polyLine)) canvas.Children.Add(_polyLine);
     }
 
     public void RemoveFrom(Canvas canvas)
@@ -39,7 +27,7 @@ public class WpfCurve : Curve
 
     public void SetVisibility(bool visible)
     {
-        _polyLine.Visibility = visible ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden;
+        _polyLine.Visibility = visible ? Visibility.Visible : Visibility.Hidden;
     }
 
     public void Update(Camera camera)
@@ -48,9 +36,6 @@ public class WpfCurve : Curve
 
         var pointsCollection = _polyLine.Points;
         pointsCollection.Clear();
-        foreach (var point in points)
-        {
-            pointsCollection.Add(new Point(point.X, point.Y));
-        }
+        foreach (var point in points) pointsCollection.Add(new Point(point.X, point.Y));
     }
 }

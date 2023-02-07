@@ -11,58 +11,58 @@
     </Window.Resources>
     <Grid x:Name="WindowGrid" ShowGridLines="False" Focusable="True" Background="DarkSlateGray">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="8*"/>
-            <ColumnDefinition Width="2*" MinWidth="250"/>
+            <ColumnDefinition Width="8*" />
+            <ColumnDefinition Width="2*" MinWidth="250" />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="5*" MinHeight="33.33" MaxHeight="40"/>
-            <RowDefinition Height="95*"/>
+            <RowDefinition Height="5*" MinHeight="33.33" MaxHeight="40" />
+            <RowDefinition Height="95*" />
         </Grid.RowDefinitions>
 
         <Grid Grid.Column="0" Grid.Row="0" x:Name="TopPanel"
               Margin="0 0 1 1">
-            <local:FirstTopPanel x:Name="FirstTopPanel"></local:FirstTopPanel>
+            <local:FirstTopPanel x:Name="FirstTopPanel" />
         </Grid>
 
         <Grid Grid.Column="1" Grid.Row="0" Background="WhiteSmoke"
               Margin="0 0 0 1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="5*"/>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="0*"/>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="5*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="0*" />
             </Grid.ColumnDefinitions>
 
             <Button Grid.Column="0" Content="Prev" x:Name="PrevPartControl"
                     Cursor="Hand" Click="ChangePart" Focusable="False"
-                    Margin="1" FontSize="14"></Button>
+                    Margin="1" FontSize="14" />
             <TextBlock Grid.Column="1" FontSize="18"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
-                       x:Name="PartTitle">First Part</TextBlock>
+                       x:Name="PartTitle">
+                First Part
+            </TextBlock>
             <Button Grid.Column="2" Content="Next" x:Name="NextPartControl"
                     Cursor="Hand" Click="ChangePart" Focusable="False"
-                    Margin="1" FontSize="14"></Button>
+                    Margin="1" FontSize="14" />
         </Grid>
 
         <Grid Grid.Column="0" Grid.Row="1" x:Name="CanvasGrid"
               Margin="0 0 1 0">
             <Canvas x:Name="FirstCanvas" Background="LightGray"
                     ClipToBounds="True"
-                    Visibility="Visible"/>
+                    Visibility="Visible" />
             <Canvas x:Name="SecondCanvas" Background="Blue"
                     ClipToBounds="True"
-                    Visibility="Collapsed">
-            </Canvas>
+                    Visibility="Collapsed" />
             <Canvas x:Name="ThirdCanvas" Background="Green"
                     ClipToBounds="True"
-                    Visibility="Collapsed">
-            </Canvas>
+                    Visibility="Collapsed" />
         </Grid>
 
         <Grid Grid.Column="1" Grid.Row="1" x:Name="SidePanel" Background="WhiteSmoke">
-            <local:FirstSidePanel x:Name="FirstSidePanel"></local:FirstSidePanel>
+            <local:FirstSidePanel x:Name="FirstSidePanel" />
         </Grid>
     </Grid>
 </Window>

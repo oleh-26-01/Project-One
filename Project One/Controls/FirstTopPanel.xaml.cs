@@ -1,19 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Project_One.Helpers;
 using Project_One_Objects;
 
@@ -21,19 +11,23 @@ namespace Project_One;
 
 public partial class FirstTopPanel : UserControl
 {
-    private FirstSidePanel _firstSidePanel;
+    public readonly double TextBoxMaxValue = 30;
+    public readonly double TextBoxMinValue = 1;
     private WpfCurve _curve;
     private WpfCurveEraser _curveEraser;
+    private FirstSidePanel _firstSidePanel;
     private UIElement _window;
-    public readonly double TextBoxMinValue = 1;
-    public readonly double TextBoxMaxValue = 30;
 
     public FirstTopPanel()
     {
         InitializeComponent();
     }
 
-    public void Init(FirstSidePanel firstSidePanelWpfCurve, WpfCurve curve, WpfCurveEraser curveEraser, UIElement window)
+    /// <summary>Represents the current action on the curve.</summary>
+    public string OnCurveAction { get; set; } = Strings.DrawAction;
+
+    public void Init(FirstSidePanel firstSidePanelWpfCurve, WpfCurve curve, WpfCurveEraser curveEraser,
+        UIElement window)
     {
         _firstSidePanel = firstSidePanelWpfCurve;
         _curve = curve;
@@ -59,13 +53,15 @@ public partial class FirstTopPanel : UserControl
     public void DrawCurve_OnChecked(object sender, RoutedEventArgs e)
     {
         _curveEraser.SetVisibility(false);
-        OnCurveAction = Strings.DrawAction;
+        if (OnCurveAction != Strings.ChangingOptAngleAction)
+            OnCurveAction = Strings.DrawAction;
     }
 
     public void EraseCurve_OnChecked(object sender, RoutedEventArgs e)
     {
         _curveEraser.SetVisibility(true);
-        OnCurveAction = Strings.EraseAction;
+        if (OnCurveAction != Strings.ChangingOptAngleAction)
+            OnCurveAction = Strings.EraseAction;
     }
 
     private void CurveOptAngle_OnTextChanged(object sender, TextChangedEventArgs e)
@@ -79,7 +75,7 @@ public partial class FirstTopPanel : UserControl
         value = Math.Clamp(value, TextBoxMinValue, TextBoxMaxValue);
         _curve.OptAngle = value.ToRad();
         _curve.ApplyAngleToCurve(_curve.OptAngle);
-        
+
         Update();
     }
 
@@ -102,7 +98,7 @@ public partial class FirstTopPanel : UserControl
         if (DrawCurve.IsChecked is not { } drawCurveIsChecked) return;
         if (!double.TryParse(CurveOptAngle.Text, out _)) return;
 
-        if (OnCurveAction == Strings.ChangingOptAngleAction) 
+        if (OnCurveAction == Strings.ChangingOptAngleAction)
             _curve.ApplyChanges();
         FocusManager.SetFocusedElement(FocusManager.GetFocusScope(CurveOptAngle), _window);
         OnCurveAction = drawCurveIsChecked ? Strings.DrawAction : Strings.EraseAction;
@@ -132,7 +128,4 @@ public partial class FirstTopPanel : UserControl
         _curve.OptAngle = Curve.DefaultOptAngle;
         ConfirmOptAngle_OnClick(sender, e);
     }
-
-    /// <summary>Represents the current action on the curve.</summary>
-    public string OnCurveAction { get; set; } = Strings.DrawAction;
 }

@@ -1,36 +1,35 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Project_One.Helpers;
 
 namespace Project_One;
 
 public partial class FirstSidePanel : UserControl
 {
-    private FirstTopPanel _firstTopPanel;
-    private WpfCurve _curve;
-    private string _filesPath;
-
     public const string FilesType = "crv";
-    private CurveViewModel? _selectedCurve;
+    private WpfCurve _curve;
     private ObservableCollection<CurveViewModel> _curveViewModels;
+    private string _filesPath;
+    private FirstTopPanel _firstTopPanel;
+    private CurveViewModel? _selectedCurve;
 
     public FirstSidePanel()
     {
         InitializeComponent();
+    }
+
+    public string FilesPath
+    {
+        get => _filesPath;
+        set
+        {
+            if (!Directory.Exists(value)) return;
+            _filesPath = value;
+            Update();
+        }
     }
 
     public void Init(FirstTopPanel firstTopPanel, WpfCurve curve, string filesPath)
@@ -60,14 +59,13 @@ public partial class FirstSidePanel : UserControl
             };
 
             if (_selectedCurve != null)
-            {
                 if (_selectedCurve.FileName == file)
                     curveViewModel = _selectedCurve;
-            }
-            
+
             _curveViewModels.Add(curveViewModel);
         }
     }
+
     public string FindFreeCurveName()
     {
         var index = 1;
@@ -95,6 +93,7 @@ public partial class FirstSidePanel : UserControl
                     _selectedCurve.IsSelected = false;
                     curveFileName = _selectedCurve.FileName;
                 }
+
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(action), action, Strings.UnknownAction);
@@ -114,12 +113,9 @@ public partial class FirstSidePanel : UserControl
     public void Select_OnClick(object sender, RoutedEventArgs e)
     {
         if (((Button)sender).DataContext is not CurveViewModel curveViewModel) return;
-        
+
         _curve.Load(curveViewModel.FileName);
-        if (_selectedCurve != null)
-        {
-            _selectedCurve.IsSelected = false;
-        }
+        if (_selectedCurve != null) _selectedCurve.IsSelected = false;
         _selectedCurve = curveViewModel;
         curveViewModel.IsSelected = true;
 
@@ -127,10 +123,10 @@ public partial class FirstSidePanel : UserControl
         _firstTopPanel.Update();
         _firstTopPanel.ConfirmOptAngle_OnClick(sender, e);
     }
-    
+
     public void Delete_OnClick(object sender, RoutedEventArgs e)
     {
-        var messageBoxResult = MessageBox.Show("Confirm deleting?", caption: "Confirm", button: MessageBoxButton.YesNo);
+        var messageBoxResult = MessageBox.Show("Confirm deleting?", "Confirm", MessageBoxButton.YesNo);
 
         switch (messageBoxResult)
         {
@@ -146,17 +142,6 @@ public partial class FirstSidePanel : UserControl
             }
             case MessageBoxResult.No:
                 break;
-        }
-    }
-    
-    public string FilesPath
-    {
-        get => _filesPath;
-        set
-        {
-            if (!Directory.Exists(value)) return;
-            _filesPath = value;
-            Update();
         }
     }
 }

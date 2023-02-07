@@ -1,5 +1,4 @@
-﻿using System.Numerics;
-using BenchmarkDotNet.Running;
+﻿using BenchmarkDotNet.Running;
 
 namespace Project_One_Objects;
 

@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.Numerics;
-using System.Reflection.Metadata;
+﻿using System.Numerics;
 
 namespace Project_One_Objects;
 
@@ -16,7 +14,40 @@ public class Camera
         _zoom = zoom;
     }
 
-    public void Move(Vector2 direction) => Position += direction;
+    public Vector2 Position { get; set; }
+
+    /// <summary>Zoom level of the camera.</summary>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    /// <remarks>1 is default zoom level.</remarks>
+    public float Zoom
+    {
+        get => _zoom;
+        set
+        {
+            if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value), "Zoom must be positive");
+
+            _zoom = value;
+        }
+    }
+
+    /// <summary>Centering relative coordinates.</summary>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    public Vector2 Center
+    {
+        get => _center;
+        set
+        {
+            if (value.X < 0 || value.Y < 0)
+                throw new ArgumentOutOfRangeException(nameof(value), "Center must be positive");
+
+            _center = value;
+        }
+    }
+
+    public void Move(Vector2 direction)
+    {
+        Position += direction;
+    }
 
     /// <summary>Moves the camera synchronously with the screen refresh.</summary>
     /// <param name="direction">"left", "right", "up", "down".</param>
@@ -43,7 +74,8 @@ public class Camera
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public void ZoomOut(float value)
     {
-        if (value is <= 0 or >= 1) throw new ArgumentOutOfRangeException(nameof(value), "Value must be between 0 and 1");
+        if (value is <= 0 or >= 1)
+            throw new ArgumentOutOfRangeException(nameof(value), "Value must be between 0 and 1");
         _zoom *= 1 - value;
     }
 
@@ -72,6 +104,7 @@ public class Camera
             result[i] /= _zoom;
             result[i] += _center + Position;
         }
+
         return result;
     }
 
@@ -87,6 +120,7 @@ public class Camera
             result[i] /= _zoom;
             result[i] += _center + Position;
         }
+
         return result;
     }
 
@@ -99,7 +133,7 @@ public class Camera
         result -= Position + _center;
         result *= _zoom;
         result += _center;
-        return result;  
+        return result;
     }
 
     /// <summary>Convert an array of points from absolute values to camera relative values.</summary>
@@ -115,6 +149,7 @@ public class Camera
             result[i] *= _zoom;
             result[i] += _center;
         }
+
         return result;
     }
 
@@ -130,41 +165,7 @@ public class Camera
             result[i] *= _zoom;
             result[i] += _center;
         }
+
         return result;
-    }
-
-    public Vector2 Position { get; set; }
-    
-    /// <summary>Zoom level of the camera.</summary>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    /// <remarks>1 is default zoom level.</remarks>
-    public float Zoom
-    {
-        get => _zoom;
-        set
-        {
-            if (value <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(value), "Zoom must be positive");
-            }
-
-            _zoom = value;
-        }
-    }
-
-    /// <summary>Centering relative coordinates.</summary>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public Vector2 Center
-    {
-        get => _center;
-        set
-        {
-            if (value.X < 0 || value.Y < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(value), "Center must be positive");
-            }
-
-            _center = value;
-        }
     }
 }

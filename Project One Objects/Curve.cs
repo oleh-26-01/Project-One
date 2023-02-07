@@ -1,16 +1,15 @@
 ﻿using System.Numerics;
-using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 
 namespace Project_One_Objects;
 
 public class Curve
 {
-    private List<Vector2> _points;
+    public static readonly double DefaultOptAngle = Math.PI / 180 * 5;
     private readonly List<Vector2> _tempPoints;
     private bool _isTempPointsSaved = true;
     private double _optAngle;
-    public static readonly double DefaultOptAngle = Math.PI / 180 * 5;
+    private List<Vector2> _points;
 
     /// <param name="optimizationAngle">1 rad</param>
     public Curve(double optimizationAngle = 0)
@@ -20,6 +19,30 @@ public class Curve
         OptAngle = optimizationAngle == 0 ? DefaultOptAngle : optimizationAngle;
     }
 
+    /// <summary>
+    ///     The minimum difference between the angles
+    ///     of consecutive vectors formed by three consecutive points.
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    /// <remarks>Does NOT update the curve. Value in radians.</remarks>
+    public double OptAngle
+    {
+        get => _optAngle;
+        set
+        {
+            if (value < 0)
+                throw new ArgumentOutOfRangeException(nameof(value), "Value must be equal or greater than 0");
+            _optAngle = value;
+        }
+    }
+
+    /// <summary>Actual points of the curve.</summary>
+    public List<Vector2> Points
+    {
+        get => _isTempPointsSaved ? _points : _tempPoints;
+        set => _points = value;
+    }
+
     /// <summary>Adds a point to the curve.</summary>
     public void AddPoint(Vector2 point)
     {
@@ -27,17 +50,14 @@ public class Curve
         {
             var angleA = Math.Atan2(_points[^1].Y - _points[^2].Y, _points[^1].X - _points[^2].X);
             var angleB = Math.Atan2(point.Y - _points[^1].Y, point.X - _points[^1].X);
-            if (Math.Abs(angleB - angleA) > OptAngle)
-            {
-                _points.Add(point);
-            }
+            if (Math.Abs(angleB - angleA) > OptAngle) _points.Add(point);
         }
         else
         {
             _points.Add(point);
         }
     }
-    
+
     /// <summary>Clear lists of temporary and actual points.</summary>
     public void Clear()
     {
@@ -57,17 +77,14 @@ public class Curve
     /// <param name="path">Path to file.</param>
     public void Load(string path)
     {
-        string json = File.ReadAllText(path);
+        var json = File.ReadAllText(path);
         var data = JsonConvert.DeserializeObject<dynamic>(json);
-        
+
         DateTime date = data.Date;
         int pointsCount = data.PointsCount;
         OptAngle = data.Accuracy;
         _points.Clear();
-        foreach (var point in data.Points)
-        {
-            _points.Add(new Vector2((float)point.X, (float)point.Y));
-        }
+        foreach (var point in data.Points) _points.Add(new Vector2((float)point.X, (float)point.Y));
     }
 
     /// <summary>Save actual points to file.</summary>
@@ -85,7 +102,7 @@ public class Curve
     }
 
     /// <summary>
-    /// Updates the temporary points list with OptAngle value.
+    ///     Updates the temporary points list with OptAngle value.
     /// </summary>
     /// <param name="optAngle">Optimization angle in radians.</param>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
@@ -110,35 +127,10 @@ public class Curve
                 _tempPoints.Add(_points[i]);
                 commonAngle = 0;
             }
+
             angleA = angleB;
         }
 
         _tempPoints.Add(_points[^1]);
-    }
-
-    /// <summary>
-    /// The minimum difference between the angles
-    /// of consecutive vectors formed by three consecutive points.
-    /// </summary>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    /// <remarks>Does NOT update the curve. Value in radians.</remarks>
-    public double OptAngle
-    {
-        get => _optAngle;
-        set
-        {
-            if (value < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(value), "Value must be equal or greater than 0");
-            }
-            _optAngle = value;
-        }
-    }
-
-    /// <summary>Actual points of the curve.</summary>
-    public List<Vector2> Points
-    {
-        get => _isTempPointsSaved ? _points : _tempPoints;
-        set => _points = value;
     }
 }
