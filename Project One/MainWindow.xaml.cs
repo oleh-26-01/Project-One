@@ -27,11 +27,8 @@ public partial class MainWindow
     private Camera[] _cameraArray;
 
     private CanvasUpdater _canvasUpdater;
-    private EventHandler _eventHandler;
-    private FirstTopPanel _firstTopPanel;
-    private SidePanel _sidePanel;
-
-    private string _filesFolder = "C:\\Coding\\C#\\Project One\\Project One\\Curves\\";
+    private EventsHandler _eventHandler;
+    private string _filesPath = "C:\\Coding\\C#\\Project One\\Project One\\Curves\\";
     private WpfCurve _curve;
     private WpfCurveEraser _curveEraser;
 
@@ -57,19 +54,19 @@ public partial class MainWindow
             _cameraArray[i] = new Camera(cameraSize, new Vector2(0, 0));
         }
 
-        Dispatcher dispatcher = Dispatcher;
+        var dispatcher = Dispatcher;
         _canvasUpdater = new CanvasUpdater(
             dispatcher, _canvasArray, _cameraArray, 
             _curve, _curveEraser);
 
-        _firstTopPanel = FirstTopPanel;
-        _firstTopPanel.Init(_curve, _curveEraser);
-        _sidePanel = new SidePanel(_filesFolder, CurvesList, _curve);
+        FirstTopPanel.Init(FirstSidePanel, _curve, _curveEraser, this);
+        FirstSidePanel.Init(FirstTopPanel, _curve, _filesPath);
 
-        _eventHandler = new EventHandler(
+
+        _eventHandler = new EventsHandler(
             this,
             WindowGrid, CanvasGrid,
-            _canvasUpdater, _firstTopPanel, _sidePanel,
+            _canvasUpdater, FirstTopPanel, FirstSidePanel,
             _cameraArray, _curve, _curveEraser);
 
         Closing += _eventHandler.WindowClosing;
@@ -78,14 +75,7 @@ public partial class MainWindow
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
-    { 
-        var canvasSize = new Vector2((float)CanvasGrid.ActualWidth, (float)CanvasGrid.ActualHeight);
-        var actualCenter = canvasSize / 2;
-        for (var i = 0; i < 3; i++)
-        {
-            _cameraArray[i].Center = actualCenter;
-        }
-        
+    {
     }
 
     private void ChangePart(object sender, RoutedEventArgs e)
@@ -109,15 +99,5 @@ public partial class MainWindow
         _canvasUpdater.CanvasIndex = _partIndex;
         _eventHandler.CanvasIndex = _partIndex;
         _canvasArray[_partIndex].Visibility = Visibility.Visible;
-    }
-
-    private void DeleteCurve_OnClick(object sender, RoutedEventArgs e)
-    {
-        _eventHandler.DeleteCurve_OnClick(sender, e);
-    }
-
-    private void SelectCurve_OnClick(object sender, RoutedEventArgs e)
-    {
-        _eventHandler.SelectCurve_OnClick(sender, e);
     }
 }

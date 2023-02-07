@@ -4,18 +4,19 @@ using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Project_One.Helpers;
 using Project_One_Objects;
 
 namespace Project_One;
 
-public class EventHandler
+public class EventsHandler
 {
     private readonly Grid _windowGrid;
     private readonly Grid _canvasGrid;
     private readonly Grid _firstTopPanelGrid;
     private readonly CanvasUpdater _canvasUpdater;
     private readonly FirstTopPanel _firstTopPanel;
-    private readonly SidePanel _sidePanel;
+    private readonly FirstSidePanel _firstSidePanel;
     private readonly Camera[] _cameraArray;
     private readonly WpfCurve _curve;
     private readonly WpfCurveEraser _curveEraser;
@@ -32,10 +33,10 @@ public class EventHandler
     public Vector2 CameraRelativeMousePosition = new(-1, -1);
     private Vector2 _cameraMoveDirection;
 
-    public EventHandler(
+    public EventsHandler(
         UIElement window,
         Grid windowGrid, Grid canvasGrid, 
-        CanvasUpdater canvasUpdater, FirstTopPanel firstTopPanel, SidePanel sidePanel,
+        CanvasUpdater canvasUpdater, FirstTopPanel firstTopPanel, FirstSidePanel firstSidePanel,
         Camera[] cameraArray, WpfCurve curve, WpfCurveEraser curveEraser)
     {
         _windowGrid = windowGrid;
@@ -43,46 +44,31 @@ public class EventHandler
 
         _canvasUpdater = canvasUpdater;
         _firstTopPanel = firstTopPanel;
-        _sidePanel = sidePanel;
+        _firstSidePanel = firstSidePanel;
 
         _cameraArray = cameraArray;
         _curve = curve;
         _curveEraser = curveEraser;
 
-        _windowGrid.MouseMove += MouseMove;
-        _windowGrid.MouseWheel += MouseWheel;
-        
         _canvasGrid.MouseDown += CanvasMouseClick;
         _canvasGrid.MouseUp += CanvasMouseClick;
         _canvasGrid.SizeChanged += CanvasSizeChanged;
 
+        window.AddHandler(Mouse.MouseMoveEvent, new MouseEventHandler(MouseMove), true);
+        window.AddHandler(Mouse.MouseWheelEvent, new MouseWheelEventHandler(MouseWheel), true);
         window.AddHandler(Keyboard.KeyDownEvent, new KeyEventHandler(WindowGridKeyDown), true);
         window.AddHandler(Keyboard.KeyUpEvent, new KeyEventHandler(WindowGridKeyUp), true);
-
-        //_windowGrid.PreviewKeyDown += WindowGridKeyDown;
-        //_windowGrid.PreviewKeyUp += WindowGridKeyUp;
-
-        _firstTopPanel.NewCurve.Click += (object sender, RoutedEventArgs e) =>
-        {
-            _firstTopPanel.ClearActiveCurve(sender, e);
-            _firstTopPanel.SaveCurveOptAngle(sender, e);
-            _sidePanel.SaveCurve(sender, e, "new");
-        };
-        _firstTopPanel.SaveCurve.Click += (object sender, RoutedEventArgs e) =>
-        {
-            _firstTopPanel.SaveCurveOptAngle(sender, e);
-            _sidePanel.SaveCurve(sender, e, "active");
-        };
-        _firstTopPanel.ClearCurve.Click += (object sender, RoutedEventArgs e) =>
-        {
-            _firstTopPanel.ClearActiveCurve(sender, e);
-            _firstTopPanel.SaveCurveOptAngle(sender, e);
-        };
     }
 
     public void WindowClosing(object? sender, System.ComponentModel.CancelEventArgs e)
     {
         _canvasUpdater.StopThread();
+    }
+
+    private void Exit()
+    {
+        _canvasUpdater.StopThread();
+        Application.Current.Shutdown();
     }
 
     private void WindowGridKeyDown(object sender, KeyEventArgs e)
@@ -116,12 +102,6 @@ public class EventHandler
             Exit();
         }
         UpdateCamera();
-    }
-
-    private void Exit()
-    {
-        _canvasUpdater.StopThread();
-        Application.Current.Shutdown();
     }
 
     private void WindowGridKeyUp(object sender, KeyEventArgs e)
@@ -177,10 +157,10 @@ public class EventHandler
                 {
                     switch (_firstTopPanel.OnCurveAction)
                     {
-                        case "Draw":
+                        case Strings.DrawAction:
                             _curve.AddPoint(CameraRelativeMousePosition);
                             break;
-                        case "Erase":
+                        case Strings.EraseAction:
                             _curveEraser.ErasePoints(_curve.Points, CameraRelativeMousePosition, _cameraArray[0].Zoom);
                             break;
                     }
@@ -204,13 +184,21 @@ public class EventHandler
 
     private void MouseWheel(object sender, MouseWheelEventArgs e)
     {
-        if (e.Delta > 0)
+        // check if mouse is over canvas
+        var position = e.GetPosition(_canvasGrid);
+        if (position.X < 0 || position.X > _canvasGrid.ActualWidth ||
+            position.Y < 0 || position.Y > _canvasGrid.ActualHeight)
         {
-            _cameraArray[_canvasIndex].ZoomIn(e.Delta / 1000f);
+            return;
         }
-        else if (e.Delta < 0)
+        switch (e.Delta)
         {
-            _cameraArray[_canvasIndex].ZoomOut(-e.Delta / 1000f);
+            case > 0:
+                _cameraArray[_canvasIndex].ZoomIn(e.Delta / 1000f);
+                break;
+            case < 0:
+                _cameraArray[_canvasIndex].ZoomOut(-e.Delta / 1000f);
+                break;
         }
     }
 
@@ -222,15 +210,12 @@ public class EventHandler
             case MouseButton.Left:
             {
                 _isCanvasLeftMouseDown = e.ButtonState == MouseButtonState.Pressed;
-                if (!_isCanvasLeftMouseDown && _canvasIndex == 0)
+                if (!_isCanvasLeftMouseDown && _canvasIndex == 0 && _firstTopPanel.OnCurveAction == Strings.EraseAction)
                 {
-                        //_curve.ApplyAngleToCurve(_curve.OptAngle);
-                        //_curve.ApplyChanges();
-                        _curveEraser.EraseNearestPoint(_curve.Points);
-                        _curveEraser.MoveToNearPoint(_curve.Points, CameraRelativeMousePosition);
-                        _firstTopPanel.Update();
+                    _curveEraser.EraseNearestPoint(_curve.Points);
+                    _curveEraser.MoveToNearPoint(_curve.Points, CameraRelativeMousePosition);
+                    _firstTopPanel.Update();
                 }
-
                 break;
             }
             case MouseButton.Right:
@@ -266,18 +251,5 @@ public class EventHandler
 
             _canvasIndex = value;
         }
-    }
-
-    public void DeleteCurve_OnClick(object sender, RoutedEventArgs routedEventArgs)
-    {
-        _sidePanel.DeleteCurve(sender, routedEventArgs);
-    }
-
-    public void SelectCurve_OnClick(object sender, RoutedEventArgs routedEventArgs)
-    {
-        _sidePanel.SelectCurve(sender, routedEventArgs);
-        _sidePanel.Update();
-        _firstTopPanel.Update();
-        _firstTopPanel.SaveCurveOptAngle(sender, routedEventArgs);
     }
 }

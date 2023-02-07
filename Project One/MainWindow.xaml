@@ -4,43 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Project_One"
-        xmlns:system="clr-namespace:System;assembly=System.Runtime"
         mc:Ignorable="d"
         Title="MainWindow" Height="720" Width="1280"
         UseLayoutRounding="True">
     <Window.Resources>
-        <SolidColorBrush x:Key="NotSelectedCurveViewModel" Color="WhiteSmoke"></SolidColorBrush>
-        <SolidColorBrush x:Key="SelectedCurveViewModel" Color="LightGray"></SolidColorBrush>
-        <local:BoolToColorConverter x:Key="BoolToColorConverter"
-            NotSelectedBrush="{StaticResource NotSelectedCurveViewModel}" 
-            SelectedBrush="{StaticResource SelectedCurveViewModel}"></local:BoolToColorConverter>
-        <DataTemplate x:Key="CurveListItemTemplate" 
-                      DataType="{x:Type local:CurveViewModel}">
-            <Border BorderThickness="0 0 0 1" BorderBrush="Black">
-                <Grid ShowGridLines="False" Background="{Binding IsSelected, Converter={StaticResource BoolToColorConverter}}" Margin="0 0 0 1">
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*"/>
-                        <ColumnDefinition Width="1*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock Grid.Column="0" Grid.Row="0" Text="{Binding DisplayFileName}"
-                               FontSize="16" Margin="4 2 2 2"></TextBlock>
-                    <TextBlock Grid.Column="0" Grid.Row="1" Text="{Binding DisplayPointCount}"
-                               FontSize="16" Margin="4 2 2 2"></TextBlock>
-                    <Button Grid.Column="1" Grid.Row="0" Focusable="False" Click="SelectCurve_OnClick"
-                            Foreground="#CC9900" FontSize="16" FontWeight="SemiBold"
-                            Content="Select" Margin="1"></Button>
-                    <Button Grid.Column="1" Grid.Row="1" Focusable="False" Click="DeleteCurve_OnClick" 
-                            Foreground="#CC0000" FontSize="16" FontWeight="SemiBold"
-                            Content="Delete" Margin="1">
-                    </Button>
-                </Grid>
-            </Border>
-        </DataTemplate>
     </Window.Resources>
     <Grid x:Name="WindowGrid" ShowGridLines="False" Focusable="True" Background="DarkSlateGray">
         <Grid.ColumnDefinitions>
@@ -95,16 +62,7 @@
         </Grid>
 
         <Grid Grid.Column="1" Grid.Row="1" x:Name="SidePanel" Background="WhiteSmoke">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <!--<ScrollViewer.Resources>
-                    <system:Double x:Key="{x:Static SystemParameters.VerticalScrollBarWidthKey}">10</system:Double>
-                </ScrollViewer.Resources>-->
-                <ItemsControl x:Name="CurvesList" Focusable="False">
-                    <ItemsControl.ItemTemplate>
-                        <StaticResource ResourceKey="CurveListItemTemplate"></StaticResource>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
+            <local:FirstSidePanel x:Name="FirstSidePanel"></local:FirstSidePanel>
         </Grid>
     </Grid>
 </Window>

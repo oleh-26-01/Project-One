@@ -11,7 +11,7 @@ using Project_One_Objects;
 
 namespace Project_One;
 
-public class WpfCurve : Project_One_Objects.Curve
+public class WpfCurve : Curve
 {
     private readonly Polyline _polyLine;
 

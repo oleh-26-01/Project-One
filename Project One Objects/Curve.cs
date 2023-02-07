@@ -7,20 +7,17 @@ namespace Project_One_Objects;
 public class Curve
 {
     private List<Vector2> _points;
-    private List<Vector2> _tempPoints;
+    private readonly List<Vector2> _tempPoints;
     private bool _isTempPointsSaved = true;
     private double _optAngle;
-
-    public const double OneRad = Math.PI / 180;
-    public const double ToDeg = 180 / Math.PI;
-    public const double ToRad = Math.PI / 180;
+    public static readonly double DefaultOptAngle = Math.PI / 180 * 5;
 
     /// <param name="optimizationAngle">1 rad</param>
-    public Curve(double optimizationAngle = Math.PI / 180 * 5)
+    public Curve(double optimizationAngle = 0)
     {
         _points = new List<Vector2>();
         _tempPoints = new List<Vector2>();
-        OptAngle = optimizationAngle;
+        OptAngle = optimizationAngle == 0 ? DefaultOptAngle : optimizationAngle;
     }
 
     /// <summary>Adds a point to the curve.</summary>
@@ -40,10 +37,7 @@ public class Curve
             _points.Add(point);
         }
     }
-
-    /// <summary>Adds points to the curve.</summary>
-    public void AddPoints(List<Vector2> points) => _points.AddRange(points);
-
+    
     /// <summary>Clear lists of temporary and actual points.</summary>
     public void Clear()
     {
@@ -146,12 +140,5 @@ public class Curve
     {
         get => _isTempPointsSaved ? _points : _tempPoints;
         set => _points = value;
-    }
-
-    /// <summary>Temporary points of the curve.</summary>
-    public List<Vector2> TempPoints
-    {
-        get => _tempPoints;
-        set => _tempPoints = value;
     }
 }

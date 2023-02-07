@@ -8,7 +8,7 @@ using System.Windows.Media;
 
 namespace Project_One;
 
-public class BoolToColorConverter : IValueConverter
+internal class BoolToColorConverter : IValueConverter
 {
     public Brush SelectedBrush { get; set; }
     public Brush NotSelectedBrush { get; set; }
