@@ -14,7 +14,7 @@
                                     SelectedBrush="{StaticResource SelectedCurveViewModel}" />
         <DataTemplate x:Key="CurveListItemTemplate"
                       DataType="{x:Type local:CurveViewModel}">
-            <Border BorderThickness="0 0 0 1" BorderBrush="Black">
+            <Border BorderThickness="0 0 0 0" BorderBrush="Black">
                 <Grid ShowGridLines="False"
                       Background="{Binding IsSelected, Converter={StaticResource BoolToColorConverter}}"
                       Margin="0 0 0 1">
@@ -33,10 +33,10 @@
                                FontSize="16" Margin="4 2 2 2" />
                     <Button Grid.Column="1" Grid.Row="0" Focusable="False" Click="Select_OnClick"
                             Foreground="#CC9900" FontSize="16" FontWeight="SemiBold"
-                            Content="Select" Margin="1" />
+                            Content="Select" Margin="3 3 3 0" />
                     <Button Grid.Column="1" Grid.Row="1" Focusable="False" Click="Delete_OnClick"
                             Foreground="#CC0000" FontSize="16" FontWeight="SemiBold"
-                            Content="Delete" Margin="1" />
+                            Content="Delete" Margin="3"/>
                 </Grid>
             </Border>
         </DataTemplate>

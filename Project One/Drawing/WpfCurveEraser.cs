@@ -31,17 +31,18 @@ public class WpfCurveEraser
         }
     }
 
-    public Vector2 Position { get; private set; }
+    public Vector2 Position { get; set; }
 
-    public void MoveToNearPoint(List<Vector2> points, Vector2 mousePosition)
+    public void MoveToNearestPoint(List<Vector2> points, Vector2 mousePosition)
     {
         if (points.Count == 0) return;
         Position = points.MinBy(p => Vector2.Distance(p, mousePosition));
     }
 
-    public void EraseNearestPoint(List<Vector2> points)
+    public void EraseNearestPoint(List<Vector2> points, Vector2 mousePosition)
     {
-        var index = points.IndexOf(Position);
+        var distances = points.Select(p => Vector2.Distance(p, mousePosition)).ToList();
+        var index = distances.IndexOf(distances.Min());
         if (index == -1) return;
         points.RemoveAt(index);
     }

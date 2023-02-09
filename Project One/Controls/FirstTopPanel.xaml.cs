@@ -26,12 +26,11 @@ public partial class FirstTopPanel : UserControl
     /// <summary>Represents the current action on the curve.</summary>
     public string OnCurveAction { get; set; } = Strings.DrawAction;
 
-    public void Init(FirstSidePanel firstSidePanelWpfCurve, WpfCurve curve, WpfCurveEraser curveEraser,
-        UIElement window)
+    public void Init(UIElement window, FirstCanvas firstCanvas, FirstSidePanel firstSidePanel)
     {
-        _firstSidePanel = firstSidePanelWpfCurve;
-        _curve = curve;
-        _curveEraser = curveEraser;
+        _firstSidePanel = firstSidePanel;
+        _curve = firstCanvas.Curve;
+        _curveEraser = firstCanvas.CurveEraser;
         _window = window;
 
         Update();
@@ -112,20 +111,25 @@ public partial class FirstTopPanel : UserControl
         _curve.Clear();
         _curve.OptAngle = Curve.DefaultOptAngle;
         ConfirmOptAngle_OnClick(sender, e);
-        _firstSidePanel.SaveCurve(sender, e, Strings.NewFileAction);
+        _firstSidePanel.SaveCurve(sender, e, true);
         Update();
     }
 
     private void SaveCurve_OnClick(object sender, RoutedEventArgs e)
     {
         ConfirmOptAngle_OnClick(sender, e);
-        _firstSidePanel.SaveCurve(sender, e, Strings.UpdateFileAction);
+        _firstSidePanel.SaveCurve(sender, e, false);
     }
 
     private void ClearCurve_OnClick(object sender, RoutedEventArgs e)
     {
         _curve.Clear();
         _curve.OptAngle = Curve.DefaultOptAngle;
+        Update();
         ConfirmOptAngle_OnClick(sender, e);
+
+        OnCurveAction = Strings.DrawAction;
+        DrawCurve.IsChecked = true;
+        _curveEraser.SetVisibility(false);
     }
 }

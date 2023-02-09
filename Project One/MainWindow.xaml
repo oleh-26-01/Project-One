@@ -23,6 +23,8 @@
         <Grid Grid.Column="0" Grid.Row="0" x:Name="TopPanel"
               Margin="0 0 1 1">
             <local:FirstTopPanel x:Name="FirstTopPanel" />
+            <local:SecondTopPanel x:Name="SecondTopPanel" Visibility="Hidden" />
+            <local:ThirdTopPanel x:Name="ThirdTopPanel" Visibility="Hidden" />
         </Grid>
 
         <Grid Grid.Column="1" Grid.Row="0" Background="WhiteSmoke"
@@ -50,19 +52,15 @@
 
         <Grid Grid.Column="0" Grid.Row="1" x:Name="CanvasGrid"
               Margin="0 0 1 0">
-            <Canvas x:Name="FirstCanvas" Background="LightGray"
-                    ClipToBounds="True"
-                    Visibility="Visible" />
-            <Canvas x:Name="SecondCanvas" Background="Blue"
-                    ClipToBounds="True"
-                    Visibility="Collapsed" />
-            <Canvas x:Name="ThirdCanvas" Background="Green"
-                    ClipToBounds="True"
-                    Visibility="Collapsed" />
+            <local:FirstCanvas x:Name="FirstCanvas" Visibility="Visible" />
+            <local:SecondCanvas x:Name="SecondCanvas" Visibility="Hidden" />
+            <local:ThirdCanvas x:Name="ThirdCanvas" Visibility="Hidden" />
         </Grid>
 
-        <Grid Grid.Column="1" Grid.Row="1" x:Name="SidePanel" Background="WhiteSmoke">
+        <Grid Grid.Column="1" Grid.Row="1" x:Name="SidePanel">
             <local:FirstSidePanel x:Name="FirstSidePanel" />
+            <local:SecondSidePanel x:Name="SecondSidePanel" Visibility="Hidden" />
+            <local:ThirdSidePanel x:Name="ThirdSidePanel" Visibility="Hidden" />
         </Grid>
     </Grid>
 </Window>

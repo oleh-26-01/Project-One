@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using Project_One.Helpers;
+using Project_One_Objects;
 
 namespace Project_One;
 
@@ -11,6 +13,7 @@ public partial class FirstSidePanel : UserControl
 {
     public const string FilesType = "crv";
     private WpfCurve _curve;
+    private Camera _camera;
     private ObservableCollection<CurveViewModel> _curveViewModels;
     private string _filesPath;
     private FirstTopPanel _firstTopPanel;
@@ -32,10 +35,11 @@ public partial class FirstSidePanel : UserControl
         }
     }
 
-    public void Init(FirstTopPanel firstTopPanel, WpfCurve curve, string filesPath)
+    public void Init(FirstCanvas firstCanvas, FirstTopPanel firstTopPanel, string filesPath)
     {
         _firstTopPanel = firstTopPanel;
-        _curve = curve;
+        _curve = firstCanvas.Curve;
+        _camera = firstCanvas.Camera;
         _filesPath = filesPath;
 
         _curveViewModels = new ObservableCollection<CurveViewModel>();
@@ -80,23 +84,16 @@ public partial class FirstSidePanel : UserControl
         return curveFileName;
     }
 
-    public void SaveCurve(object sender, RoutedEventArgs e, string action)
+    public void SaveCurve(object sender, RoutedEventArgs e, bool newFile)
     {
         var curveFileName = FindFreeCurveName();
-        switch (action)
+        if (!newFile)
         {
-            case Strings.NewFileAction:
-                break;
-            case Strings.UpdateFileAction:
-                if (_selectedCurve != null)
-                {
-                    _selectedCurve.IsSelected = false;
-                    curveFileName = _selectedCurve.FileName;
-                }
-
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(action), action, Strings.UnknownAction);
+            if (_selectedCurve != null)
+            {
+                _selectedCurve.IsSelected = false;
+                curveFileName = _selectedCurve.FileName;
+            }
         }
 
         _selectedCurve = new CurveViewModel
@@ -115,6 +112,8 @@ public partial class FirstSidePanel : UserControl
         if (((Button)sender).DataContext is not CurveViewModel curveViewModel) return;
 
         _curve.Load(curveViewModel.FileName);
+        _camera.Position = -_camera.Center;
+        _camera.Zoom = 1;
         if (_selectedCurve != null) _selectedCurve.IsSelected = false;
         _selectedCurve = curveViewModel;
         curveViewModel.IsSelected = true;

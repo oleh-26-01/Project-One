@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics;
+using System.Numerics;
 
 namespace Project_One_Objects;
 
@@ -53,7 +54,7 @@ public class Camera
     /// <param name="direction">"left", "right", "up", "down".</param>
     /// <param name="timeDiff">time difference in milliseconds between last update and current update.</param>
     /// <param name="coeff">multiplier for camera move.</param>
-    public void MoveSync(Vector2 direction, int timeDiff, float coeff = 1f)
+    public void MoveSync(Vector2 direction, float timeDiff, float coeff = 1f)
     {
         var vectorDirection = direction * coeff * timeDiff / 1000f;
         vectorDirection /= _zoom;

@@ -109,9 +109,8 @@ public class Curve
     public void ApplyAngleToCurve(double optAngle)
     {
         OptAngle = optAngle;
-        _isTempPointsSaved = false;
-
         if (_points.Count < 3) return;
+        _isTempPointsSaved = false;
 
         double commonAngle = 0;
         _tempPoints.Clear();
