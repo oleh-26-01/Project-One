@@ -42,8 +42,8 @@ public class WpfCurveEraser
     public void EraseNearestPoint(List<Vector2> points, Vector2 mousePosition)
     {
         var distances = points.Select(p => Vector2.Distance(p, mousePosition)).ToList();
+        if (distances.Count == 0) return;
         var index = distances.IndexOf(distances.Min());
-        if (index == -1) return;
         points.RemoveAt(index);
     }
 

@@ -5,5 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Canvas x:Name="CanvasControl" Background="Blue" ClipToBounds="True"/>
+    <Canvas x:Name="CanvasControl" Background="LightGray" ClipToBounds="True"
+            SizeChanged="Canvas_OnSizeChanged"
+            MouseDown="Canvas_OnMouseClick" MouseUp="Canvas_OnMouseClick"
+            MouseMove="Canvas_OnMouseMove" MouseWheel="Canvas_OnMouseWheel"/>
 </UserControl>

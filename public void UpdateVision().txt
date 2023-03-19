@@ -1,0 +1,97 @@
+    public void UpdateVision()
+    {
+        if (!_isVisionActive || _track is null) return;
+
+        MathExtensions.FindRelativeAngles(_track.Points, _position, _bodyAngle, _trackPointsAngles);
+        for (var i = 0; i < _sortedTrackPointsAngles.Length; i++)
+        {
+            _sortedTrackPointsAngles[i].X = i;
+            _sortedTrackPointsAngles[i].Y = _trackPointsAngles[i];
+        }
+        Array.Sort(_sortedTrackPointsAngles, (a, b) => a.Y.CompareTo(b.Y));
+
+        MathExtensions.CalcVectorAngles(_visionCount, _bodyAngle, _carVisionAngles);
+        for (var i = 0; i < _sortedCarVisionAngles.Length; i++)
+        {
+            _sortedCarVisionAngles[i].X = i;
+            _sortedCarVisionAngles[i].Y = _carVisionAngles[i];
+        }
+        Array.Sort(_sortedCarVisionAngles, (a, b) => a.Y.CompareTo(b.Y));
+
+        for (var i = 0; i < _visionCount; i++)
+        {
+            _tempVectorAngles[i] = _sortedCarVisionAngles[i].Y;
+        }
+
+        MathExtensions.AngleToSlopeIntercept(_tempVectorAngles, _position, _vectorSlopeIntercepts);
+
+        int c = 0; // car vision index
+        int t = 0; // track points index
+        int f = 0; // vectors iterated
+
+        while (t < _track.Points.Length && f < _visionCount + 1)
+        {
+            var sortedCvaIndex = (c - 1).Mod(_visionCount);
+            if (!MathExtensions.IsAngleBetween(
+                    _sortedTrackPointsAngles[t].Y, 
+                    _sortedCarVisionAngles[sortedCvaIndex].Y, 
+                    _sortedCarVisionAngles[c].Y))
+            {
+                c = (c + 1) % _visionCount;
+                f++;
+            }
+            else
+            {
+                var secondPointIndex = (int)(_sortedTrackPointsAngles[t].X + 1) % _track.Points.Length;
+                var tempC = c;
+                while (MathExtensions.IsAngleBetween(
+                           _sortedCarVisionAngles[c].Y, 
+                           _sortedTrackPointsAngles[t].Y,
+                           _trackPointsAngles[secondPointIndex]))
+                {
+                    if (_vectorSlopeIntercepts[c].X - _trackSlopeIntercepts[secondPointIndex].X != 0)
+                    {
+                        var x = (_trackSlopeIntercepts[secondPointIndex].Y - _vectorSlopeIntercepts[c].Y) /
+                                (_vectorSlopeIntercepts[c].X - _trackSlopeIntercepts[secondPointIndex].X);
+                        var y = _vectorSlopeIntercepts[c].X * x + _vectorSlopeIntercepts[c].Y;
+                        var point = new Vector2(x, y);
+                        _tempPoints[(int)_sortedCarVisionAngles[c].X].Add(point);
+                    }
+
+                    c = (c + 1) % _visionCount;
+                }
+
+                c = tempC;
+                t++;
+            }
+        }
+
+        for (var i = 0; i < _visionCount; i++)
+        {
+            switch (_tempPoints[i].Count)
+            {
+                case 1:
+                    _visionPoints[i] = _tempPoints[i][0];
+                    break;
+                case > 1:
+                {
+                    var min = float.MaxValue;
+                    var minIndex = 0;
+                    for (var j = 0; j < _tempPoints[i].Count; j++)
+                    {
+                        var dist = Vector2.Distance(_position, _tempPoints[i][j]);
+                        if (!(dist < min)) continue;
+                        min = dist;
+                        minIndex = j;
+                    }
+
+                    _visionPoints[i] = _tempPoints[i][minIndex];
+                    break;
+                }
+                default:
+                    _visionPoints[i] = Vector2.Zero;
+                    break;
+            }
+            _tempPoints[i].Clear();
+        }
+    }

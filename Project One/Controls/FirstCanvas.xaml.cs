@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Numerics;
 using System.Reactive.Linq;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -76,7 +77,7 @@ public partial class FirstCanvas : UserControl
     /// <summary>Starts the canvas updater.</summary>
     public void StartUpdates()
     {
-        _updateSubscription = Observable.Timer(TimeSpan.Zero, TimeSpan.FromMilliseconds(TargetRefreshTime))
+        _updateSubscription = Observable.Interval(TimeSpan.FromMilliseconds(TargetRefreshTime))
             .Subscribe((l) =>
             {
                 Dispatcher.Invoke(() =>
@@ -90,6 +91,7 @@ public partial class FirstCanvas : UserControl
             });
     }
 
+    /// <summary>Stops the canvas updater.</summary>
     public void StopUpdates()
     {
         _updateSubscription?.Dispose();
@@ -125,9 +127,14 @@ public partial class FirstCanvas : UserControl
         }
     }
 
+    [DllImport("user32.dll")]
+    private static extern bool SetCursorPos(int a, int b);
+
     public void Canvas_OnMouseMove(object sender, MouseEventArgs e)
     {
         var position = e.GetPosition(CanvasControl);
+        //Console.WriteLine(position);
+        
         var newMousePosition = new Vector2((float)position.X, (float)position.Y);
         var mousePositionWorld = _camera.ConvertIn(newMousePosition);
         
@@ -151,7 +158,16 @@ public partial class FirstCanvas : UserControl
         {
             if (e.RightButton == MouseButtonState.Pressed)
             {
-                _camera.Move((MousePosition - newMousePosition) / _camera.Zoom);
+                var wrappedMousePosition = MouseExtensions.WrapMouseMove(CanvasControl);
+                if (wrappedMousePosition != newMousePosition && wrappedMousePosition != Vector2.Zero)
+                {
+                    newMousePosition = wrappedMousePosition;
+                    mousePositionWorld = _camera.ConvertIn(newMousePosition);
+                }
+                else
+                {
+                    _camera.Move((MousePosition - newMousePosition) / _camera.Zoom);
+                }
             }
         }
 

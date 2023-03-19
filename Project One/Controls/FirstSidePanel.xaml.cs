@@ -31,7 +31,6 @@ public partial class FirstSidePanel : UserControl
         {
             if (!Directory.Exists(value)) return;
             _filesPath = value;
-            Update();
         }
     }
 
@@ -40,7 +39,7 @@ public partial class FirstSidePanel : UserControl
         _firstTopPanel = firstTopPanel;
         _curve = firstCanvas.Curve;
         _camera = firstCanvas.Camera;
-        _filesPath = filesPath;
+        FilesPath = filesPath;
 
         _curveViewModels = new ObservableCollection<CurveViewModel>();
         CurvesList.ItemsSource = _curveViewModels;

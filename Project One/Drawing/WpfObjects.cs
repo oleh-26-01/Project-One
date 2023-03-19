@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -30,6 +31,15 @@ public class WpfObjects
         return line;
     }
 
+    public static Line CarVector(double x1 = 0, double y1 = 0, double x2 = 0, double y2 = 0)
+    {
+        var line = Line(x1, y1, x2, y2);
+        //line.StrokeThickness = 2;
+        //line.SetValue(RenderOptions.EdgeModeProperty, EdgeMode.Aliased);
+        line.Stroke = Brushes.Red;
+        return line;
+    }
+
     /// <summary>Creates new WPF Polyline object and stylize it.</summary>
     /// <returns>Stylized WPF Polyline.</returns>
     public static Polyline Polyline()
@@ -38,6 +48,16 @@ public class WpfObjects
         {
             Stroke = Brushes.Black,
             StrokeThickness = 2
+        };
+    }
+
+    public static Polygon Polygon(Brush colorBrush, bool isFilled = true, bool isStroked = true)
+    {
+        return new()
+        {
+            Fill = isFilled ? colorBrush : Brushes.Transparent,
+            Stroke = isStroked ? Brushes.Black : Brushes.Transparent,
+            StrokeThickness = 1
         };
     }
 
@@ -52,5 +72,12 @@ public class WpfObjects
             Fill = Brushes.Transparent,
             Visibility = Visibility.Hidden
         };
+    }
+
+    public static Line CheckpointLine(double x1 = 0, double y1 = 0, double x2 = 0, double y2 = 0)
+    {
+        var line = Line(x1, y1, x2, y2);
+        line.Stroke = Brushes.Yellow;
+        return line;
     }
 }

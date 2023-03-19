@@ -10,4 +10,10 @@ internal class Strings
     public const string UpdateFileAction = "UpdateFileAction";
 
     public const string UnknownAction = "UnknowAction";
+
+    public const string Forward = "Forward";
+    public const string Backward = "Backward";
+
+    public const string Collision = "Collided";
+    public const string NoCollision = "No collision";
 }

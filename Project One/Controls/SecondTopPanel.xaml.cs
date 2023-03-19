@@ -1,17 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+﻿using System.Windows.Controls;
+using Project_One.Drawing;
+using Project_One_Objects;
 
 namespace Project_One;
 
@@ -20,8 +9,32 @@ namespace Project_One;
 /// </summary>
 public partial class SecondTopPanel : UserControl
 {
+    private WpfCar _car;
+    private Camera _camera;
+    private FpsMeter _fpsMeter;
+
     public SecondTopPanel()
     {
         InitializeComponent();
+    }
+
+    public void Init(SecondCanvas secondCanvas, SecondSidePanel secondSidePanel)
+    {
+        _car = secondCanvas.Car;
+        _camera = secondCanvas.Camera;
+
+        FollowCarCheckBox.Click += (sender, e) =>
+        {
+            if (FollowCarCheckBox.IsChecked == true)
+            {
+                _camera.Follow(() => _car.Position);
+            }
+            else
+            {
+                _camera.FollowStop();
+            }
+        };
+        _camera.Follow(FollowCarCheckBox.IsChecked == true ? () => _car.Position : null);
+        ShowVisionCheckBox.Click += (sender, e) => { _car.IsVisionActive = ShowVisionCheckBox.IsChecked == true; };
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Numerics;
+﻿using System.Numerics;
 
 namespace Project_One_Objects;
 
@@ -7,6 +6,7 @@ public class Camera
 {
     private Vector2 _center;
     private float _zoom;
+    private Func<Vector2>? _followPositionGetter;
 
     public Camera(Vector2 center, Vector2 position, float zoom = 1)
     {
@@ -43,6 +43,25 @@ public class Camera
 
             _center = value;
         }
+    }
+
+    public bool IsFollowing => _followPositionGetter != null;
+
+    public void Follow(Func<Vector2>? positionGetter)
+    {
+        _followPositionGetter = positionGetter;
+    }
+
+    public void FollowStop()
+    {
+        _followPositionGetter = null;
+    }
+
+    public void FollowUpdate(float dt)
+    {
+        if (_followPositionGetter == null) return;
+        var followPosition = _followPositionGetter();
+        Position += ((followPosition - Center) - Position).Scale(dt / 0.2);
     }
 
     public void Move(Vector2 direction)
@@ -169,4 +188,5 @@ public class Camera
 
         return result;
     }
+
 }

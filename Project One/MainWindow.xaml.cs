@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Project_One_Objects;
 
 namespace Project_One;
 
@@ -13,7 +15,7 @@ public partial class MainWindow
     public MainWindow()
     {
         InitializeComponent();
-
+        
         _partIndex = 0;
         FirstCanvas.Init(FirstTopPanel);
         FirstTopPanel.Init(this, FirstCanvas, FirstSidePanel);
@@ -21,7 +23,20 @@ public partial class MainWindow
 
         FirstCanvas.StartUpdates();
 
+        SecondCanvas.Init(SecondTopPanel.CarDirectionLabel, SecondTopPanel.CollisionLabel, SecondTopPanel.CpsLabel);
+        SecondTopPanel.Init(SecondCanvas, SecondSidePanel);
+
+        SecondSidePanel.Init(SecondCanvas, _filesPath);
+
         AddHandler(Keyboard.KeyDownEvent, new KeyEventHandler(CloseWindow), true);
+
+        Closed += (sender, e) =>
+        {
+            FirstCanvas.StopUpdates();
+            SecondCanvas.StopUpdates();
+        };
+
+        // Render.Transform
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
@@ -30,9 +45,12 @@ public partial class MainWindow
 
     private void CloseWindow(object sender, RoutedEventArgs e)
     {
-        FirstCanvas.StopUpdates();
         if (Keyboard.IsKeyDown(Key.Q) || Keyboard.IsKeyDown(Key.Escape))
+        {
+            FirstCanvas.StopUpdates();
+            SecondCanvas.StopUpdates();
             Close();
+        }
     }
 
     private void ChangePart(object sender, RoutedEventArgs e)
@@ -60,11 +78,15 @@ public partial class MainWindow
         ThirdCanvas.Visibility = _partIndex == 2 ? Visibility.Visible : Visibility.Hidden;
 
         FirstCanvas.StopUpdates();
+        SecondCanvas.StopUpdates();
 
         switch (_partIndex)
         {
             case 0:
                 FirstCanvas.StartUpdates();
+                break;
+            case 1:
+                SecondCanvas.StartUpdates();
                 break;
         }
     }

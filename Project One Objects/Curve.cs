@@ -75,7 +75,7 @@ public class Curve
 
     /// <summary>Load points from file.</summary>
     /// <param name="path">Path to file.</param>
-    public void Load(string path)
+    public Curve Load(string path)
     {
         var json = File.ReadAllText(path);
         var data = JsonConvert.DeserializeObject<dynamic>(json);
@@ -85,6 +85,7 @@ public class Curve
         OptAngle = data.Accuracy;
         _points.Clear();
         foreach (var point in data.Points) _points.Add(new Vector2((float)point.X, (float)point.Y));
+        return this;
     }
 
     /// <summary>Save actual points to file.</summary>

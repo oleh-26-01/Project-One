@@ -1,7 +1,6 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Shapes;
 using Project_One_Objects;
 
@@ -11,7 +10,7 @@ public class WpfCurve : Curve
 {
     private readonly Polyline _polyLine;
 
-    public WpfCurve(string filePath = "")
+    public WpfCurve(string filePath = "", double optimizationAngle = 0) : base(optimizationAngle)
     {
         _polyLine = WpfObjects.Polyline();
         if (filePath != "") Load(filePath);
@@ -34,6 +33,7 @@ public class WpfCurve : Curve
 
     public void Update(Camera camera)
     {
+
         var points = camera.ConvertOut(Points);
 
         var pointsCollection = _polyLine.Points;
