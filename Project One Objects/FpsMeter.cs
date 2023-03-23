@@ -4,7 +4,7 @@ namespace Project_One_Objects;
 
 public class FpsMeter
 {
-    private const int BufferSize = 5_000;
+    private const int BufferSize = 3_000;
     private readonly DateTime[] _buffer;
     private DateTime _lastTime = DateTime.Now;
     private int _index = 0;

@@ -50,7 +50,12 @@ public class Curve
         {
             var angleA = Math.Atan2(_points[^1].Y - _points[^2].Y, _points[^1].X - _points[^2].X);
             var angleB = Math.Atan2(point.Y - _points[^1].Y, point.X - _points[^1].X);
-            if (Math.Abs(angleB - angleA) > OptAngle) _points.Add(point);
+            if (Math.Abs(angleB - angleA) > OptAngle)
+            {
+                point.X = (_points[^1].X - point.X == 0) ? point.X + MathExtensions.CloseToZero : point.X;
+                point.Y = (_points[^1].Y - point.Y == 0) ? point.Y + MathExtensions.CloseToZero : point.Y;
+                _points.Add(point);
+            }
         }
         else
         {

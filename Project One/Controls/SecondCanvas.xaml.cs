@@ -98,7 +98,7 @@ public partial class SecondCanvas : UserControl
                             //Console.WriteLine("Checkpoint");
                         }
                     }
-                    _car.UpdateVision();
+                    //_car.UpdateVision();
                     _car.Update(_camera);
                     MoveCar();
                     MoveCamera();
@@ -125,7 +125,7 @@ public partial class SecondCanvas : UserControl
             });
 
         // do update as fast as possible
-        _isCarUpdateThreadRunning = false;
+        _isCarUpdateThreadRunning = true;
         _carUpdateThread = new Thread(() =>
         {
             while (_isCarUpdateThreadRunning)
@@ -133,9 +133,7 @@ public partial class SecondCanvas : UserControl
                 Dispatcher.Invoke(() =>
                 {
                     for (var i = 0; i < 100; i++)
-                    {
                         _car.UpdateVision();
-                    }
                     _fpsMeter.Tick();
                 });
             }

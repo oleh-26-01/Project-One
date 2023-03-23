@@ -1,6 +1,4 @@
-﻿using System.Buffers;
-using System.Numerics;
-using Microsoft.Diagnostics.Tracing.Analysis.GC;
+﻿using System.Numerics;
 
 namespace Project_One_Objects;
 
@@ -8,6 +6,8 @@ public static class MathExtensions
 {
     public const double OneRad = Math.PI / 180;
     public const double TwoPi = Math.PI * 2;
+    public const float FTwoPi = (float)Math.PI * 2;
+    public const float CloseToZero = 1e-5f;
 
     /// <summary> Converts degrees to radians. </summary>
     /// <param name="degrees"> The angle in degrees. </param>
@@ -43,22 +43,34 @@ public static class MathExtensions
         return Vector2.Transform(v, rotation);
     }
 
-    /// <summary> Scales a vector by a scalar. </summary>
-    /// <typeparam name="T"> The type of the scalar. </typeparam>
+    /// <inheritdoc>
+    /// <summary> Scales a vector by a given scalar. </summary>
     /// <param name="v"> The vector to scale. </param>
     /// <param name="scalar"> The scalar to scale by. </param>
     /// <returns> The scaled vector. </returns>
-    public static Vector2 Scale<T>(this Vector2 v, T scalar) where T : struct, IConvertible
+    /// </inheritdoc>
+    public static Vector2 Scale(this Vector2 v, int scalar)
     {
-        var scale = Convert.ToSingle(scalar);
-        return new Vector2(v.X * scale, v.Y * scale);
+        return new Vector2(v.X * scalar, v.Y * scalar);
+    }
+
+    /// <inheritdoc cref="Scale(Vector2,int)"/>
+    public static Vector2 Scale(this Vector2 v, float scalar)
+    {
+        return new Vector2(v.X * scalar, v.Y * scalar);
+    }
+
+    /// <inheritdoc cref="Scale(Vector2,int)"/>
+    public static Vector2 Scale(this Vector2 v, double scalar)
+    {
+        return new Vector2((float)(v.X * scalar), (float)(v.Y * scalar));
     }
 
     /// <summary> Returns the slope and intercept of a line defined by two points. </summary>
     /// <returns> The Vector2, where X is the slope and Y is the intercept. </returns>
     public static Vector2 SlopeIntercept(Vector2 v1, Vector2 v2)
     {
-        if (v1.X - v2.X == 0) return new Vector2(float.MaxValue, v1.X);
+        if (v1.X - v2.X == 0) return new Vector2(float.MaxValue, -float.MaxValue);
         if (v1.Y - v2.Y == 0) return new Vector2(0, v1.Y);
 
         var slope = (v2.Y - v1.Y) / (v2.X - v1.X);
@@ -66,37 +78,46 @@ public static class MathExtensions
         return new Vector2(slope, intercept);
     }
 
+    /// <returns> Cross product of v1 and v2 </returns>
     public static float Cross(this Vector2 v1, Vector2 v2)
     {
         return v1.X * v2.Y - v1.Y * v2.X;
     }
 
+    /// <returns> Length of vector v </returns>
     public static float Length(this Vector2 v)
     {
         return (float)Math.Sqrt(v.X * v.X + v.Y * v.Y);
     }
 
+    /// <summary>
+    /// Returns the distance between point and the line segment defined by lineStart and lineEnd.
+    /// </summary>
+    /// <param name="point"> The point to find the distance to. </param>
+    /// <param name="lineStart"> The start of the line segment. </param>
+    /// <param name="lineEnd"> The end of the line segment. </param>
+    /// <returns> The distance between the point and the line segment. </returns>
     public static float DistanceToSegment(Vector2 point, Vector2 lineStart, Vector2 lineEnd)
     {
         var A = lineEnd.Y - lineStart.Y;
         var B = lineStart.X - lineEnd.X;
         var C = A * lineStart.X + B * lineStart.Y;
 
-        return (float)Math.Abs(A * point.X + B * point.Y - C) / (float)Math.Sqrt(A * A + B * B);
+        return Math.Abs(A * point.X + B * point.Y - C) / (float)Math.Sqrt(A * A + B * B);
     }
 
     public static Vector2 LineIntersection(Vector2 a, Vector2 b, Vector2 c, Vector2 d)
     {
-        Vector2 deltaAB = b - a;
-        Vector2 deltaCD = d - c;
-        float denominator = deltaAB.Cross(deltaCD);
+        var deltaAB = b - a;
+        var deltaCD = d - c;
+        var denominator = deltaAB.Cross(deltaCD);
         if (denominator == 0)
         {
             return new Vector2(float.NaN, float.NaN);
         }
 
-        Vector2 deltaAC = c - a;
-        float t = deltaAC.Cross(deltaCD) / denominator;
+        var deltaAC = c - a;
+        var t = deltaAC.Cross(deltaCD) / denominator;
         return a + deltaAB * t;
     }
 
@@ -113,75 +134,80 @@ public static class MathExtensions
     }
 
     /// <summary>
-    /// Returns angles relative to the specific position and body angle.
+    /// Calculate angles relative to the specific position and body angle.
     /// </summary>
     /// <param name="points"> The points to find the angles of. </param>
     /// <param name="position"> The position to find the angles relative to. </param>
     /// <param name="bodyAngle"> The body angle to find the angles relative to. </param>
     /// <param name="targetArray"> The array to store the angles in. </param>
-    /// <returns></returns>
-    public static float[] FindRelativeAngles(Vector2[] points, Vector2 position, double bodyAngle = 0, float[]? targetArray = null)
+    public static void CalcRelativeAngles(Vector2[] points, Vector2 position, double bodyAngle, float[] targetArray)
     {
-        //var angles = ArrayPool<float>.Shared.Rent(points.Length);
-        var angles = targetArray ?? new float[points.Length];
         for (var i = 0; i < points.Length; i++)
         {
             var point = points[i];
             var angle = Math.Atan2(point.Y - position.Y, point.X - position.X);
-            angles[i] = (float)angle.Mod(TwoPi);
+            targetArray[i] = (float)angle.Mod(TwoPi);
         }
-        return angles;
     }
 
-    public static float[] CalcVectorAngles(int count, double bodyAngle = 0, float[]? targetArray = null)
+    /// <summary>
+    /// Calculate angles of the vectors, released in a circle, relative to the specific body angle.
+    /// </summary>
+    /// <param name="count"> The number of vectors to find the angles of. </param>
+    /// <param name="bodyAngle"> The body angle to find the angles relative to. </param>
+    /// <param name="targetArray"> The array to store the angles in. </param>
+    public static void CalcVectorAngles(int count, double bodyAngle, float[] targetArray)
     {
-        //var angles = ArrayPool<float>.Shared.Rent(count);
-        var angles = targetArray ?? new float[count];
         var angle = 0d;
         var angleStep = TwoPi / count;
         for (var i = 0; i < count; i++)
         {
-            angles[i] = (float)((bodyAngle + angle) % TwoPi); // !!!
+            targetArray[i] = (float)((bodyAngle + angle) % TwoPi); // !!!
             angle += angleStep;
         }
-        return angles;
     }
 
-    public static Vector2[] AngleToSlopeIntercept(float[] angles, Vector2 position, Vector2[]? targetArray = null)
+    /// <summary> Transform angles to slope-intercept form. </summary>
+    /// <param name="angles"> The angles to transform. </param>
+    /// <param name="position"> The position to transform the angles relative to. </param>
+    /// <param name="targetArray"> The array to store the slope-intercept form in. </param>
+    /// <remarks> The slope-intercept form is stored in the Vector2, where X is the slope and Y is the intercept. </remarks>
+    public static void AngleToSlopeIntercept(float[] angles, Vector2 position, Vector2[] targetArray)
     {
-        //var points = ArrayPool<Vector2>.Shared.Rent(angles.Length);
-        var points = targetArray ?? new Vector2[angles.Length];
         for (var i = 0; i < angles.Length; i++)
         {
-            points[i].X = (float)Math.Tan(angles[i]);
-            points[i].Y = position.Y - points[i].X * position.X;
+            targetArray[i].X = (float)(Math.Tan(angles[i]));
+            targetArray[i].Y = position.Y - targetArray[i].X * position.X;
         }
-        return points;
     }
 
-    public static bool IsAngleBetween<T>(T angle, T first, T second) where T : struct, IConvertible
+    /// <inheritdoc>
+    /// <summary> Check if an angle is between two other angles. </summary>
+    /// <param name="angle"> The angle to check. </param>
+    /// <param name="first"> The first angle. </param>
+    /// <param name="second"> The second angle. </param>
+    /// <returns> True if the angle is between the two other angles. </returns>
+    /// </inheritdoc>
+    public static bool IsAngleBetween(float angle, float first, float second)
     {
-        var a = Convert.ToSingle(angle);
-        var f = Convert.ToSingle(first);
-        var s = Convert.ToSingle(second);
-        if (f > s)
+        if (first > second)
         {
-            (f, s) = (s, f);
+            (first, second) = (second, first);
         }
 
-        if (s - f > Math.PI)
+        if (second - first > Math.PI)
         {
-            (f, s) = (s, f + (float)TwoPi);
+            (first, second) = (second, first + FTwoPi);
         }
 
-        if (f <= a && a < s) 
+        if (first <= angle && angle < second)
         {
             return true;
         }
 
-        a += (float)TwoPi;
+        angle += FTwoPi;
 
-        if (f <= a && a < s)
+        if (first <= angle && angle < second)
         {
             return true;
         }
@@ -189,11 +215,55 @@ public static class MathExtensions
         return false;
     }
 
-    public static T Mod<T>(this T a, T b)
+    /// <inheritdoc cref="IsAngleBetween(float,float,float)"/>
+    public static bool IsAngleBetween(double angle, double first, double second)
     {
-        dynamic divisor = b;
-        dynamic dividend = a % divisor;
+        if (first > second)
+        {
+            (first, second) = (second, first);
+        }
 
-        return dividend >= 0 ? dividend : dividend + divisor;
+        if (second - first > Math.PI)
+        {
+            (first, second) = (second, first + TwoPi);
+        }
+
+        if (first <= angle && angle < second)
+        {
+            return true;
+        }
+
+        angle += TwoPi;
+
+        if (first <= angle && angle < second)
+        {
+            return true;
+        }
+
+        return false;
     }
+
+    /// <inheritdoc>
+    /// <summary> Returns mod of a and b. The result is always positive. </summary>
+    /// <param name="a"> The dividend. </param>
+    /// <param name="b"> The divisor. </param>
+    /// <returns> The remainder of a / b. </returns>
+    /// </inheritdoc>
+    public static int Mod(this int a, int b)
+    {
+        return a - b * (int)Math.Floor(a / (double)b);
+    }
+
+    /// <inheritdoc cref="Mod(int, int)" />
+    public static float Mod(this float a, float b)
+    {
+        return a - b * (float)Math.Floor(a / b);
+    }
+
+    /// <inheritdoc cref="Mod(int, int)" />
+    public static double Mod(this double a, double b)
+    {
+        return a - b * Math.Floor(a / b);
+    }
+
 }

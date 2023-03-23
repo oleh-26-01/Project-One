@@ -79,6 +79,7 @@ public partial class MainWindow
 
         FirstCanvas.StopUpdates();
         SecondCanvas.StopUpdates();
+        ThirdCanvas.StopUpdates();
 
         switch (_partIndex)
         {
@@ -87,6 +88,9 @@ public partial class MainWindow
                 break;
             case 1:
                 SecondCanvas.StartUpdates();
+                break;
+            case 2:
+                ThirdCanvas.StartUpdates();
                 break;
         }
     }

@@ -1,19 +1,20 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics;
+using System.Numerics;
 
 namespace Project_One_Objects;
 
 public class Car
 {
     private Vector2 _position;
-    private float _speed = 0;
-    private double _bodyAngle = 0;
-    private double _frontWheelsAngle = 0;
+    private float _speed;
+    private double _bodyAngle;
+    private double _frontWheelsAngle;
 
     public Track? _track;
     private Vector2[] _trackSlopeIntercepts;
     private int _visionCount = 8;
     private Vector2[] _visionPoints;
-    private float[] _minVisionLengths;
+    private readonly float[] _minVisionLengths;
     private List<Vector2>[] _tempPoints;
     private bool _isVisionActive = false;
 
@@ -188,17 +189,17 @@ public class Car
     public float[] GetMinVisionLengths()
     {
         var carVertices = new Vector2[4];
-        carVertices[0] = new Vector2(-Width / 2f, -Height / 2f);
-        carVertices[1] = new Vector2(Width / 2f, -Height / 2f);
-        carVertices[2] = new Vector2(Width / 2f, Height / 2f);
-        carVertices[3] = new Vector2(-Width / 2f, Height / 2f);
+        carVertices[0] = new Vector2(Width / 2f, -Height / 2f);
+        carVertices[1] = new Vector2(Width / 2f, Height / 2f);
+        carVertices[2] = new Vector2(-Width / 2f, Height / 2f);
+        carVertices[3] = new Vector2(-Width / 2f, -Height / 2f);
 
         var nanVector = new Vector2(float.NaN, float.NaN);
         var result = new float[_visionCount];
 
         var verticesAngles = new float[carVertices.Length];
         var sortedVerticesAngles = new Vector2[carVertices.Length];
-        MathExtensions.FindRelativeAngles(carVertices, _position, _bodyAngle, verticesAngles);
+        MathExtensions.CalcRelativeAngles(carVertices, _position, _bodyAngle, verticesAngles);
         for (var i = 0; i < sortedVerticesAngles.Length; i++)
         {
             sortedVerticesAngles[i].X = i;
@@ -208,7 +209,7 @@ public class Car
 
         var carVisionAngles = new float[_visionCount];
         var sortedCarVisionAngles = new Vector2[_visionCount];
-        MathExtensions.CalcVectorAngles(_visionCount, 0f, carVisionAngles);
+        MathExtensions.CalcVectorAngles(_visionCount, 90d.ToRad(), carVisionAngles); // !!! 90d.ToRad()
         for (var i = 0; i < sortedCarVisionAngles.Length; i++)
         {
             sortedCarVisionAngles[i].X = i;
@@ -220,22 +221,22 @@ public class Car
         var f = 0; // vectors iterated
         for (var v = 0; v < carVertices.Length && f < _visionCount; v++)
         {
-            var v1index = v.Mod(carVertices.Length);
-            var v2index = (v + 1).Mod(carVertices.Length);
-            while (!MathExtensions.IsAngleBetween(sortedCarVisionAngles[c].Y, sortedVerticesAngles[v1index].Y,
-                    sortedVerticesAngles[v2index].Y))
+            var v1Index = v.Mod(carVertices.Length);
+            var v2Index = (v + 1).Mod(carVertices.Length);
+            while (!MathExtensions.IsAngleBetween(sortedCarVisionAngles[c].Y, sortedVerticesAngles[v1Index].Y,
+                    sortedVerticesAngles[v2Index].Y))
             {
                 c = (c + 1).Mod(_visionCount);
                 f++;
             }
 
-            while (MathExtensions.IsAngleBetween(sortedCarVisionAngles[c].Y, sortedVerticesAngles[v1index].Y,
-                       sortedVerticesAngles[v2index].Y))
+            while (MathExtensions.IsAngleBetween(sortedCarVisionAngles[c].Y, sortedVerticesAngles[v1Index].Y,
+                       sortedVerticesAngles[v2Index].Y))
             {
                 var visionPoint = new Vector2(1, 0).Rotate(sortedCarVisionAngles[c].Y);
                 var point = MathExtensions.LineIntersection(Vector2.Zero, visionPoint,
-                    carVertices[(int)sortedVerticesAngles[v1index].X],
-                    carVertices[(int)sortedVerticesAngles[v2index].X]);
+                    carVertices[(int)sortedVerticesAngles[v1Index].X],
+                    carVertices[(int)sortedVerticesAngles[v2Index].X]);
                 if (point != nanVector)
                 {
                     result[(int)sortedCarVisionAngles[c].X] = point.Length();
@@ -256,7 +257,7 @@ public class Car
 
         var bodyAngle = _bodyAngle.Mod(MathExtensions.TwoPi);
 
-        MathExtensions.FindRelativeAngles(_track.Points, _position, bodyAngle, _trackPointsAngles);
+        MathExtensions.CalcRelativeAngles(_track.Points, _position, bodyAngle, _trackPointsAngles);
         for (var i = 0; i < _sortedTrackPointsAngles.Length; i++)
         {
             _sortedTrackPointsAngles[i].X = i;
@@ -307,7 +308,7 @@ public class Car
                     {
                         var x = (_trackSlopeIntercepts[secondPointIndex].Y - _vectorSlopeIntercepts[c].Y) /
                                 (_vectorSlopeIntercepts[c].X - _trackSlopeIntercepts[secondPointIndex].X);
-                        var y = _vectorSlopeIntercepts[c].X * x + _vectorSlopeIntercepts[c].Y;
+                        var y = _trackSlopeIntercepts[secondPointIndex].X * x + _trackSlopeIntercepts[secondPointIndex].Y;
                         var point = new Vector2(x, y);
                         _tempPoints[(int)_sortedCarVisionAngles[c].X].Add(point);
                     }
