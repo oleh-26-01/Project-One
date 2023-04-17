@@ -1,15 +1,12 @@
-﻿using System;
-using System.Numerics;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Project_One_Objects;
 
 namespace Project_One;
 
 public partial class MainWindow
 {
-    private readonly string _filesPath = "C:\\Coding\\C#\\Project One\\Project One\\Curves\\";
+    private const string FilesPath = "C:\\Coding\\C#\\Project One\\Project One\\Curves\\";
     private readonly string[] _parts = { "First", "Second", "Third" };
     private int _partIndex;
     public MainWindow()
@@ -19,14 +16,14 @@ public partial class MainWindow
         _partIndex = 0;
         FirstCanvas.Init(FirstTopPanel);
         FirstTopPanel.Init(this, FirstCanvas, FirstSidePanel);
-        FirstSidePanel.Init(FirstCanvas, FirstTopPanel, _filesPath);
+        FirstSidePanel.Init(FirstCanvas, FirstTopPanel, FilesPath);
 
         FirstCanvas.StartUpdates();
 
         SecondCanvas.Init(SecondTopPanel.CarDirectionLabel, SecondTopPanel.CollisionLabel, SecondTopPanel.CpsLabel);
         SecondTopPanel.Init(SecondCanvas, SecondSidePanel);
 
-        SecondSidePanel.Init(SecondCanvas, _filesPath);
+        SecondSidePanel.Init(SecondCanvas, FilesPath);
 
         AddHandler(Keyboard.KeyDownEvent, new KeyEventHandler(CloseWindow), true);
 

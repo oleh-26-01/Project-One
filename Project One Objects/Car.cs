@@ -12,9 +12,9 @@ public class Car
 
     public Track? _track;
     private Vector2[] _trackSlopeIntercepts;
-    private int _visionCount = 8;
+    private int _visionCount;
     private Vector2[] _visionPoints;
-    private readonly float[] _minVisionLengths;
+    private float[] _minVisionLengths;
     private List<Vector2>[] _tempPoints;
     private bool _isVisionActive = false;
 
@@ -42,12 +42,8 @@ public class Car
     {
         _position = startPosition;
         _bodyAngle = bodyAngle;
+        VisionCount = 8;
         _frontWheelsAngle = _bodyAngle;
-        _visionPoints = new Vector2[_visionCount];
-        _minVisionLengths = GetMinVisionLengths();
-        _tempPoints = new List<Vector2>[_visionCount];
-        for (var i = 0; i < _visionCount; i++)
-            _tempPoints[i] = new List<Vector2>();
     }
 
     /// <summary> Copy constructor </summary>
@@ -104,24 +100,42 @@ public class Car
     }
     */
 
-    public int VisionCount => _visionCount;
+    // genome necessary value
+    public float MaxSpeed => _maxSpeed;
+
+    public int VisionCount 
+    {
+        get => _visionCount;
+        set
+        {
+            if (value < 1)
+                throw new ArgumentOutOfRangeException(nameof(value), "Vision count must be greater than 0.");
+            _visionCount = (int)value;
+            _visionPoints = new Vector2[_visionCount];
+            _minVisionLengths = GetMinVisionLengths();
+            _tempPoints = new List<Vector2>[_visionCount];
+            for (var i = 0; i < _visionCount; i++)
+                _tempPoints[i] = new List<Vector2>();
+
+            _carVisionAngles = new float[_visionCount];
+            _sortedCarVisionAngles = new Vector2[_visionCount];
+            _vectorSlopeIntercepts = new Vector2[_visionCount];
+            _tempVectorAngles = new float[_visionCount];
+        }
+    }
 
     public Vector2[] VisionPoints => _visionPoints;
 
     public Track Track
     {
-        get => _track;
+        get => _track!;
         set
         {
             _trackPointsAngles = new float[value.Points.Length];
             _sortedTrackPointsAngles = new Vector2[value.Points.Length];
-            _carVisionAngles = new float[_visionCount];
-            _sortedCarVisionAngles = new Vector2[_visionCount];
-            _vectorSlopeIntercepts = new Vector2[_visionCount];
-            _tempVectorAngles = new float[_visionCount];
+            _trackSlopeIntercepts = new Vector2[value.Points.Length];
 
             _track = value;
-            _trackSlopeIntercepts = new Vector2[_track.Points.Length];
             for (var i = 1; i < _track.Points.Length; i++)
             {
                 _trackSlopeIntercepts[i] = MathExtensions.SlopeIntercept(_track.Points[i - 1], _track.Points[i]);
@@ -439,7 +453,7 @@ public class Car
 
     /// <summary> Stops the car from turning. </summary>
     /// <param name="dt"> The time in seconds since the last update.</param>
-    public void StopTurning(float dt)
+    public void StopTurning(float dt)   
     {
         switch (_frontWheelsAngle)
         {

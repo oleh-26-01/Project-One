@@ -53,7 +53,7 @@ public class Track
     {
         _curvePoints = new Curve().Load(path).Points.ToArray();
         _points = GetPoints();
-        _checkpointIndexes = GetCheckpoints();
+        _checkpointIndexes = GetCheckpointIndexes();
         LoadStatus = true;
         return this;
     }
@@ -80,7 +80,7 @@ public class Track
         return result;
     }
 
-    private List<int> GetCheckpoints()
+    private List<int> GetCheckpointIndexes()
     {
         var points = _points;
         var checkpoints = new List<int>();
@@ -96,6 +96,19 @@ public class Track
             if (distance < _minCheckpointDistance) continue;
             checkpoints.Add(i + 1);
             distance = 0;
+        }
+
+        return checkpoints;
+    }
+
+    public List<Vector2> GetCheckpoints()
+    {
+        var checkpoints = new List<Vector2>();
+        foreach (var index in _checkpointIndexes)
+        {
+            var firstPoint = _points[index];
+            var secondPoint = _points[^(index + 1)];
+            checkpoints.Add((firstPoint + secondPoint) / 2);
         }
 
         return checkpoints;

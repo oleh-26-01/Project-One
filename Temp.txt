@@ -1,1 +1,34 @@
-﻿
+﻿Third part ui design
+
+Side Panel:
+	1. Show only list of selected tracks;
+	2. Next to track name show amout of checkpoints;
+	3. There will be two buttons: "Select" and "Watch";
+	4. "Select" button will select track, and load genome and etc. or create new genome;
+	5. "Watch" button will "play" genome. 
+		This button have two states: Red color - unavailable and Green color - available;
+
+Top Panel:
+	1. [Train | Stop] button;
+	2. Drop-down list of genomes ("new one", best genome or any of N generation, if exist) as start population;
+	3. "Multi-threading" checkbox;
+	4. "Hide replay" checkbox;
+	5. "Generation №", "Best score" and "best to average rate" labels;
+	6. "Reset" button;
+
+Genome:
+	1. Contain car entity;
+	2. Know about track;
+	3. Have "genome" - list of genes;
+		List of genes - sequence of car actions;
+	4. Have "fitness" - score of genome;
+		Fitness is based on distance to next checkpoint and time of driving;
+	5. Tickrate must be defined;
+
+Population-agent:
+	1. Contain list of genomes;
+	2. Know about track;
+	3. Generate start population;
+	4. Analize genomes, and select best;
+	5. Create new generation of genomes;
+	6. Save best genome and every N generation;

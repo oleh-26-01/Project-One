@@ -175,6 +175,19 @@ public partial class SecondCanvas : UserControl
         var dt = _lastUpdate.ElapsedMilliseconds / 1000f;
         _car.Move(dt);
         
+        if (Keyboard.IsKeyDown(Key.A))
+        {
+            _car.TurnLeft(dt);
+        }
+        else if (Keyboard.IsKeyDown(Key.D))
+        {
+            _car.TurnRight(dt);
+        }
+        else
+        {
+            _car.StopTurning(dt);
+        }        
+        
         if (Keyboard.IsKeyDown(Key.W))
         {
             _car.SpeedUp(dt);
@@ -187,20 +200,6 @@ public partial class SecondCanvas : UserControl
         {
             _car.Stop(dt);
         }
-
-        if (Keyboard.IsKeyDown(Key.A))
-        {
-            _car.TurnLeft(dt);
-        }
-        else if (Keyboard.IsKeyDown(Key.D))
-        {
-            _car.TurnRight(dt);
-        }
-        else
-        {
-            _car.StopTurning(dt);
-        }
-
     }
     
     public void Canvas_OnMouseClick(object sender, MouseButtonEventArgs e)
