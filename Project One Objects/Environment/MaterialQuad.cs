@@ -5,8 +5,9 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using Project_One_Objects.Helpers;
 
-namespace Project_One_Objects;
+namespace Project_One_Objects.Environment;
 
 public class MaterialQuad
 {

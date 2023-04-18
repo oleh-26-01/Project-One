@@ -16,7 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Project_One_Objects;
+using Project_One_Objects.Helpers;
 
 namespace Project_One;
 

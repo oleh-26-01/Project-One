@@ -5,7 +5,7 @@ using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using Project_One.Helpers;
-using Project_One_Objects;
+using Project_One_Objects.Helpers;
 
 namespace Project_One;
 

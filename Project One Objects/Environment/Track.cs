@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
+using Project_One_Objects.Helpers;
 
-namespace Project_One_Objects;
+namespace Project_One_Objects.Environment;
 
 public class Track
 {
@@ -119,11 +120,11 @@ public class Track
         var checkpointIndex = _checkpointIndexes[_currentCheckpointIndex];
         var firstPoint = _points[checkpointIndex];
         var secondPoint = _points[^(checkpointIndex + 1)];
-        
+
         var center = (firstPoint + secondPoint) / 2;
         var distanceToCenter = Vector2.Distance(carPosition, center);
         if (distanceToCenter > _width) return false;
-        
+
         var distance = MathExtensions.DistanceToSegment(carPosition, firstPoint, secondPoint);
         if (distance < checkDistance)
         {

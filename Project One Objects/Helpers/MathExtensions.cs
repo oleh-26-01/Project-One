@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace Project_One_Objects;
+namespace Project_One_Objects.Helpers;
 
 public static class MathExtensions
 {
@@ -16,7 +16,7 @@ public static class MathExtensions
     {
         return degrees * OneRad;
     }
-    
+
     /// <summary> Converts radians to degrees. </summary>
     /// <param name="radians"> The angle in radians. </param>
     /// <returns> The angle in degrees. </returns>
@@ -176,7 +176,7 @@ public static class MathExtensions
     {
         for (var i = 0; i < angles.Length; i++)
         {
-            targetArray[i].X = (float)(Math.Tan(angles[i]));
+            targetArray[i].X = (float)Math.Tan(angles[i]);
             targetArray[i].Y = position.Y - targetArray[i].X * position.X;
         }
     }

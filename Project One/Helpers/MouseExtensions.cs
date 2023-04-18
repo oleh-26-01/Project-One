@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Project_One_Objects;
+using Project_One_Objects.Helpers;
 
 namespace Project_One;
 

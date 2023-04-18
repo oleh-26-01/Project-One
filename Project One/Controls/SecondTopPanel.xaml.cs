@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 using Project_One.Drawing;
-using Project_One_Objects;
+using Project_One_Objects.Helpers;
 
 namespace Project_One;
 

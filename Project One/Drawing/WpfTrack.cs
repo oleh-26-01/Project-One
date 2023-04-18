@@ -2,7 +2,8 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using Project_One_Objects;
+using Project_One_Objects.Environment;
+using Project_One_Objects.Helpers;
 
 namespace Project_One;
 

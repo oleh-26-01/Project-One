@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Project_One_Objects;
+namespace Project_One_Objects.Helpers;
 
 public class FpsMeter
 {

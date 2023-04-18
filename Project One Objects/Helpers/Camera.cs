@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace Project_One_Objects;
+namespace Project_One_Objects.Helpers;
 
 public class Camera
 {
@@ -61,7 +61,7 @@ public class Camera
     {
         if (_followPositionGetter == null) return;
         var followPosition = _followPositionGetter();
-        Position += ((followPosition - Center) - Position).Scale(dt / 0.2);
+        Position += (followPosition - Center - Position).Scale(dt / 0.2);
     }
 
     public void Move(Vector2 direction)

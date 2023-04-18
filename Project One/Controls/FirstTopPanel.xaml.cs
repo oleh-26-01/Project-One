@@ -5,7 +5,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Project_One.Helpers;
-using Project_One_Objects;
+using Project_One_Objects.Environment;
+using Project_One_Objects.Helpers;
 
 namespace Project_One;
 

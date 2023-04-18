@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
+using Project_One_Objects.Helpers;
 
-namespace Project_One_Objects;
+namespace Project_One_Objects.Environment;
 
 public class Car
 {
@@ -103,14 +104,14 @@ public class Car
     // genome necessary value
     public float MaxSpeed => _maxSpeed;
 
-    public int VisionCount 
+    public int VisionCount
     {
         get => _visionCount;
         set
         {
             if (value < 1)
                 throw new ArgumentOutOfRangeException(nameof(value), "Vision count must be greater than 0.");
-            _visionCount = (int)value;
+            _visionCount = value;
             _visionPoints = new Vector2[_visionCount];
             _minVisionLengths = GetMinVisionLengths();
             _tempPoints = new List<Vector2>[_visionCount];
@@ -164,7 +165,7 @@ public class Car
         if (_track is null) return false;
         var nextPointDistance =
             Vector2.Distance(_position, _track.CurvePoints[(nearestPointIndex + 1).Mod(_track.CurvePoints.Length)]);
-        var prevPointDistance = 
+        var prevPointDistance =
             Vector2.Distance(_position, _track.CurvePoints[(nearestPointIndex - 1).Mod(_track.CurvePoints.Length)]);
         var currentPointDistance =
             Vector2.Distance(_position, _track.CurvePoints[nearestPointIndex]);
@@ -179,11 +180,11 @@ public class Car
 
         nearestPointIndex = Math.Clamp(nearestPointIndex, 1, _track.CurvePoints.Length - 1);
 
-        var vector = _track.CurvePoints[nearestPointIndex] - 
+        var vector = _track.CurvePoints[nearestPointIndex] -
                      _track.CurvePoints[nearestPointIndex - 1];
-        var angle = (Math.Atan2(vector.Y, vector.X)).Mod(MathExtensions.TwoPi);
-        return MathExtensions.IsAngleBetween(_bodyAngle.Mod(MathExtensions.TwoPi), 
-            (angle - Math.PI / 2.01).Mod(MathExtensions.TwoPi), 
+        var angle = Math.Atan2(vector.Y, vector.X).Mod(MathExtensions.TwoPi);
+        return MathExtensions.IsAngleBetween(_bodyAngle.Mod(MathExtensions.TwoPi),
+            (angle - Math.PI / 2.01).Mod(MathExtensions.TwoPi),
             (angle + Math.PI / 2.01).Mod(MathExtensions.TwoPi));
     }
 
@@ -302,8 +303,8 @@ public class Car
         {
             var sortedCvaIndex = (c - 1).Mod(_visionCount);
             if (!MathExtensions.IsAngleBetween(
-                    _sortedTrackPointsAngles[t].Y, 
-                    _sortedCarVisionAngles[sortedCvaIndex].Y, 
+                    _sortedTrackPointsAngles[t].Y,
+                    _sortedCarVisionAngles[sortedCvaIndex].Y,
                     _sortedCarVisionAngles[c].Y))
             {
                 c = (c + 1) % _visionCount;
@@ -314,7 +315,7 @@ public class Car
                 var secondPointIndex = (int)(_sortedTrackPointsAngles[t].X + 1) % _track.Points.Length;
                 var tempC = c;
                 while (MathExtensions.IsAngleBetween(
-                           _sortedCarVisionAngles[c].Y, 
+                           _sortedCarVisionAngles[c].Y,
                            _sortedTrackPointsAngles[t].Y,
                            _trackPointsAngles[secondPointIndex]))
                 {
@@ -343,20 +344,20 @@ public class Car
                     _visionPoints[i] = _tempPoints[i][0];
                     break;
                 case > 1:
-                {
-                    var min = float.MaxValue;
-                    var minIndex = 0;
-                    for (var j = 0; j < _tempPoints[i].Count; j++)
                     {
-                        var dist = Vector2.Distance(_position, _tempPoints[i][j]);
-                        if (!(dist < min)) continue;
-                        min = dist;
-                        minIndex = j;
-                    }
+                        var min = float.MaxValue;
+                        var minIndex = 0;
+                        for (var j = 0; j < _tempPoints[i].Count; j++)
+                        {
+                            var dist = Vector2.Distance(_position, _tempPoints[i][j]);
+                            if (!(dist < min)) continue;
+                            min = dist;
+                            minIndex = j;
+                        }
 
-                    _visionPoints[i] = _tempPoints[i][minIndex];
-                    break;
-                }
+                        _visionPoints[i] = _tempPoints[i][minIndex];
+                        break;
+                    }
                 default:
                     _visionPoints[i] = Vector2.Zero;
                     break;
@@ -396,8 +397,8 @@ public class Car
         }
 
         //_speed = Math.Clamp(_speed, -_maxSpeed, _maxSpeed);
-        _speed += ((float)Math.Min(Math.Min(_speed, 
-                           _maxSpeed / (Math.Pow(Math.Abs(_frontWheelsAngle).ToDeg(), 0.35) + 0.1)), 
+        _speed += ((float)Math.Min(Math.Min(_speed,
+                           _maxSpeed / (Math.Pow(Math.Abs(_frontWheelsAngle).ToDeg(), 0.35) + 0.1)),
                        _maxSpeed) - _speed) * dt * 2;
     }
 
@@ -414,7 +415,7 @@ public class Car
             _speed -= _slowDownSpeed * dt;
         }
 
-        _speed += ((float)Math.Max(Math.Max(_speed, 
+        _speed += ((float)Math.Max(Math.Max(_speed,
                            -_maxSpeed / (Math.Pow(Math.Abs(_frontWheelsAngle).ToDeg(), 0.35) + 0.1)),
                        -_maxSpeed) - _speed) * dt * 2;
     }
@@ -453,7 +454,7 @@ public class Car
 
     /// <summary> Stops the car from turning. </summary>
     /// <param name="dt"> The time in seconds since the last update.</param>
-    public void StopTurning(float dt)   
+    public void StopTurning(float dt)
     {
         switch (_frontWheelsAngle)
         {
