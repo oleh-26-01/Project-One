@@ -1,5 +1,7 @@
 ﻿using System.Numerics;
 using BenchmarkDotNet.Running;
+using Project_One_Objects.AIComponents;
+using Project_One_Objects.Environment;
 using Project_One_Objects.Helpers;
 
 namespace Project_One_Objects;
@@ -13,20 +15,27 @@ internal class Program
     
     private static void Main()
     {
-        RunBenchmark();
-        return;
+        //RunBenchmark();
+        var track = new Track().Load("C:\\Coding\\C#\\Project One\\Project One\\Curves\\curve004.crv");
+        var populationManager = new PopulationManager(100, track);
+        for (var i = 0; i < 200; i++)
+        {
+            populationManager.RunSimulationParallel();
+            var report = populationManager.AnalyzeGeneration();
+            Console.WriteLine(report);
+            populationManager.PrepareNextGeneration();  
+        }
 
-        var a = new Vector2(1, 1);
-        var b = new Vector2(3, 3);
-        var c = new Vector2(1, 2);
-        var d = new Vector2(2, 1);
-        var deltaAB = b - a;
-        var deltaCD = d - c;
-        var deltaAC = c - a;
-        var intersection = MathExtensions.LineIntersection(a, b, c, d);
-        var intersectionOpt = MathExtensions.LineIntersectionOpt(a, deltaAB, deltaCD, deltaAC);
+        populationManager.RunSimulationParallel();
+        var report2 = populationManager.AnalyzeGeneration();
+        var bestGenome = populationManager.Population[0];
+        Console.WriteLine(report2);
+        Console.WriteLine(bestGenome.FullDistance);
+        // save in file bestGenome.Genes
+        var stringGenes = string.Join(" ", bestGenome.Genes);
 
-        Console.WriteLine(intersection);
-        Console.WriteLine(intersectionOpt);
+        Console.WriteLine(populationManager.Population[0].CheckPoints[^1]);
+        Console.WriteLine(populationManager.Population[0].Car.Position);
+        System.IO.File.WriteAllText("C:\\Coding\\C#\\Project One\\Project One\\Curves\\curve001.genes", stringGenes);
     }
 }

@@ -10,11 +10,10 @@ Side Panel:
 
 Top Panel:
 	1. [Train | Stop] button;
-	2. Drop-down list of genomes ("new one", best genome or any of N generation, if exist) as start population;
-	3. "Multi-threading" checkbox;
-	4. "Hide replay" checkbox;
-	5. "Generation №", "Best score" and "best to average rate" labels;
-	6. "Reset" button;
+	2. "Multi-threading" checkbox;
+	3. "Hide replay" checkbox;
+	4. "Generation №", "Best score" and "best to average rate" labels;
+	5. "Reset" button;
 
 Genome:
 	1. Contain car entity;
@@ -32,3 +31,8 @@ Population-agent:
 	4. Analize genomes, and select best;
 	5. Create new generation of genomes;
 	6. Save best genome and every N generation;
+	
+	* Implement a gene significance system:
+	1. Each gene have a significance;
+	2. Gene with high significance hava less chance to be mutated;
+	3. Gene with higher significance have more chance to be inherited;

@@ -14,7 +14,7 @@ public class WpfTrack : Track
     public bool ShowCheckpoints { get; set; } = true;
 
     public WpfTrack(string filePath = "", 
-        float width = 6, float minCheckpointDistance = 100) : base(width, minCheckpointDistance)
+        float width = 6, float minCheckpointDistance = 10) : base(width, minCheckpointDistance)
     {
         _polyLine = WpfObjects.Polyline();
         _checkpointLine = WpfObjects.CheckpointLine();

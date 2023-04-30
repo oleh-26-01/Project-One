@@ -13,13 +13,26 @@ public class Track
     private int _currentCheckpointIndex = 0;
     public bool LoadStatus = false;
 
-    public Track(float width = 10, float minCheckpointDistance = 100)
+    public Track(float width = 10, float minCheckpointDistance = 10)
     {
         Width = width;
         MinCheckpointDistance = minCheckpointDistance;
         _curvePoints = Array.Empty<Vector2>();
         _points = Array.Empty<Vector2>();
         _checkpointIndexes = new List<int>();
+    }
+
+    public Track(Track track)
+    {
+        _width = track._width;
+        _curvePoints = new Vector2[track._curvePoints.Length];
+        track._curvePoints.CopyTo(_curvePoints, 0);
+        _points = new Vector2[track._points.Length];
+        track._points.CopyTo(_points, 0);
+        _minCheckpointDistance = track._minCheckpointDistance;
+        _checkpointIndexes = track._checkpointIndexes;
+        _currentCheckpointIndex = track._currentCheckpointIndex;
+        LoadStatus = track.LoadStatus;
     }
 
     public float Width
@@ -135,5 +148,10 @@ public class Track
         }
 
         return false;
+    }
+
+    public void DropCheckpoint()
+    {
+        _currentCheckpointIndex = 0;
     }
 }

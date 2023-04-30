@@ -25,12 +25,18 @@ public partial class MainWindow
 
         SecondSidePanel.Init(SecondCanvas, FilesPath);
 
+        ThirdCanvas.Init();
+        ThirdTopPanel.Init(ThirdCanvas, ThirdSidePanel);
+
+        ThirdSidePanel.Init(ThirdCanvas, FilesPath);
+
         AddHandler(Keyboard.KeyDownEvent, new KeyEventHandler(CloseWindow), true);
 
         Closed += (sender, e) =>
         {
             FirstCanvas.StopUpdates();
             SecondCanvas.StopUpdates();
+            ThirdCanvas.StopUpdates();
         };
 
         // Render.Transform
@@ -46,6 +52,7 @@ public partial class MainWindow
         {
             FirstCanvas.StopUpdates();
             SecondCanvas.StopUpdates();
+            ThirdCanvas.StopUpdates();
             Close();
         }
     }

@@ -2,10 +2,55 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:projectOne="clr-namespace:Project_One"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
-    </Grid>
+        <UserControl.Resources>
+        <SolidColorBrush x:Key="NotSelectedTrackViewModel" Color="WhiteSmoke" />
+        <SolidColorBrush x:Key="SelectedTrackViewModel" Color="LightGray" />
+        <projectOne:BoolToColorConverter x:Key="BoolToColorConverter"
+                                    NotSelectedBrush="{StaticResource NotSelectedTrackViewModel}"
+                                    SelectedBrush="{StaticResource SelectedTrackViewModel}" />
+        <DataTemplate x:Key="TrackListItemTemplate"
+                      DataType="{x:Type projectOne:TrackViewModel}">
+            <Border BorderThickness="0 0 0 0" BorderBrush="Black">
+                <Grid ShowGridLines="False"
+                      Background="{Binding IsVisible, Converter={StaticResource BoolToColorConverter}}"
+                      Margin="0 0 0 1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0" Grid.Row="0" Text="{Binding DisplayFileName}"
+                               FontSize="16" Margin="4 2 2 2" />
+                    <TextBlock Grid.Column="0" Grid.Row="1" Text="{Binding DisplayPointCount}"
+                               FontSize="16" Margin="4 2 2 2" />
+                    <Button Grid.Column="1" Grid.Row="0" Focusable="False" Click="Delete_OnClick"
+                            Foreground="#CC0000" FontSize="16" FontWeight="SemiBold"
+                            Content="Delete" Margin="3 3 3 0" />
+                    <Button Grid.Column="1" Grid.Row="1" Focusable="False" Click="Select_OnClick"
+                            Foreground="{Binding ButtonBrush}" FontSize="16" FontWeight="SemiBold"
+                            Content="{Binding DisplayButtonContext}" Margin="3"/>
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </UserControl.Resources>
+    
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <!--<ScrollViewer.Resources>
+                    <system:Double x:Key="{x:Static SystemParameters.VerticalScrollBarWidthKey}">10</system:Double>
+                </ScrollViewer.Resources>-->
+        <ItemsControl x:Name="TracksList" Focusable="False">
+            <ItemsControl.ItemTemplate>
+                <StaticResource ResourceKey="TrackListItemTemplate" />
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </ScrollViewer>
+
 </UserControl>

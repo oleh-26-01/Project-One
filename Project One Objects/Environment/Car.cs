@@ -1,6 +1,6 @@
-﻿using System.Diagnostics;
-using System.Numerics;
+﻿using System.Numerics;
 using Project_One_Objects.Helpers;
+using MemoryExtensions = Project_One_Objects.Helpers.MemoryExtensions;
 
 namespace Project_One_Objects.Environment;
 
@@ -51,16 +51,21 @@ public class Car
     /// <param name="car"> Car to copy </param>
     public Car(Car car)
     {
-        _position = car._position;
+        _position = new Vector2(car._position.X, car._position.Y);
         _speed = car._speed;
         _bodyAngle = car._bodyAngle;
         _frontWheelsAngle = car._frontWheelsAngle;
-        _track = car._track;
+        _track = new Track(car.Track);
         _trackSlopeIntercepts = car._trackSlopeIntercepts;
         _visionCount = car._visionCount;
-        _visionPoints = car._visionPoints;
+        _visionPoints = new Vector2[car._visionPoints.Length];
+        car._visionPoints.FullCopyTo(_visionPoints);
+        //Array.Copy(car._visionPoints, _visionPoints, car._visionPoints.Length);
         _minVisionLengths = car._minVisionLengths;
-        _tempPoints = car._tempPoints;
+        _tempPoints = new List<Vector2>[car._tempPoints.Length];
+        car._tempPoints.FullCopyTo(_tempPoints);
+        //MemoryExtensions.Copy<List<Vector2>>(car._tempPoints, _tempPoints);
+        //Array.Copy(car._tempPoints, _tempPoints, car._tempPoints.Length);
         _isVisionActive = car._isVisionActive;
         _slowDownSpeed = car._slowDownSpeed;
         _speedUpSpeed = car._speedUpSpeed;
@@ -70,12 +75,18 @@ public class Car
         _rotateSpeed = car._rotateSpeed;
         _rotateBackSpeed = car._rotateBackSpeed;
         _stopRotate = car._stopRotate;
-        _trackPointsAngles = car._trackPointsAngles;
-        _sortedTrackPointsAngles = car._sortedTrackPointsAngles;
-        _carVisionAngles = car._carVisionAngles;
-        _sortedCarVisionAngles = car._sortedCarVisionAngles;
-        _vectorSlopeIntercepts = car._vectorSlopeIntercepts;
-        _tempVectorAngles = car._tempVectorAngles;
+        _trackPointsAngles = new float[car._trackPointsAngles.Length];
+        Array.Copy(car._trackPointsAngles, _trackPointsAngles, car._trackPointsAngles.Length);
+        _sortedTrackPointsAngles = new Vector2[car._sortedTrackPointsAngles.Length];
+        Array.Copy(car._sortedTrackPointsAngles, _sortedTrackPointsAngles, car._sortedTrackPointsAngles.Length);
+        _carVisionAngles = new float[car._carVisionAngles.Length];
+        Array.Copy(car._carVisionAngles, _carVisionAngles, car._carVisionAngles.Length);
+        _sortedCarVisionAngles = new Vector2[car._sortedCarVisionAngles.Length];
+        Array.Copy(car._sortedCarVisionAngles, _sortedCarVisionAngles, car._sortedCarVisionAngles.Length);
+        _vectorSlopeIntercepts = new Vector2[car._vectorSlopeIntercepts.Length];
+        Array.Copy(car._vectorSlopeIntercepts, _vectorSlopeIntercepts, car._vectorSlopeIntercepts.Length);
+        _tempVectorAngles = new float[car._tempVectorAngles.Length];
+        Array.Copy(car._tempVectorAngles, _tempVectorAngles, car._tempVectorAngles.Length);
         nearestPointIndex = car.nearestPointIndex;
     }
 
