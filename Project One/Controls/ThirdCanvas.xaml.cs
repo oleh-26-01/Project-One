@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Numerics;
 using System.Reactive.Linq;
 using System.Windows;
@@ -19,7 +20,7 @@ public partial class ThirdCanvas : UserControl
     
     private readonly Camera _camera;
     private readonly WpfTrack _track;
-    private readonly string _trackPath = "C:\\Coding\\C#\\Project One\\Project One\\Curves\\curve009.crv";
+    private readonly string _trackPath = "C:\\Coding\\C#\\Project One\\Project One\\Curves\\curve001.crv";
     private WpfCar _car;
 
     public Vector2 MousePosition = new(-1, -1);
@@ -64,29 +65,29 @@ public partial class ThirdCanvas : UserControl
         _car.IsVisionActive = true;
         _car.Track = _track;
 
-        Genome? currentBest = null;
-
         var stopwatch = new Stopwatch();
         stopwatch.Start();
 
         _populationManager.RunSimulationParallel();
-        currentBest = _populationManager.Population[0];
+        var currentBest = _populationManager.Population[0];
         
         var iteration = 1;
 
-        while (currentBest?.CurrentDistance > 0.1 && iteration++ < 500)
+        while (currentBest.CurrentDistance > 0.1 && iteration++ < 250)
         {
             _populationManager.PrepareNextGeneration();
             _populationManager.RunSimulationParallel(true);
             var report = _populationManager.AnalyzeGeneration();
             currentBest = _populationManager.Population[0];
-            if (iteration % 10 == 0)
+            if (iteration % 1 == 0)
             {
                 Console.WriteLine(report);
                 Console.WriteLine($"Fitness: {currentBest.Fitness} " +
                                   $"Distance: {currentBest.CurrentDistance} " +
                                   $"Avg. Speed: {currentBest.AvgSpeed} " +
                                   $"Time: {currentBest.CurrentTime}\n\n");
+                Console.WriteLine($"On checkpoint fitness: " +
+                                  $"{currentBest.OnCheckpointFitness.Select(f => f.ToString()).Aggregate((a, b) => $"{a}, {b}")}");
             }
             //iteration++;
         }

@@ -16,6 +16,7 @@ public class Genome
 
     private int _currentGene = 0;
     private bool _isAlive = true;
+    public double[] OnCheckpointFitness { get; set; }
 
     private float _fullDistance;
     public Genome(Car car, float tickRate)
@@ -24,6 +25,8 @@ public class Genome
         _track = car.Track;
         _tickRate = tickRate;
         _checkPoints = _track.GetCheckpoints().ToArray();
+
+        OnCheckpointFitness = new double[_checkPoints.Length];
 
         _fullDistance = Vector2.Distance(_car.Position, _checkPoints[0]);
         for (var i = 0; i < _checkPoints.Length - 1; i++)
@@ -66,13 +69,17 @@ public class Genome
         if (_car.IsCollision() || _currentGene >= Genes.Length)
         {
             Fitness = GetFitness();
+            _track.DropCheckpoint();
             _isAlive = false;
         }
         else if (_track.OnCheckpoint(_car.Position, _car.Width))
         {
+            OnCheckpointFitness[_track.CurrentCheckpointIndex - 1] = GetFitness();
+
             if (_track.CurrentCheckpointIndex == 0 && !_firstCheckpoint)
             {
                 Fitness = GetFitness();
+                _track.DropCheckpoint();
                 _isAlive = false;
             }
 
@@ -99,8 +106,7 @@ public class Genome
         //    timePoints *= 1.5f;
 
         var checkpointPoints = 100 * _track.CurrentCheckpointIndex / _checkPoints.Length;
-
-        _track.DropCheckpoint();
+        
         return distancePoints + timePoints + checkpointPoints;
     }
 

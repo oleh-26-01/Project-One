@@ -106,20 +106,20 @@ public partial class SecondCanvas : UserControl
                     if (_labelTimer.ElapsedMilliseconds > 100)
                     {
                         _labelTimer.Restart();
-                        //_cpsLabel.Content = $"{(int)_fpsMeter.GetAverageFps() / 10}k cps";
+                        _cpsLabel.Content = $"{(int)_fpsMeter.GetAverageFps() / 10}k cps";
                         //_cpsLabel.Content = $"Car. pos. x: {_car.Position.X}, y: {_car.Position.Y}";
-                        var checkpoints = _track.GetCheckpoints().ToArray();
-                        if (checkpoints.Length == 0)
-                        {
-                            _cpsLabel.Content = "Distance: 0";
-                            return;
-                        }
-                        var distance = Vector2.Distance(_car.Position, checkpoints[_track.CurrentCheckpointIndex]);
-                        for (var i = _track.CurrentCheckpointIndex; i < _track.CheckpointsIndexes.Count - 1; i++)
-                        {
-                            distance += Vector2.Distance(checkpoints[i], checkpoints[i + 1]);
-                        }
-                        _cpsLabel.Content = $"Distance: {distance}";
+                        //var checkpoints = _track.GetCheckpoints().ToArray();
+                        //if (checkpoints.Length == 0)
+                        //{
+                        //    _cpsLabel.Content = "Distance: 0";
+                        //    return;
+                        //}
+                        //var distance = Vector2.Distance(_car.Position, checkpoints[_track.CurrentCheckpointIndex]);
+                        //for (var i = _track.CurrentCheckpointIndex; i < _track.CheckpointsIndexes.Count - 1; i++)
+                        //{
+                        //    distance += Vector2.Distance(checkpoints[i], checkpoints[i + 1]);
+                        //}
+                        //_cpsLabel.Content = $"Distance: {distance}";
 
                         var isLookingForward = _car.IsLookingForward();
                         _carDirectionLabel.Content = isLookingForward ? Strings.Forward : Strings.Backward;
