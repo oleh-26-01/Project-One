@@ -5,12 +5,12 @@ using Project_One_Objects.Helpers;
 namespace Project_One;
 
 /// <summary>
-/// Interaction logic for SecondTopPanel.xaml
+///     Interaction logic for SecondTopPanel.xaml
 /// </summary>
 public partial class SecondTopPanel : UserControl
 {
-    private WpfCar _car;
     private Camera _camera;
+    private WpfCar _car;
     private FpsMeter _fpsMeter;
 
     public SecondTopPanel()
@@ -26,13 +26,9 @@ public partial class SecondTopPanel : UserControl
         FollowCarCheckBox.Click += (sender, e) =>
         {
             if (FollowCarCheckBox.IsChecked == true)
-            {
                 _camera.Follow(() => _car.Position);
-            }
             else
-            {
                 _camera.FollowStop();
-            }
         };
         _camera.Follow(FollowCarCheckBox.IsChecked == true ? () => _car.Position : null);
         ShowVisionCheckBox.Click += (sender, e) => { _car.IsVisionActive = ShowVisionCheckBox.IsChecked == true; };

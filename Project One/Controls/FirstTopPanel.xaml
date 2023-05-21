@@ -48,11 +48,11 @@
                 </Grid.ColumnDefinitions>
 
                 <Button Grid.Column="0" x:Name="DecreaseOptAngle" Click="DecreaseOptAngle_OnClick"
-                        Content="-" Focusable="False" FontSize="16" VerticalContentAlignment="Stretch"/>
+                        Content="-" Focusable="False" FontSize="16" VerticalContentAlignment="Stretch" />
                 <TextBox Grid.Column="1" x:Name="CurveOptAngle" FontSize="16" BorderThickness="0 1 0 1"
                          HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
                 <Button Grid.Column="2" x:Name="IncreaseOptAngle" Click="IncreaseOptAngle_OnClick"
-                        Content="+" Focusable="False" FontSize="16" VerticalContentAlignment="Stretch"/>
+                        Content="+" Focusable="False" FontSize="16" VerticalContentAlignment="Stretch" />
                 <Button Grid.Column="3" x:Name="ConfirmOptAngle" Click="ConfirmOptAngle_OnClick"
                         Content="✓" Focusable="False" FontSize="16" FontWeight="Bold" Foreground="Black"
                         Margin="3 0 0 0" />

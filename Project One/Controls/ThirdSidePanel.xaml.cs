@@ -1,33 +1,33 @@
-﻿using Project_One.Drawing;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using Project_One.Drawing;
 using Project_One_Objects.AIComponents;
 using Project_One_Objects.Helpers;
 
 namespace Project_One;
 
 /// <summary>
-/// Interaction logic for ThirdSidePanel.xaml
+///     Interaction logic for ThirdSidePanel.xaml
 /// </summary>
 public partial class ThirdSidePanel : UserControl
 {
     public const string FilesType = "crv";
-    private string _filesPath;
-    private WpfCar _car;
-    private WpfTrack _track;
     private Camera _camera;
     private float _cameraZoom;
-    private ObservableCollection<TrackViewModel> _trackViewModels;
+    private WpfCar _car;
+    private string _filesPath;
     private TrackViewModel? _selectedTrack;
     private ThirdCanvas _thirdCanvas;
+    private WpfTrack _track;
+    private ObservableCollection<TrackViewModel> _trackViewModels;
 
     public ThirdSidePanel()
     {
         InitializeComponent();
     }
-    
+
     public string FilesPath
     {
         get => _filesPath;
@@ -68,9 +68,7 @@ public partial class ThirdSidePanel : UserControl
             };
             if (_selectedTrack != null)
                 if (_selectedTrack.FileName == file)
-                {
                     trackViewModel = _selectedTrack;
-                }
 
             _trackViewModels.Add(trackViewModel);
         }
@@ -119,5 +117,4 @@ public partial class ThirdSidePanel : UserControl
 
         Update();
     }
-
 }

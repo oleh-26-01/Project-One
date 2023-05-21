@@ -1,5 +1,4 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -13,7 +12,8 @@ public class WpfMaterialQuad : MaterialQuad
 {
     private readonly Polygon _polygon;
 
-    public WpfMaterialQuad(float width, float height, Vector2 position, double angle, Brush colorBrush) : base(width, height, position, angle)
+    public WpfMaterialQuad(float width, float height, Vector2 position, double angle, Brush colorBrush) : base(width,
+        height, position, angle)
     {
         _polygon = WpfObjects.Polygon(colorBrush, true, false);
     }

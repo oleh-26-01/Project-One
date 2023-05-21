@@ -9,10 +9,11 @@ public partial class MainWindow
     private const string FilesPath = "C:\\Coding\\C#\\Project One\\Project One\\Curves\\";
     private readonly string[] _parts = { "First", "Second", "Third" };
     private int _partIndex;
+
     public MainWindow()
     {
         InitializeComponent();
-        
+
         _partIndex = 0;
         FirstCanvas.Init(FirstTopPanel);
         FirstTopPanel.Init(this, FirstCanvas, FirstSidePanel);
@@ -61,7 +62,7 @@ public partial class MainWindow
     {
         if ((Button)sender == NextPartControl)
             _partIndex++;
-        else if ((Button)sender == PrevPartControl) 
+        else if ((Button)sender == PrevPartControl)
             _partIndex--;
 
         _partIndex += _parts.Length;

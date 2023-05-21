@@ -34,7 +34,13 @@ public static class Config
                 car.Stop(dt);
             }
         },
-        { 4, (car, dt) => car.TurnRight(dt) },
+        {
+            4, (car, dt) =>
+            {
+                car.TurnRight(dt);
+                car.Stop(dt);
+            }
+        },
         {
             5, (car, dt) =>
             {
@@ -66,8 +72,8 @@ public static class Config
     };
     public static readonly List<int> CarActionsKeys = CarActions.Keys.ToList();
 
-    public static readonly int TickRate = 30; // need to test up to 18 ticks per second.
-    public static readonly float MutationRate = 0.01f;
+    public static readonly int TickRate = 18; // need to test up to 18 ticks per second.
+    public static readonly float MutationRate = 0.03f;
     public static readonly Dictionary<int, string> Origins = new()
     {
         { 0, "Random" },
@@ -75,15 +81,21 @@ public static class Config
         { 2, "RandomCross" },
         { 3, "Mutate" },
         { 4, "Best" },
-        { 5, "SurvivorIssue" }
+        { 5, "SurvivorIssue" },
+        { 6, "ValueCross" }
     };
     public static readonly Dictionary<string, int> OriginsKeys = Origins.ToDictionary(x => x.Value, x => x.Key);
 
     public static readonly float BestGenomesRate = 0.5f;
-    public static readonly float RandomCrossGenomesRate = 0.225f;
-    public static readonly float CrossoverGenomesRate = 0.225f;
-    public static readonly float MutatedGenomesRate = 0.05f;
+    public static readonly float RandomCrossGenomesRate = 0.1f;
+    public static readonly float CrossoverGenomesRate = 0.1f;
+    public static readonly float MutatedGenomesRate = 0.2f;
     public static readonly float RandomGenomesRate = 0.1f;
-    
-    public static readonly int MaxDegreeOfParallelism = 5;
+    public static readonly float ValueCrossGenomesRate = 0.1f;
+
+    public static readonly int MaxDegreeOfParallelism = 8;
+    public static readonly ParallelOptions OptimizationOptions = new()
+    {
+        MaxDegreeOfParallelism = MaxDegreeOfParallelism
+    };
 }

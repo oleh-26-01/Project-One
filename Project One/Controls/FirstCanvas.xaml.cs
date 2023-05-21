@@ -13,42 +13,38 @@ namespace Project_One;
 
 public partial class FirstCanvas : UserControl
 {
-    private readonly Camera _camera;
-    private readonly WpfCurve _curve;
-    private readonly WpfCurveEraser _curveEraser;
     private readonly WpfCrosshair _crosshair;
+
+    private FirstTopPanel _firstTopPanel;
+    private IDisposable? _keyEventSubscription;
+    private int _tickRate = 60;
+
+    private IDisposable? _updateSubscription;
 
     public Vector2 MousePosition = new(-1, -1);
     public Vector2 MousePositionWorld = new(-1, -1);
 
-    private IDisposable? _updateSubscription;
-    private IDisposable? _keyEventSubscription;
-    private int _tickRate = 60;
-    private Stopwatch _lastUpdate = new();
-
-    private FirstTopPanel _firstTopPanel;
-
     public FirstCanvas()
     {
         InitializeComponent();
-        _camera = new Camera(new Vector2((float)ActualWidth, (float)ActualHeight), new Vector2(0, 0));
-        _curve = new WpfCurve();
-        _curveEraser = new WpfCurveEraser();
+        Camera = new Camera(new Vector2((float)ActualWidth, (float)ActualHeight), new Vector2(0, 0));
+        Curve = new WpfCurve();
+        CurveEraser = new WpfCurveEraser();
         _crosshair = new WpfCrosshair(new Vector2(0, 0));
     }
 
     /// <summary>The curve drawn on the canvas.</summary>
-    public WpfCurve Curve => _curve;
+    public WpfCurve Curve { get; }
 
     /// <summary>The curve eraser drawn on the canvas.</summary>
-    public WpfCurveEraser CurveEraser => _curveEraser;
+    public WpfCurveEraser CurveEraser { get; }
 
     /// <summary>The camera used to draw all objects on the canvas.</summary>
-    public Camera Camera => _camera;
-    
+    public Camera Camera { get; }
+
     /// <summary>The time in milliseconds between each update.</summary>
     public double TargetRefreshTime => 1000d / _tickRate;
-    
+
     /// <summary>The number of times per second the canvas will be updated.</summary>
     /// <exception cref="ArgumentOutOfRangeException">TickRate must be greater than 0.</exception>
     /// <remarks>TickRate is not guaranteed to be accurate.</remarks>
@@ -63,14 +59,14 @@ public partial class FirstCanvas : UserControl
     }
 
     /// <summary>The time since the last update.</summary>
-    public Stopwatch LastUpdate => _lastUpdate;
+    public Stopwatch LastUpdate { get; } = new();
 
     public void Init(FirstTopPanel firstTopPanel)
     {
         _firstTopPanel = firstTopPanel;
 
-        _curve.DrawOn(CanvasControl);
-        _curveEraser.DrawOn(CanvasControl);
+        Curve.DrawOn(CanvasControl);
+        CurveEraser.DrawOn(CanvasControl);
         _crosshair.DrawOn(CanvasControl);
     }
 
@@ -78,15 +74,15 @@ public partial class FirstCanvas : UserControl
     public void StartUpdates()
     {
         _updateSubscription = Observable.Interval(TimeSpan.FromMilliseconds(TargetRefreshTime))
-            .Subscribe((l) =>
+            .Subscribe(l =>
             {
                 Dispatcher.Invoke(() =>
                 {
-                    _curve.Update(_camera);
-                    _crosshair.Update(_camera);
-                    _curveEraser.Update(_camera);
+                    Curve.Update(Camera);
+                    _crosshair.Update(Camera);
+                    CurveEraser.Update(Camera);
                     UpdateCamera();
-                    _lastUpdate.Restart();
+                    LastUpdate.Restart();
                 });
             });
     }
@@ -105,9 +101,9 @@ public partial class FirstCanvas : UserControl
         cameraMoveDirection.Y += Keyboard.IsKeyDown(Key.Down) ? 1 : 0;
         cameraMoveDirection.Y -= Keyboard.IsKeyDown(Key.Up) ? 1 : 0;
         if (cameraMoveDirection.Length() > 0)
-            _camera.MoveSync(
-                Vector2.Normalize(cameraMoveDirection), 
-                _lastUpdate.ElapsedMilliseconds, 
+            Camera.MoveSync(
+                Vector2.Normalize(cameraMoveDirection),
+                LastUpdate.ElapsedMilliseconds,
                 300);
     }
 
@@ -121,8 +117,8 @@ public partial class FirstCanvas : UserControl
 
         if (e is { ChangedButton: MouseButton.Left, LeftButton: MouseButtonState.Released })
         {
-            _curveEraser.EraseNearestPoint(_curve.Points, MousePositionWorld);
-            _curveEraser.MoveToNearestPoint(_curve.Points, MousePositionWorld);
+            CurveEraser.EraseNearestPoint(Curve.Points, MousePositionWorld);
+            CurveEraser.MoveToNearestPoint(Curve.Points, MousePositionWorld);
             _firstTopPanel.Update();
         }
     }
@@ -134,21 +130,21 @@ public partial class FirstCanvas : UserControl
     {
         var position = e.GetPosition(CanvasControl);
         //Console.WriteLine(position);
-        
+
         var newMousePosition = new Vector2((float)position.X, (float)position.Y);
-        var mousePositionWorld = _camera.ConvertIn(newMousePosition);
-        
-        _curveEraser.MoveToNearestPoint(_curve.Points, mousePositionWorld);
+        var mousePositionWorld = Camera.ConvertIn(newMousePosition);
+
+        CurveEraser.MoveToNearestPoint(Curve.Points, mousePositionWorld);
 
         if (e.LeftButton == MouseButtonState.Pressed)
         {
             switch (_firstTopPanel.OnCurveAction)
             {
                 case Strings.DrawAction:
-                    _curve.AddPoint(mousePositionWorld);
+                    Curve.AddPoint(mousePositionWorld);
                     break;
                 case Strings.EraseAction:
-                    _curveEraser.ErasePoints(_curve.Points, mousePositionWorld, _camera.Zoom);
+                    CurveEraser.ErasePoints(Curve.Points, mousePositionWorld, Camera.Zoom);
                     break;
             }
 
@@ -162,11 +158,11 @@ public partial class FirstCanvas : UserControl
                 if (wrappedMousePosition != newMousePosition && wrappedMousePosition != Vector2.Zero)
                 {
                     newMousePosition = wrappedMousePosition;
-                    mousePositionWorld = _camera.ConvertIn(newMousePosition);
+                    mousePositionWorld = Camera.ConvertIn(newMousePosition);
                 }
                 else
                 {
-                    _camera.Move((MousePosition - newMousePosition) / _camera.Zoom);
+                    Camera.Move((MousePosition - newMousePosition) / Camera.Zoom);
                 }
             }
         }
@@ -178,16 +174,13 @@ public partial class FirstCanvas : UserControl
     public void Canvas_OnMouseWheel(object sender, MouseWheelEventArgs e)
     {
         var mousePosition = e.GetPosition(CanvasControl);
-        if (mousePosition.X < 0 || mousePosition.Y < 0 || mousePosition.X > ActualWidth || mousePosition.Y > ActualHeight) return;
+        if (mousePosition.X < 0 || mousePosition.Y < 0 || mousePosition.X > ActualWidth ||
+            mousePosition.Y > ActualHeight) return;
 
         if (e.Delta > 0)
-        {
-            _camera.ZoomIn(e.Delta / 1000f);
-        }
+            Camera.ZoomIn(e.Delta / 1000f);
         else
-        {
-            _camera.ZoomOut(-e.Delta / 1000f);
-        }
+            Camera.ZoomOut(-e.Delta / 1000f);
     }
 
     private void Canvas_OnSizeChanged(object sender, SizeChangedEventArgs e)
@@ -195,7 +188,7 @@ public partial class FirstCanvas : UserControl
         var canvasSize = new Vector2((float)e.NewSize.Width, (float)e.NewSize.Height);
         var newCenter = canvasSize / 2;
 
-        _camera.Move(_camera.Center - newCenter);
-        _camera.Center = newCenter;
+        Camera.Move(Camera.Center - newCenter);
+        Camera.Center = newCenter;
     }
 }

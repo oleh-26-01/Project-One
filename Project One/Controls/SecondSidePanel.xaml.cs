@@ -8,24 +8,24 @@ using Project_One_Objects.Helpers;
 namespace Project_One;
 
 /// <summary>
-/// Interaction logic for SecondSidePanel.xaml
+///     Interaction logic for SecondSidePanel.xaml
 /// </summary>
 public partial class SecondSidePanel : UserControl
 {
     public const string FilesType = "crv";
-    private string _filesPath;
-    private WpfCar _car;
-    private WpfTrack _track;
     private Camera _camera;
     private float _cameraZoom;
-    private ObservableCollection<TrackViewModel> _trackViewModels;
+    private WpfCar _car;
+    private string _filesPath;
     private TrackViewModel? _selectedTrack;
+    private WpfTrack _track;
+    private ObservableCollection<TrackViewModel> _trackViewModels;
 
     public SecondSidePanel()
     {
         InitializeComponent();
     }
-    
+
     public string FilesPath
     {
         get => _filesPath;
@@ -65,9 +65,7 @@ public partial class SecondSidePanel : UserControl
             };
             if (_selectedTrack != null)
                 if (_selectedTrack.FileName == file)
-                {
                     trackViewModel = _selectedTrack;
-                }
 
             _trackViewModels.Add(trackViewModel);
         }

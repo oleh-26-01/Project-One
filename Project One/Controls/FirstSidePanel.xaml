@@ -36,7 +36,7 @@
                             Content="Select" Margin="3 3 3 0" />
                     <Button Grid.Column="1" Grid.Row="1" Focusable="False" Click="Delete_OnClick"
                             Foreground="#CC0000" FontSize="16" FontWeight="SemiBold"
-                            Content="Delete" Margin="3"/>
+                            Content="Delete" Margin="3" />
                 </Grid>
             </Border>
         </DataTemplate>

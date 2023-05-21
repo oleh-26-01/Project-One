@@ -5,11 +5,12 @@ namespace Project_One_Objects.AIComponents;
 
 public class Genome
 {
-    private readonly Car _car;
+    private Car _car;
     private readonly Track _track;
     private readonly Vector2[] _checkPoints;
     private bool _firstCheckpoint = true;
     public int[] Genes { get; set; }
+    public short[] Values { get; set; }
     public int Origin { get; set; }
     public double Fitness;
     private readonly float _tickRate;
@@ -35,9 +36,18 @@ public class Genome
         }
         var size = (int)(_fullDistance / (car.MaxSpeed * TickTime / 1.5));
         Genes = new int[size];
+        Values = new short[size];
+        for (var i = 0; i < Values.Length; i++)
+        {
+            Values[i] = 1;
+        }
     }
 
-    public Car Car => _car;
+    public Car Car
+    {
+        get => _car;
+        set => _car = value;
+    }
     public Track Track => _track;
     public float TickRate => _tickRate;
     public float TickTime => 1 / _tickRate;
@@ -74,15 +84,15 @@ public class Genome
         }
         else if (_track.OnCheckpoint(_car.Position, _car.Width))
         {
-            OnCheckpointFitness[_track.CurrentCheckpointIndex - 1] = GetFitness();
-
             if (_track.CurrentCheckpointIndex == 0 && !_firstCheckpoint)
             {
                 Fitness = GetFitness();
                 _track.DropCheckpoint();
                 _isAlive = false;
+                return; // to prevent IndexOutOfRangeException on line 89
             }
-
+            
+            OnCheckpointFitness[_track.CurrentCheckpointIndex - 1] = GetFitness();
             _firstCheckpoint = false;
         }
     }

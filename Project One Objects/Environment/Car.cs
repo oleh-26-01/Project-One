@@ -1,6 +1,5 @@
 ﻿using System.Numerics;
 using Project_One_Objects.Helpers;
-using MemoryExtensions = Project_One_Objects.Helpers.MemoryExtensions;
 
 namespace Project_One_Objects.Environment;
 
@@ -19,15 +18,15 @@ public class Car
     private List<Vector2>[] _tempPoints;
     private bool _isVisionActive = false;
 
-    private float _slowDownSpeed = 60;
-    private float _speedUpSpeed = 30;
-    private float _stopSpeed = 10;
-    private float _maxSpeed = 40;
+    private readonly float _slowDownSpeed = 60;
+    private readonly float _speedUpSpeed = 30;
+    private readonly float _stopSpeed = 10;
+    private readonly float _maxSpeed = 40;
 
-    private float _maxFrontWheelsAngle = (float)30d.ToRad();
-    private float _rotateSpeed = 3;
-    private float _rotateBackSpeed = 2;
-    private float _stopRotate = 3;
+    private readonly float _maxFrontWheelsAngle = (float)30d.ToRad();
+    private readonly float _rotateSpeed = 3;
+    private readonly float _rotateBackSpeed = 3;
+    private readonly float _stopRotate = 2;
 
     // fields to prevent garbage collection
     private float[] _trackPointsAngles;
@@ -37,7 +36,7 @@ public class Car
     private Vector2[] _vectorSlopeIntercepts;
     private float[] _tempVectorAngles;
 
-    public int nearestPointIndex = 1;
+    public int NearestPointIndex = 1;
 
     public Car(Vector2 startPosition, double bodyAngle)
     {
@@ -60,12 +59,9 @@ public class Car
         _visionCount = car._visionCount;
         _visionPoints = new Vector2[car._visionPoints.Length];
         car._visionPoints.FullCopyTo(_visionPoints);
-        //Array.Copy(car._visionPoints, _visionPoints, car._visionPoints.Length);
         _minVisionLengths = car._minVisionLengths;
         _tempPoints = new List<Vector2>[car._tempPoints.Length];
         car._tempPoints.FullCopyTo(_tempPoints);
-        //MemoryExtensions.Copy<List<Vector2>>(car._tempPoints, _tempPoints);
-        //Array.Copy(car._tempPoints, _tempPoints, car._tempPoints.Length);
         _isVisionActive = car._isVisionActive;
         _slowDownSpeed = car._slowDownSpeed;
         _speedUpSpeed = car._speedUpSpeed;
@@ -87,7 +83,7 @@ public class Car
         Array.Copy(car._vectorSlopeIntercepts, _vectorSlopeIntercepts, car._vectorSlopeIntercepts.Length);
         _tempVectorAngles = new float[car._tempVectorAngles.Length];
         Array.Copy(car._tempVectorAngles, _tempVectorAngles, car._tempVectorAngles.Length);
-        nearestPointIndex = car.nearestPointIndex;
+        NearestPointIndex = car.NearestPointIndex;
     }
 
     public Vector2 Position => _position;
@@ -175,24 +171,24 @@ public class Car
     {
         if (_track is null) return false;
         var nextPointDistance =
-            Vector2.Distance(_position, _track.CurvePoints[(nearestPointIndex + 1).Mod(_track.CurvePoints.Length)]);
+            Vector2.Distance(_position, _track.CurvePoints[(NearestPointIndex + 1).Mod(_track.CurvePoints.Length)]);
         var prevPointDistance =
-            Vector2.Distance(_position, _track.CurvePoints[(nearestPointIndex - 1).Mod(_track.CurvePoints.Length)]);
+            Vector2.Distance(_position, _track.CurvePoints[(NearestPointIndex - 1).Mod(_track.CurvePoints.Length)]);
         var currentPointDistance =
-            Vector2.Distance(_position, _track.CurvePoints[nearestPointIndex]);
+            Vector2.Distance(_position, _track.CurvePoints[NearestPointIndex]);
         if (nextPointDistance < prevPointDistance && nextPointDistance < currentPointDistance)
         {
-            nearestPointIndex++;
+            NearestPointIndex++;
         }
         else if (prevPointDistance < nextPointDistance && prevPointDistance < currentPointDistance)
         {
-            nearestPointIndex--;
+            NearestPointIndex--;
         }
 
-        nearestPointIndex = Math.Clamp(nearestPointIndex, 1, _track.CurvePoints.Length - 1);
+        NearestPointIndex = Math.Clamp(NearestPointIndex, 1, _track.CurvePoints.Length - 1);
 
-        var vector = _track.CurvePoints[nearestPointIndex] -
-                     _track.CurvePoints[nearestPointIndex - 1];
+        var vector = _track.CurvePoints[NearestPointIndex] -
+                     _track.CurvePoints[NearestPointIndex - 1];
         var angle = Math.Atan2(vector.Y, vector.X).Mod(MathExtensions.TwoPi);
         return MathExtensions.IsAngleBetween(_bodyAngle.Mod(MathExtensions.TwoPi),
             (angle - Math.PI / 2.01).Mod(MathExtensions.TwoPi),

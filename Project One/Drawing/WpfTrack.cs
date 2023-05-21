@@ -1,6 +1,5 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using System.Windows.Shapes;
 using Project_One_Objects.Environment;
 using Project_One_Objects.Helpers;
@@ -9,17 +8,18 @@ namespace Project_One;
 
 public class WpfTrack : Track
 {
-    private readonly Polyline _polyLine;
     private readonly Line _checkpointLine;
-    public bool ShowCheckpoints { get; set; } = true;
+    private readonly Polyline _polyLine;
 
-    public WpfTrack(string filePath = "", 
+    public WpfTrack(string filePath = "",
         float width = 6, float minCheckpointDistance = 10) : base(width, minCheckpointDistance)
     {
         _polyLine = WpfObjects.Polyline();
         _checkpointLine = WpfObjects.CheckpointLine();
         if (filePath != "") Load(filePath);
     }
+
+    public bool ShowCheckpoints { get; set; } = true;
 
     public void DrawOn(Canvas canvas)
     {

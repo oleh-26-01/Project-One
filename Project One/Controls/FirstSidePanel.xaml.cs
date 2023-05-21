@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.IO;
-using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
-using Project_One.Helpers;
 using Project_One_Objects.Helpers;
 
 namespace Project_One;
@@ -12,8 +9,8 @@ namespace Project_One;
 public partial class FirstSidePanel : UserControl
 {
     public const string FilesType = "crv";
-    private WpfCurve _curve;
     private Camera _camera;
+    private WpfCurve _curve;
     private ObservableCollection<CurveViewModel> _curveViewModels;
     private string _filesPath;
     private FirstTopPanel _firstTopPanel;
@@ -87,13 +84,11 @@ public partial class FirstSidePanel : UserControl
     {
         var curveFileName = FindFreeCurveName();
         if (!newFile)
-        {
             if (_selectedCurve != null)
             {
                 _selectedCurve.IsSelected = false;
                 curveFileName = _selectedCurve.FileName;
             }
-        }
 
         _selectedCurve = new CurveViewModel
         {

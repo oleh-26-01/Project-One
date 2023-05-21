@@ -1,25 +1,14 @@
-﻿1. Fitness: 504.5926525535524 Distance: 4.568747 Time: 13.700001
-	Proportions: 0.05, 0.0, 0.35, 0.6.
-	Mutation rate: 0.01
-	Population size: 100 000 (1 000 000).
-	Number of generations: 500.
+﻿1. Fitness: 1472.2267641256133 Distance: 5.742025 Avg. Speed: 39.6161 Time: 10.888889
+	Population-groups 10 000, prop 0.15, 0.15, 0.05, 0.5, 0.15
+	survivor issue on
+	time: 25m
 
-2. Fitness: 505.9888739883251 Distance: 5.004417 Time: 12.966667
-	Proportions: 0.95, 0.0, 0.02, 0.03.
-	Mutation rate: 0.01
-	Population size: 1 000 (10 000).
-	Number of generations: 10 000.
-
-3. Fitness: 503.65502312809474 Distance: 6.262934 Time: 13.466667
-	Proportions: 0.95, 0.0, 0.02, 0.03.
-	Mutation rate: 0.01
-	Population size: 1 000 (10 000).
-	Number of generations: 10 000.
-	*remark: no additional points (x1.1) when distance is less than some value.
-
-4. Fitness: 509.28876304204454 Distance: 4.0699997 Time: 12.1
-	Proportions: 0.5, 0.0, 0.1(new), 0.2, 0.2.
-	Mutation rate: 0.1 (not effective)
-	Population size: 1 000 (10 000).
-	Number of generations: 3 600.
-	*remark: no additional points (x1.1) when distance is less than some value.
+2. Fitness: 1470.252150645059 Distance: 7.455221 Avg. Speed: 39.458767 Time: 10.888889
+	Population-groups 200, prop 0.1, 0.1, 0.2, 0.5, 0.1
+	survivor issue off
+	time: 39s
+	
+3. Fitness: 1476.5724818030642 Distance: 7.0059147 Avg. Speed: 40.11402 Time: 10.722222
+	Population-groups 200, prop 0.1, 0.1, 0.2, 0.5, 0.1
+	survivor issue off
+	time: 27s

@@ -1,6 +1,5 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using System.Windows.Shapes;
 using Project_One_Objects.Environment;
 using Project_One_Objects.Helpers;
@@ -34,7 +33,6 @@ public class WpfCurve : Curve
 
     public void Update(Camera camera)
     {
-
         var points = camera.ConvertOut(Points);
 
         var pointsCollection = _polyLine.Points;

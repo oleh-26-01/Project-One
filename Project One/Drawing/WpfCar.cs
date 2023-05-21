@@ -1,5 +1,4 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -12,19 +11,18 @@ namespace Project_One.Drawing;
 public class WpfCar : Car
 {
     private readonly WpfMaterialQuad _body;
-    private readonly WpfMaterialQuad _wheelFrontLeft;
-    private readonly WpfMaterialQuad _wheelFrontRight;
+    private readonly Line[] _carVectors;
     private readonly WpfMaterialQuad _wheelBackLeft;
     private readonly WpfMaterialQuad _wheelBackRight;
-    private readonly Line[] _carVectors;
+    private readonly WpfMaterialQuad _wheelFrontLeft;
+    private readonly WpfMaterialQuad _wheelFrontRight;
     private bool _vectorsVisibility = true;
 
     public WpfCar(Vector2 startPosition, double bodyAngle) : base(startPosition, bodyAngle)
     {
-
         _body = new WpfMaterialQuad(
-            Width, Height, 
-            startPosition, bodyAngle, 
+            Width, Height,
+            startPosition, bodyAngle,
             Brushes.LimeGreen);
 
         _wheelFrontLeft = new WpfMaterialQuad(
@@ -50,14 +48,13 @@ public class WpfCar : Car
         _carVectors = new Line[VisionCount];
         for (var i = 0; i < VisionCount; i++)
             _carVectors[i] = WpfObjects.CarVector();
-
     }
 
     public void DrawOn(Canvas canvas)
     {
         for (var i = 0; i < VisionCount; i++)
             canvas.Children.Add(_carVectors[i]);
-        
+
         _body.DrawOn(canvas);
         _wheelFrontLeft.DrawOn(canvas);
         _wheelFrontRight.DrawOn(canvas);
@@ -125,7 +122,6 @@ public class WpfCar : Car
         _wheelBackRight.Update(camera, Position, BodyAngle);
 
         for (var i = 0; i < VisionCount && IsVisionActive; i++)
-        {
             if (VisionPoints[i] == Vector2.Zero)
             {
                 _carVectors[i].Visibility = Visibility.Hidden;
@@ -140,6 +136,5 @@ public class WpfCar : Car
                 _carVectors[i].X2 = end.X;
                 _carVectors[i].Y2 = end.Y;
             }
-        }
     }
 }

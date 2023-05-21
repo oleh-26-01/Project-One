@@ -68,6 +68,7 @@ public class Track
         _curvePoints = new Curve().Load(path).Points.ToArray();
         _points = GetPoints();
         _checkpointIndexes = GetCheckpointIndexes();
+        DropCheckpoint();
         LoadStatus = true;
         return this;
     }

@@ -1,5 +1,4 @@
 ﻿using System.Windows;
-using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -44,7 +43,7 @@ public class WpfObjects
     /// <returns>Stylized WPF Polyline.</returns>
     public static Polyline Polyline()
     {
-        return new()
+        return new Polyline
         {
             Stroke = Brushes.Black,
             StrokeThickness = 2
@@ -53,7 +52,7 @@ public class WpfObjects
 
     public static Polygon Polygon(Brush colorBrush, bool isFilled = true, bool isStroked = true)
     {
-        return new()
+        return new Polygon
         {
             Fill = isFilled ? colorBrush : Brushes.Transparent,
             Stroke = isStroked ? Brushes.Black : Brushes.Transparent,
@@ -65,7 +64,7 @@ public class WpfObjects
     /// <returns>Stylized WPF Ellipse.</returns>
     public static Ellipse EraserEllipse()
     {
-        return new()
+        return new Ellipse
         {
             Stroke = Brushes.Yellow,
             StrokeThickness = 2,

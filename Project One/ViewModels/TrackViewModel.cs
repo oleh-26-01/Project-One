@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media;
+﻿using System.Linq;
 
 namespace Project_One;
 
-class TrackViewModel
+internal class TrackViewModel
 {
     public string FileName { get; set; }
     public string DisplayFileName => "name: " + FileName.Split("\\").Last();

@@ -7,6 +7,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using Project_One.Drawing;
 using Project_One.Helpers;
 using Project_One_Objects.Helpers;
@@ -15,41 +16,37 @@ namespace Project_One;
 
 public partial class SecondCanvas : UserControl
 {
-    private readonly Camera _camera;
-    private readonly WpfTrack _track;
-    private readonly WpfCar _car;
+    private Label _carDirectionLabel;
+    private Thread _carUpdateThread;
+    private Label _collisionLabel;
+    private Label _cpsLabel;
+    private readonly FpsMeter _fpsMeter = new();
+    private bool _isCarUpdateThreadRunning;
+    private readonly Stopwatch _labelTimer = new();
+    private int _tickRate = 60;
+
+    private IDisposable? _updateSubscription;
+    public float CameraZoom = 12;
 
     public Vector2 MousePosition = new(-1, -1);
     public Vector2 MousePositionWorld = new(-1, -1);
-    public float CameraZoom = 12;
-
-    private IDisposable? _updateSubscription;
-    private Thread _carUpdateThread;
-    private bool _isCarUpdateThreadRunning = false;
-    private int _tickRate = 60;
-    private Stopwatch _lastUpdate = new();
-    private FpsMeter _fpsMeter = new();
-    private Label _carDirectionLabel;
-    private Label _collisionLabel;
-    private Label _cpsLabel;
-    private Stopwatch _labelTimer = new();
 
     public SecondCanvas()
     {
         InitializeComponent();
-        _camera = new Camera(new Vector2((float)ActualWidth, (float)ActualHeight), new Vector2(0, 0), CameraZoom);
-        _track = new WpfTrack();
-        _car = new WpfCar(new Vector2(0, 0), 0);
+        Camera = new Camera(new Vector2((float)ActualWidth, (float)ActualHeight), new Vector2(0, 0), CameraZoom);
+        Track = new WpfTrack();
+        Car = new WpfCar(new Vector2(0, 0), 0);
     }
 
     /// <summary>The car drawn on the canvas.</summary>
-    public WpfCar Car => _car;
+    public WpfCar Car { get; }
 
     /// <summary>The track drawn on the canvas.</summary>
-    public WpfTrack Track => _track;
+    public WpfTrack Track { get; }
 
     /// <summary>The camera used to draw all objects on the canvas.</summary>
-    public Camera Camera => _camera;
+    public Camera Camera { get; }
 
     /// <summary>The time in milliseconds between each update.</summary>
     public double TargetRefreshTime => 1000d / _tickRate;
@@ -64,21 +61,21 @@ public partial class SecondCanvas : UserControl
         {
             if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value), "Tick rate must be greater than 0.");
             _tickRate = value;
-            _lastUpdate.Restart();
+            LastUpdate.Restart();
         }
     }
 
     /// <summary>The time since the last update.</summary>
-    public Stopwatch LastUpdate => _lastUpdate;
+    public Stopwatch LastUpdate { get; } = new();
 
     public void Init(Label carDirectionLabel, Label collisionLabel, Label cpsLabel)
     {
         _carDirectionLabel = carDirectionLabel;
         _collisionLabel = collisionLabel;
         _cpsLabel = cpsLabel;
-        _track.DrawOn(CanvasControl);
-        _car.DrawOn(CanvasControl);
-        _car.IsVisionActive = true;
+        Track.DrawOn(CanvasControl);
+        Car.DrawOn(CanvasControl);
+        Car.IsVisionActive = true;
         _labelTimer.Start();
     }
 
@@ -86,23 +83,24 @@ public partial class SecondCanvas : UserControl
     public void StartUpdates()
     {
         _updateSubscription = Observable.Interval(TimeSpan.FromMilliseconds(TargetRefreshTime))
-            .Subscribe((l) =>
+            .Subscribe(l =>
             {
                 Dispatcher.Invoke(() =>
                 {
-                    if (_track.LoadStatus)
+                    if (Track.LoadStatus)
                     {
-                        _track.Update(_camera);
-                        if (_track.OnCheckpoint(_car.Position, _car.Width))
+                        Track.Update(Camera);
+                        if (Track.OnCheckpoint(Car.Position, Car.Width))
                         {
                             //Console.WriteLine("Checkpoint");
                         }
                     }
+
                     //_car.UpdateVision();
-                    _car.Update(_camera);
+                    Car.Update(Camera);
                     MoveCar();
                     MoveCamera();
-                    _lastUpdate.Restart();
+                    LastUpdate.Restart();
                     if (_labelTimer.ElapsedMilliseconds > 100)
                     {
                         _labelTimer.Restart();
@@ -121,13 +119,13 @@ public partial class SecondCanvas : UserControl
                         //}
                         //_cpsLabel.Content = $"Distance: {distance}";
 
-                        var isLookingForward = _car.IsLookingForward();
+                        var isLookingForward = Car.IsLookingForward();
                         _carDirectionLabel.Content = isLookingForward ? Strings.Forward : Strings.Backward;
-                        _carDirectionLabel.Foreground = isLookingForward ? System.Windows.Media.Brushes.Blue : System.Windows.Media.Brushes.Red;
+                        _carDirectionLabel.Foreground = isLookingForward ? Brushes.Blue : Brushes.Red;
 
-                        var isCollision = _car.IsCollision();
+                        var isCollision = Car.IsCollision();
                         _collisionLabel.Content = isCollision ? Strings.Collision : Strings.NoCollision;
-                        _collisionLabel.Foreground = isCollision ? System.Windows.Media.Brushes.Red : System.Windows.Media.Brushes.Green;
+                        _collisionLabel.Foreground = isCollision ? Brushes.Red : Brushes.Green;
 
                         if (isCollision)
                         {
@@ -142,14 +140,12 @@ public partial class SecondCanvas : UserControl
         _carUpdateThread = new Thread(() =>
         {
             while (_isCarUpdateThreadRunning)
-            {
                 Dispatcher.Invoke(() =>
                 {
                     for (var i = 0; i < 100; i++)
-                        _car.UpdateVision();
+                        Car.UpdateVision();
                     _fpsMeter.Tick();
                 });
-            }
         });
         _carUpdateThread.Start();
     }
@@ -164,9 +160,9 @@ public partial class SecondCanvas : UserControl
     public void MoveCamera()
     {
         //Console.WriteLine($"camera center abs position: {_camera.Position + _camera.Center }, car position: {_car.Position}");
-        if (_camera.IsFollowing)
+        if (Camera.IsFollowing)
         {
-            _camera.FollowUpdate(_lastUpdate.ElapsedMilliseconds / 1000f);
+            Camera.FollowUpdate(LastUpdate.ElapsedMilliseconds / 1000f);
         }
         else
         {
@@ -176,45 +172,33 @@ public partial class SecondCanvas : UserControl
             cameraMoveDirection.Y += Keyboard.IsKeyDown(Key.Down) ? 1 : 0;
             cameraMoveDirection.Y -= Keyboard.IsKeyDown(Key.Up) ? 1 : 0;
             if (cameraMoveDirection.Length() > 0)
-                _camera.MoveSync(
-                    Vector2.Normalize(cameraMoveDirection), 
-                    _lastUpdate.ElapsedMilliseconds, 
+                Camera.MoveSync(
+                    Vector2.Normalize(cameraMoveDirection),
+                    LastUpdate.ElapsedMilliseconds,
                     300);
         }
     }
 
     public void MoveCar()
     {
-        var dt = _lastUpdate.ElapsedMilliseconds / 1000f;
-        _car.Move(dt);
-        
+        var dt = LastUpdate.ElapsedMilliseconds / 1000f;
+        Car.Move(dt);
+
         if (Keyboard.IsKeyDown(Key.A))
-        {
-            _car.TurnLeft(dt);
-        }
+            Car.TurnLeft(dt);
         else if (Keyboard.IsKeyDown(Key.D))
-        {
-            _car.TurnRight(dt);
-        }
+            Car.TurnRight(dt);
         else
-        {
-            _car.StopTurning(dt);
-        }        
-        
+            Car.StopTurning(dt);
+
         if (Keyboard.IsKeyDown(Key.W))
-        {
-            _car.SpeedUp(dt);
-        }
+            Car.SpeedUp(dt);
         else if (Keyboard.IsKeyDown(Key.S))
-        {
-            _car.SpeedDown(dt);
-        }
+            Car.SpeedDown(dt);
         else
-        {
-            _car.Stop(dt);
-        }
+            Car.Stop(dt);
     }
-    
+
     public void Canvas_OnMouseClick(object sender, MouseButtonEventArgs e)
     {
         Mouse.Capture(e.ButtonState == MouseButtonState.Pressed ? CanvasControl : null);
@@ -231,12 +215,11 @@ public partial class SecondCanvas : UserControl
     {
         var position = e.GetPosition(CanvasControl);
         var newMousePosition = new Vector2((float)position.X, (float)position.Y);
-        var mousePositionWorld = _camera.ConvertIn(newMousePosition);
+        var mousePositionWorld = Camera.ConvertIn(newMousePosition);
         var newCenter = newMousePosition;
 
         if (e.LeftButton == MouseButtonState.Pressed)
         {
-            
         }
         else
         {
@@ -246,14 +229,11 @@ public partial class SecondCanvas : UserControl
                 if (wrappedMousePosition != newMousePosition && wrappedMousePosition != Vector2.Zero)
                 {
                     newMousePosition = wrappedMousePosition;
-                    mousePositionWorld = _camera.ConvertIn(newMousePosition);
+                    mousePositionWorld = Camera.ConvertIn(newMousePosition);
                 }
                 else
                 {
-                    if (!_camera.IsFollowing)
-                    {
-                        _camera.Move((MousePosition - newMousePosition) / _camera.Zoom);
-                    }
+                    if (!Camera.IsFollowing) Camera.Move((MousePosition - newMousePosition) / Camera.Zoom);
                 }
             }
         }
@@ -262,20 +242,17 @@ public partial class SecondCanvas : UserControl
         MousePositionWorld = mousePositionWorld;
     }
 
-    
+
     public void Canvas_OnMouseWheel(object sender, MouseWheelEventArgs e)
     {
         var mousePosition = e.GetPosition(CanvasControl);
-        if (mousePosition.X < 0 || mousePosition.Y < 0 || mousePosition.X > ActualWidth || mousePosition.Y > ActualHeight) return;
+        if (mousePosition.X < 0 || mousePosition.Y < 0 || mousePosition.X > ActualWidth ||
+            mousePosition.Y > ActualHeight) return;
 
         if (e.Delta > 0)
-        {
-            _camera.ZoomIn(e.Delta / 1000f);
-        }
+            Camera.ZoomIn(e.Delta / 1000f);
         else
-        {
-            _camera.ZoomOut(-e.Delta / 1000f);
-        }
+            Camera.ZoomOut(-e.Delta / 1000f);
     }
 
     private void Canvas_OnSizeChanged(object sender, SizeChangedEventArgs e)
@@ -283,7 +260,7 @@ public partial class SecondCanvas : UserControl
         var canvasSize = new Vector2((float)e.NewSize.Width, (float)e.NewSize.Height);
         var newCenter = canvasSize / 2;
 
-        _camera.Move(_camera.Center - newCenter);
-        _camera.Center = newCenter;
+        Camera.Move(Camera.Center - newCenter);
+        Camera.Center = newCenter;
     }
 }

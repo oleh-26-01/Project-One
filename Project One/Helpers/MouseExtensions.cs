@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -29,8 +24,8 @@ public class MouseExtensions
         if (dropMousePosition == position) return position;
         var windowPosition = canvas.PointToScreen(new Point(0, 0));
         var newCursorPos = dropMousePosition + new Vector2(
-            (float)(windowPosition.X),
-            (float)(windowPosition.Y));
+            (float)windowPosition.X,
+            (float)windowPosition.Y);
         SetCursorPos((int)newCursorPos.X, (int)newCursorPos.Y);
         return dropMousePosition;
     }
