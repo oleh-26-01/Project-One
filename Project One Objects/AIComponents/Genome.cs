@@ -6,6 +6,7 @@ namespace Project_One_Objects.AIComponents;
 public class Genome
 {
     private Car _car;
+    private int _visionOptimization = 0;
     private readonly Track _track;
     private readonly Vector2[] _checkPoints;
     private bool _firstCheckpoint = true;
@@ -75,7 +76,19 @@ public class Genome
         Config.CarActions[Genes[_currentGene]](_car, TickTime);
         _currentGene++;
         _car.Move(TickTime);
-        _car.UpdateVision();
+
+        if (_visionOptimization - (int)(TickTime * 1000) <= 0)
+        {
+            _car.UpdateVision();
+            _visionOptimization = _car.VisionOptimization();
+        }
+        else
+        {
+            _visionOptimization -= (int)(TickTime * 1000);
+        }
+
+        //_car.UpdateVision();
+
         if (_car.IsCollision() || _currentGene >= Genes.Length)
         {
             Fitness = GetFitness();

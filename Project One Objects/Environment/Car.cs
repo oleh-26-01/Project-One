@@ -373,6 +373,25 @@ public class Car
         }
     }
 
+    public int VisionOptimization()
+    {
+        var minVisionPointsLength = float.MaxValue;
+        for (var i = 0; i < _visionCount; i++)
+        {
+            var distance = Vector2.Distance(_position, _visionPoints[i]) - _minVisionLengths[i];
+            if (distance < minVisionPointsLength)
+            {
+                minVisionPointsLength = distance;
+            }
+        }
+
+        var time = (_maxSpeed - _speed) / _speedUpSpeed +
+                   (minVisionPointsLength - ((Math.Pow(_maxSpeed, 2) - Math.Pow(_speed, 2)) / (2 * _speedUpSpeed))) / _maxSpeed;
+
+        return (int)(time * 1000);
+    }
+
+
     /// <summary> Move Car according to its speed, body angle, and front wheels angle.</summary>
     /// <param name="dt"> The time in seconds since the last update.</param>
     public void Move(float dt)
