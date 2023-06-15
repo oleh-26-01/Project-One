@@ -1,4 +1,6 @@
-﻿using System.Numerics;
+﻿using System.Data;
+using System.Numerics;
+using Project_One_Objects.AIComponents;
 using Project_One_Objects.Helpers;
 
 namespace Project_One_Objects.Environment;
@@ -21,7 +23,7 @@ public class Car
     private readonly float _slowDownSpeed = 60;
     private readonly float _speedUpSpeed = 30;
     private readonly float _stopSpeed = 10;
-    private readonly float _maxSpeed = 40;
+    private readonly float _maxSpeed = 40f; // actual max is 14.5 higher
 
     private readonly float _maxFrontWheelsAngle = (float)30d.ToRad();
     private readonly float _rotateSpeed = 3;
@@ -37,12 +39,13 @@ public class Car
     private float[] _tempVectorAngles;
 
     public int NearestPointIndex = 1;
+    private double _visionOptimization = 0;
 
     public Car(Vector2 startPosition, double bodyAngle)
     {
         _position = startPosition;
         _bodyAngle = bodyAngle;
-        VisionCount = 8;
+        VisionCount = 14;
         _frontWheelsAngle = _bodyAngle;
     }
 
@@ -373,7 +376,20 @@ public class Car
         }
     }
 
-    public int VisionOptimization()
+    public void UpdateVisionOpt(double dt)
+    {
+        if (_visionOptimization - dt <= 0)
+        {
+            UpdateVision();
+            _visionOptimization = VisionOptimization();
+        }
+        else
+        {
+            _visionOptimization -= dt;
+        }
+    }
+
+    private double VisionOptimization()
     {
         var minVisionPointsLength = float.MaxValue;
         for (var i = 0; i < _visionCount; i++)
@@ -388,7 +404,7 @@ public class Car
         var time = (_maxSpeed - _speed) / _speedUpSpeed +
                    (minVisionPointsLength - ((Math.Pow(_maxSpeed, 2) - Math.Pow(_speed, 2)) / (2 * _speedUpSpeed))) / _maxSpeed;
 
-        return (int)(time * 1000);
+        return time;
     }
 
 
@@ -422,10 +438,10 @@ public class Car
             _speed += _slowDownSpeed * dt;
         }
 
-        //_speed = Math.Clamp(_speed, -_maxSpeed, _maxSpeed);
         _speed += ((float)Math.Min(Math.Min(_speed,
                            _maxSpeed / (Math.Pow(Math.Abs(_frontWheelsAngle).ToDeg(), 0.35) + 0.1)),
                        _maxSpeed) - _speed) * dt * 2;
+        //_speed = Math.Clamp(_speed, -_maxSpeed, _maxSpeed);
     }
 
     /// <summary> Accelerates the car backwards. </summary>
@@ -444,6 +460,7 @@ public class Car
         _speed += ((float)Math.Max(Math.Max(_speed,
                            -_maxSpeed / (Math.Pow(Math.Abs(_frontWheelsAngle).ToDeg(), 0.35) + 0.1)),
                        -_maxSpeed) - _speed) * dt * 2;
+        //_speed = Math.Clamp(_speed, -_maxSpeed, _maxSpeed);
     }
 
     /// <summary> Stops the car. </summary>

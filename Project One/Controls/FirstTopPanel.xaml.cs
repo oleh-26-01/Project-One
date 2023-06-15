@@ -4,17 +4,19 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Project_One.Drawing.WpfOnly;
+using Project_One.Drawing.Wrappers;
 using Project_One.Helpers;
 using Project_One_Objects.Environment;
 using Project_One_Objects.Helpers;
 
-namespace Project_One;
+namespace Project_One.Controls;
 
 public partial class FirstTopPanel : UserControl
 {
     public readonly double TextBoxMaxValue = 30;
     public readonly double TextBoxMinValue = 1;
-    private WpfCurve _curve;
+    private CurveWPF _curve;
     private WpfCurveEraser _curveEraser;
     private FirstSidePanel _firstSidePanel;
     private UIElement _window;

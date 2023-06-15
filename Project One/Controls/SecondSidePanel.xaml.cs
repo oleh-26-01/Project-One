@@ -2,23 +2,20 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using Project_One.Drawing;
+using Project_One.Drawing.Wrappers;
 using Project_One_Objects.Helpers;
 
-namespace Project_One;
+namespace Project_One.Controls;
 
-/// <summary>
-///     Interaction logic for SecondSidePanel.xaml
-/// </summary>
 public partial class SecondSidePanel : UserControl
 {
     public const string FilesType = "crv";
     private Camera _camera;
     private float _cameraZoom;
-    private WpfCar _car;
+    private CarWPF _car;
     private string _filesPath;
     private TrackViewModel? _selectedTrack;
-    private WpfTrack _track;
+    private TrackWPF _track;
     private ObservableCollection<TrackViewModel> _trackViewModels;
 
     public SecondSidePanel()
@@ -56,7 +53,7 @@ public partial class SecondSidePanel : UserControl
         foreach (var file in files)
         {
             if (!file.EndsWith(FilesType)) continue;
-            var track = new WpfTrack(file);
+            var track = new TrackWPF(file);
             var trackViewModel = new TrackViewModel
             {
                 FileName = file,

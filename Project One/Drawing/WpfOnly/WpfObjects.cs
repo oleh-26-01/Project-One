@@ -1,13 +1,13 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace Project_One;
+namespace Project_One.Drawing.WpfOnly;
 
+/// <summary> Creates stylized WPF objects. </summary>
 public class WpfObjects
 {
-    /// <summary>Creates new WPF Line object and stylize it.</summary>
-    /// <returns>Stylized WPF Line.</returns>
     public static Line Line(double x1 = 0, double y1 = 0, double x2 = 0, double y2 = 0)
     {
         return new Line
@@ -21,8 +21,6 @@ public class WpfObjects
         };
     }
 
-    /// <summary>Creates new WPF Line object and stylize it as a crosshair.</summary>
-    /// <returns>Stylized WPF Line.</returns>
     public static Line CrosshairLine(double x1 = 0, double y1 = 0, double x2 = 0, double y2 = 0)
     {
         var line = Line(x1, y1, x2, y2);
@@ -33,14 +31,10 @@ public class WpfObjects
     public static Line CarVector(double x1 = 0, double y1 = 0, double x2 = 0, double y2 = 0)
     {
         var line = Line(x1, y1, x2, y2);
-        //line.StrokeThickness = 2;
-        //line.SetValue(RenderOptions.EdgeModeProperty, EdgeMode.Aliased);
         line.Stroke = Brushes.Red;
         return line;
     }
 
-    /// <summary>Creates new WPF Polyline object and stylize it.</summary>
-    /// <returns>Stylized WPF Polyline.</returns>
     public static Polyline Polyline()
     {
         return new Polyline
@@ -60,8 +54,6 @@ public class WpfObjects
         };
     }
 
-    /// <summary>Create new WPF Ellipse object and stylize it. Hidden by default.</summary>
-    /// <returns>Stylized WPF Ellipse.</returns>
     public static Ellipse EraserEllipse()
     {
         return new Ellipse
@@ -78,5 +70,16 @@ public class WpfObjects
         var line = Line(x1, y1, x2, y2);
         line.Stroke = Brushes.Yellow;
         return line;
+    }
+
+    public static TextBlock TextBlock(string text = "", double x = 0, double y = 0, float fontSize = 12)
+    {
+        return new TextBlock
+        {
+            Text = text,
+            Foreground = Brushes.Black,
+            FontSize = fontSize,
+            Margin = new Thickness(x, y, 0, 0)
+        };
     }
 }

@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Numerics;
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Shapes;
 using Project_One_Objects.Helpers;
 
-namespace Project_One;
+namespace Project_One.Drawing.WpfOnly;
 
-public class WpfCrosshair
+public class WpfCrosshair : WpfAbstract
 {
     private readonly Line _line1;
     private readonly Line _line2;
@@ -20,6 +18,8 @@ public class WpfCrosshair
     {
         _line1 = WpfObjects.CrosshairLine();
         _line2 = WpfObjects.CrosshairLine();
+        Objects.Add(_line1);
+        Objects.Add(_line2);
         _relativePositions = new Vector2[4];
         Size = size;
         _position = position;
@@ -42,25 +42,7 @@ public class WpfCrosshair
         }
     }
 
-    public void DrawOn(Canvas canvas)
-    {
-        if (!canvas.Children.Contains(_line1)) canvas.Children.Add(_line1);
-        if (!canvas.Children.Contains(_line2)) canvas.Children.Add(_line2);
-    }
-
-    public void RemoveFrom(Canvas canvas)
-    {
-        canvas.Children.Remove(_line1);
-        canvas.Children.Remove(_line2);
-    }
-
-    public void SetVisibility(bool visible)
-    {
-        _line1.Visibility = visible ? Visibility.Visible : Visibility.Hidden;
-        _line2.Visibility = visible ? Visibility.Visible : Visibility.Hidden;
-    }
-
-    public void Update(Camera camera)
+    public new void Update(Camera camera)
     {
         var position = camera.ConvertOut(_position);
         var points = _relativePositions.Select(p => p + position).ToArray();

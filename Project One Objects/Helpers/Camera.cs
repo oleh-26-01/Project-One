@@ -7,6 +7,7 @@ public class Camera
     private Vector2 _center;
     private float _zoom;
     private Func<Vector2>? _followPositionGetter;
+    private Action? _updateZoomLabel;
 
     public Camera(Vector2 center, Vector2 position, float zoom = 1)
     {
@@ -28,6 +29,7 @@ public class Camera
             if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value), "Zoom must be positive");
 
             _zoom = value;
+            _updateZoomLabel?.Invoke();
         }
     }
 
@@ -64,6 +66,11 @@ public class Camera
         Position += (followPosition - Center - Position).Scale(dt / 0.2);
     }
 
+    public void SetZoomUpdater(Action? updateZoomLabel)
+    {
+        _updateZoomLabel = updateZoomLabel;
+    }
+
     public void Move(Vector2 direction)
     {
         Position += direction;
@@ -87,6 +94,7 @@ public class Camera
     {
         if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value), "Value must be greater than 0");
         _zoom *= 1 + value;
+        _updateZoomLabel?.Invoke();
     }
 
     /// <summary>Decreases zoom by the given value.</summary>
@@ -97,6 +105,7 @@ public class Camera
         if (value is <= 0 or >= 1)
             throw new ArgumentOutOfRangeException(nameof(value), "Value must be between 0 and 1");
         _zoom *= 1 - value;
+        _updateZoomLabel?.Invoke();
     }
 
     /// <summary>Convert a point from world space to screen space.</summary>

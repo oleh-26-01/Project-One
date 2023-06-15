@@ -45,13 +45,14 @@ public class Curve
     }
 
     /// <summary>Adds a point to the curve.</summary>
-    public void AddPoint(Vector2 point)
+    public void AddPoint(Vector2 point, float minLength = 0)
     {
         if (_points.Count > 1)
         {
             var angleA = Math.Atan2(_points[^1].Y - _points[^2].Y, _points[^1].X - _points[^2].X);
             var angleB = Math.Atan2(point.Y - _points[^1].Y, point.X - _points[^1].X);
-            if (Math.Abs(angleB - angleA) > OptAngle)
+            var length = Vector2.Distance(_points[^1], point);
+            if (Math.Abs(angleB - angleA) > OptAngle && length > minLength)
             {
                 point.X = _points[^1].X - point.X == 0 ? point.X + MathExtensions.CloseToZero : point.X;
                 point.Y = _points[^1].Y - point.Y == 0 ? point.Y + MathExtensions.CloseToZero : point.Y;
@@ -87,7 +88,6 @@ public class Curve
         var data = JsonConvert.DeserializeObject<dynamic>(json);
 
         DateTime date = data.Date;
-        int pointsCount = data.PointsCount;
         OptAngle = data.Accuracy;
         _points.Clear();
         foreach (var point in data.Points) _points.Add(new Vector2((float)point.X, (float)point.Y));
@@ -101,7 +101,6 @@ public class Curve
         var json = new
         {
             Date = DateTime.Now,
-            PointsCount = _points.Count,
             Accuracy = OptAngle,
             Points = _points
         };

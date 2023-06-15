@@ -3,44 +3,45 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Project_One.Drawing.WpfOnly;
 using Project_One_Objects.Environment;
 using Project_One_Objects.Helpers;
 
-namespace Project_One.Drawing;
+namespace Project_One.Drawing.Wrappers;
 
-public class WpfCar : Car
+public class CarWPF : Car
 {
-    private readonly WpfMaterialQuad _body;
+    private readonly MaterialQuadWPF _body;
     private readonly Line[] _carVectors;
-    private readonly WpfMaterialQuad _wheelBackLeft;
-    private readonly WpfMaterialQuad _wheelBackRight;
-    private readonly WpfMaterialQuad _wheelFrontLeft;
-    private readonly WpfMaterialQuad _wheelFrontRight;
+    private readonly MaterialQuadWPF _wheelBackLeft;
+    private readonly MaterialQuadWPF _wheelBackRight;
+    private readonly MaterialQuadWPF _wheelFrontLeft;
+    private readonly MaterialQuadWPF _wheelFrontRight;
     private bool _vectorsVisibility = true;
 
-    public WpfCar(Vector2 startPosition, double bodyAngle) : base(startPosition, bodyAngle)
+    public CarWPF(Vector2 startPosition, double bodyAngle) : base(startPosition, bodyAngle)
     {
-        _body = new WpfMaterialQuad(
+        _body = new MaterialQuadWPF(
             Width, Height,
             startPosition, bodyAngle,
             Brushes.LimeGreen);
 
-        _wheelFrontLeft = new WpfMaterialQuad(
+        _wheelFrontLeft = new MaterialQuadWPF(
             Width * 0.1f, Height * 0.15f,
             startPosition + new Vector2(1.5f, -0.9f), bodyAngle,
             Brushes.Red);
 
-        _wheelFrontRight = new WpfMaterialQuad(
+        _wheelFrontRight = new MaterialQuadWPF(
             Width * 0.1f, Height * 0.15f,
             startPosition + new Vector2(1.5f, 0.9f), bodyAngle,
             Brushes.Red);
 
-        _wheelBackLeft = new WpfMaterialQuad(
+        _wheelBackLeft = new MaterialQuadWPF(
             Width * 0.1f, Height * 0.15f,
             startPosition + new Vector2(-1.5f, -0.9f), bodyAngle,
             Brushes.Blue);
 
-        _wheelBackRight = new WpfMaterialQuad(
+        _wheelBackRight = new MaterialQuadWPF(
             Width * 0.1f, Height * 0.15f,
             startPosition + new Vector2(-1.5f, 0.9f), bodyAngle,
             Brushes.Blue);

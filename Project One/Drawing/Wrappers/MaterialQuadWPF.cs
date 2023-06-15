@@ -3,16 +3,17 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Project_One.Drawing.WpfOnly;
 using Project_One_Objects.Environment;
 using Project_One_Objects.Helpers;
 
-namespace Project_One;
+namespace Project_One.Drawing.Wrappers;
 
-public class WpfMaterialQuad : MaterialQuad
+public class MaterialQuadWPF : MaterialQuad
 {
     private readonly Polygon _polygon;
 
-    public WpfMaterialQuad(float width, float height, Vector2 position, double angle, Brush colorBrush) : base(width,
+    public MaterialQuadWPF(float width, float height, Vector2 position, double angle, Brush colorBrush) : base(width,
         height, position, angle)
     {
         _polygon = WpfObjects.Polygon(colorBrush, true, false);

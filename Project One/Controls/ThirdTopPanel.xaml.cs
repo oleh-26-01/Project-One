@@ -1,18 +1,9 @@
 ﻿using System.Windows.Controls;
-using Project_One.Drawing;
-using Project_One_Objects.Helpers;
 
-namespace Project_One;
+namespace Project_One.Controls;
 
-/// <summary>
-///     Interaction logic for ThirdTopPanel.xaml
-/// </summary>
 public partial class ThirdTopPanel : UserControl
 {
-    private Camera _camera;
-    private WpfCar _car;
-    private FpsMeter _fpsMeter;
-
     public ThirdTopPanel()
     {
         InitializeComponent();
@@ -20,17 +11,14 @@ public partial class ThirdTopPanel : UserControl
 
     public void Init(ThirdCanvas thirdCanvas, ThirdSidePanel thirdSidePanel)
     {
-        _car = thirdCanvas.Car;
-        _camera = thirdCanvas.Camera;
-
         FollowCarCheckBox.Click += (sender, e) =>
         {
             if (FollowCarCheckBox.IsChecked == true)
-                _camera.Follow(() => _car.Position);
+                thirdCanvas.Camera.Follow(() => thirdCanvas.Car.Position);
             else
-                _camera.FollowStop();
+                thirdCanvas.Camera.FollowStop();
         };
-        _camera.Follow(FollowCarCheckBox.IsChecked == true ? () => _car.Position : null);
-        ShowVisionCheckBox.Click += (sender, e) => { _car.IsVisionActive = ShowVisionCheckBox.IsChecked == true; };
+        thirdCanvas.Camera.Follow(FollowCarCheckBox.IsChecked == true ? () => thirdCanvas.Car.Position : null);
+        ShowVisionCheckBox.Click += (sender, e) => { thirdCanvas.Car.IsVisionActive = ShowVisionCheckBox.IsChecked == true; };
     }
 }

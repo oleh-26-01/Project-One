@@ -1,17 +1,18 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Shapes;
+using Project_One.Drawing.WpfOnly;
 using Project_One_Objects.Environment;
 using Project_One_Objects.Helpers;
 
-namespace Project_One;
+namespace Project_One.Drawing.Wrappers;
 
-public class WpfTrack : Track
+public class TrackWPF : Track
 {
     private readonly Line _checkpointLine;
     private readonly Polyline _polyLine;
 
-    public WpfTrack(string filePath = "",
+    public TrackWPF(string filePath = "",
         float width = 6, float minCheckpointDistance = 10) : base(width, minCheckpointDistance)
     {
         _polyLine = WpfObjects.Polyline();

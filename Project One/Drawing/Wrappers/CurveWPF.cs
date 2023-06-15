@@ -1,16 +1,17 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Shapes;
+using Project_One.Drawing.WpfOnly;
 using Project_One_Objects.Environment;
 using Project_One_Objects.Helpers;
 
-namespace Project_One;
+namespace Project_One.Drawing.Wrappers;
 
-public class WpfCurve : Curve
+public class CurveWPF : Curve
 {
     private readonly Polyline _polyLine;
 
-    public WpfCurve(string filePath = "", double optimizationAngle = 0) : base(optimizationAngle)
+    public CurveWPF(string filePath = "", double optimizationAngle = 0) : base(optimizationAngle)
     {
         _polyLine = WpfObjects.Polyline();
         if (filePath != "") Load(filePath);

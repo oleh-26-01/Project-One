@@ -2,17 +2,17 @@
 using System.Diagnostics;
 using System.Numerics;
 using System.Reactive.Linq;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Project_One.Drawing;
+using Project_One.Drawing.WpfOnly;
+using Project_One.Drawing.Wrappers;
 using Project_One.Helpers;
 using Project_One_Objects.Helpers;
 
-namespace Project_One;
+namespace Project_One.Controls;
 
 public partial class SecondCanvas : UserControl
 {
@@ -35,18 +35,22 @@ public partial class SecondCanvas : UserControl
     {
         InitializeComponent();
         Camera = new Camera(new Vector2((float)ActualWidth, (float)ActualHeight), new Vector2(0, 0), CameraZoom);
-        Track = new WpfTrack();
-        Car = new WpfCar(new Vector2(0, 0), 0);
+        CameraZoomLabel = new WpfText(Strings.CameraZoom(Camera), new Vector2(0, 0), 16);
+        Track = new TrackWPF();
+        Car = new CarWPF(new Vector2(0, 0), 0);
     }
 
     /// <summary>The car drawn on the canvas.</summary>
-    public WpfCar Car { get; }
+    public CarWPF Car { get; }
 
     /// <summary>The track drawn on the canvas.</summary>
-    public WpfTrack Track { get; }
+    public TrackWPF Track { get; }
 
     /// <summary>The camera used to draw all objects on the canvas.</summary>
     public Camera Camera { get; }
+
+    /// <summary>The label that displays the camera zoom.</summary>
+    public WpfText CameraZoomLabel { get; }
 
     /// <summary>The time in milliseconds between each update.</summary>
     public double TargetRefreshTime => 1000d / _tickRate;
@@ -73,6 +77,8 @@ public partial class SecondCanvas : UserControl
         _carDirectionLabel = carDirectionLabel;
         _collisionLabel = collisionLabel;
         _cpsLabel = cpsLabel;
+        CameraZoomLabel.DrawOn(CanvasControl);
+        Camera.SetZoomUpdater(() => CameraZoomLabel.SetText(Strings.CameraZoom(Camera)));
         Track.DrawOn(CanvasControl);
         Car.DrawOn(CanvasControl);
         Car.IsVisionActive = true;
@@ -105,7 +111,7 @@ public partial class SecondCanvas : UserControl
                     {
                         _labelTimer.Restart();
                         _cpsLabel.Content = $"{(int)_fpsMeter.GetAverageFps() / 10}k cps";
-                        //_cpsLabel.Content = $"Car. pos. x: {_car.Position.X}, y: {_car.Position.Y}";
+                        //_cpsLabel.Content = $"Car speed: {Car.Speed}";
                         //var checkpoints = _track.GetCheckpoints().ToArray();
                         //if (checkpoints.Length == 0)
                         //{
@@ -143,7 +149,7 @@ public partial class SecondCanvas : UserControl
                 Dispatcher.Invoke(() =>
                 {
                     for (var i = 0; i < 100; i++)
-                        Car.UpdateVision();
+                        Car.UpdateVisionOpt(1f / _tickRate);
                     _fpsMeter.Tick();
                 });
         });
@@ -207,9 +213,6 @@ public partial class SecondCanvas : UserControl
         {
         }
     }
-
-    [DllImport("user32.dll")]
-    private static extern bool SetCursorPos(int a, int b);
 
     public void Canvas_OnMouseMove(object sender, MouseEventArgs e)
     {

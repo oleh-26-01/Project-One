@@ -1,4 +1,7 @@
-﻿namespace Project_One.Helpers;
+﻿using Project_One_Objects.Helpers;
+using System;
+
+namespace Project_One.Helpers;
 
 internal class Strings
 {
@@ -16,4 +19,10 @@ internal class Strings
 
     public const string Collision = "Collided";
     public const string NoCollision = "No collision";
+
+    public static string CameraZoom(Camera camera)
+    {
+        var zoom = Math.Round(camera.Zoom, Math.Clamp((int)Math.Log10(1 / camera.Zoom) + 1, 0, 15));
+        return $"(±): {zoom}";
+    }
 }

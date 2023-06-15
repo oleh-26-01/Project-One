@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Project_One"
+        xmlns:controls="clr-namespace:Project_One.Controls"
         mc:Ignorable="d"
         Title="MainWindow" Height="720" Width="1280"
         UseLayoutRounding="True">
@@ -22,9 +23,9 @@
 
         <Grid Grid.Column="0" Grid.Row="0" x:Name="TopPanel"
               Margin="0 0 1 1">
-            <local:FirstTopPanel x:Name="FirstTopPanel" />
-            <local:SecondTopPanel x:Name="SecondTopPanel" Visibility="Hidden" />
-            <local:ThirdTopPanel x:Name="ThirdTopPanel" Visibility="Hidden" />
+            <controls:FirstTopPanel x:Name="FirstTopPanel"  Visibility="Visible" />
+            <controls:SecondTopPanel x:Name="SecondTopPanel" Visibility="Hidden" />
+            <controls:ThirdTopPanel x:Name="ThirdTopPanel" Visibility="Hidden"/>
         </Grid>
 
         <Grid Grid.Column="1" Grid.Row="0" Background="WhiteSmoke"
@@ -52,15 +53,15 @@
 
         <Grid Grid.Column="0" Grid.Row="1" x:Name="CanvasGrid"
               Margin="0 0 1 0">
-            <local:FirstCanvas x:Name="FirstCanvas" Visibility="Visible" />
-            <local:SecondCanvas x:Name="SecondCanvas" Visibility="Hidden" />
-            <local:ThirdCanvas x:Name="ThirdCanvas" Visibility="Hidden" />
+            <controls:FirstCanvas x:Name="FirstCanvas" />
+            <controls:SecondCanvas x:Name="SecondCanvas" Visibility="Hidden" />
+            <controls:ThirdCanvas x:Name="ThirdCanvas" Visibility="Hidden" />
         </Grid>
 
         <Grid Grid.Column="1" Grid.Row="1" x:Name="SidePanel">
-            <local:FirstSidePanel x:Name="FirstSidePanel" />
-            <local:SecondSidePanel x:Name="SecondSidePanel" Visibility="Hidden" />
-            <local:ThirdSidePanel x:Name="ThirdSidePanel" Visibility="Hidden" />
+            <controls:FirstSidePanel x:Name="FirstSidePanel" />
+            <controls:SecondSidePanel x:Name="SecondSidePanel" Visibility="Hidden" />
+            <controls:ThirdSidePanel x:Name="ThirdSidePanel" Visibility="Hidden" />
         </Grid>
     </Grid>
 </Window>

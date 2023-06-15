@@ -6,10 +6,13 @@ namespace Project_One_Objects.AIComponents;
 public class Genome
 {
     private Car _car;
-    private int _visionOptimization = 0;
     private readonly Track _track;
     private readonly Vector2[] _checkPoints;
     private bool _firstCheckpoint = true;
+    private readonly int _checkpointEvolutionStep = 0;
+    public int MiddleGeneIndex = -1;
+    public bool GetSecondCheckpoint = false;
+    public Car MiddleCarState = null;
     public int[] Genes { get; set; }
     public short[] Values { get; set; }
     public int Origin { get; set; }
@@ -18,24 +21,23 @@ public class Genome
 
     private int _currentGene = 0;
     private bool _isAlive = true;
-    public double[] OnCheckpointFitness { get; set; }
 
-    private float _fullDistance;
-    public Genome(Car car, float tickRate)
+    private readonly float _fullDistance = 0;
+    public Genome(Car car, float tickRate, int checkpointEvolutionStep)
     {
         _car = car;
         _track = car.Track;
         _tickRate = tickRate;
+        _checkpointEvolutionStep = checkpointEvolutionStep;
         _checkPoints = _track.GetCheckpoints().ToArray();
 
-        OnCheckpointFitness = new double[_checkPoints.Length];
-
-        _fullDistance = Vector2.Distance(_car.Position, _checkPoints[0]);
-        for (var i = 0; i < _checkPoints.Length - 1; i++)
+        _fullDistance = Vector2.Distance(_car.Position, _checkPoints[_checkpointEvolutionStep]);
+        for (var i = _checkpointEvolutionStep; i < checkpointEvolutionStep + Config.StepWidth; i++)
         {
             _fullDistance += Vector2.Distance(_checkPoints[i], _checkPoints[i + 1]);
         }
-        var size = (int)(_fullDistance / (car.MaxSpeed * TickTime / 1.5));
+
+        var size = (int)(_fullDistance / (car.MaxSpeed * TickTime / 4));
         Genes = new int[size];
         Values = new short[size];
         for (var i = 0; i < Values.Length; i++)
@@ -58,7 +60,8 @@ public class Genome
     public int CurrentGene => _currentGene;
     public float CurrentDistance { get; set; }
     public float CurrentTime => _currentGene * TickTime;
-    public float AvgSpeed => (_fullDistance - CurrentDistance) / CurrentTime;
+    public List<float> Speeds { get; set; } = new();
+    public float AvgSpeed => Speeds.Average();
 
 
     /// <summary>
@@ -77,35 +80,33 @@ public class Genome
         _currentGene++;
         _car.Move(TickTime);
 
-        if (_visionOptimization - (int)(TickTime * 1000) <= 0)
-        {
-            _car.UpdateVision();
-            _visionOptimization = _car.VisionOptimization();
-        }
-        else
-        {
-            _visionOptimization -= (int)(TickTime * 1000);
-        }
+        Speeds.Add(_car.Speed);
 
-        //_car.UpdateVision();
+        _car.UpdateVisionOpt(TickTime);
 
-        if (_car.IsCollision() || _currentGene >= Genes.Length)
+        if (_car.IsCollision() || _currentGene + 1 == Genes.Length)
         {
             Fitness = GetFitness();
-            _track.DropCheckpoint();
+            _track.CurrentCheckpointIndex = _checkpointEvolutionStep;
             _isAlive = false;
         }
         else if (_track.OnCheckpoint(_car.Position, _car.Width))
         {
-            if (_track.CurrentCheckpointIndex == 0 && !_firstCheckpoint)
+            if (_track.CurrentCheckpointIndex == _checkpointEvolutionStep + 1)
             {
+                MiddleGeneIndex = _currentGene;
+                MiddleCarState = new Car(_car);
+            }
+
+            if (_track.CurrentCheckpointIndex == _checkpointEvolutionStep + Config.StepWidth && !_firstCheckpoint)
+            {
+                GetSecondCheckpoint = true;
                 Fitness = GetFitness();
-                _track.DropCheckpoint();
+                _track.CurrentCheckpointIndex = _checkpointEvolutionStep;
                 _isAlive = false;
                 return; // to prevent IndexOutOfRangeException on line 89
             }
             
-            OnCheckpointFitness[_track.CurrentCheckpointIndex - 1] = GetFitness();
             _firstCheckpoint = false;
         }
     }
@@ -115,22 +116,19 @@ public class Genome
     private double GetFitness()
     {
         CurrentDistance = Vector2.Distance(_car.Position, _checkPoints[_track.CurrentCheckpointIndex]);
-        for (var i = _track.CurrentCheckpointIndex; i < _checkPoints.Length - 1; i++)
+        for (var i = _track.CurrentCheckpointIndex; i < _checkpointEvolutionStep + Config.StepWidth; i++)
         {
             CurrentDistance += Vector2.Distance(_checkPoints[i], _checkPoints[i + 1]);
         }
 
         if (CurrentDistance > _fullDistance)
             CurrentDistance = _fullDistance;
+
         var distancePoints = 1000 * Math.Sqrt(1 - CurrentDistance / _fullDistance);
-
         var timePoints = 666 * Math.Sqrt(1 - (float)_currentGene / Genes.Length);
-        //if (CurrentDistance < 10)
-        //    timePoints *= 1.5f;
+        var avgSpeedPoints = 333 * (AvgSpeed / _car.MaxSpeed);
 
-        var checkpointPoints = 100 * _track.CurrentCheckpointIndex / _checkPoints.Length;
-        
-        return distancePoints + timePoints + checkpointPoints;
+        return distancePoints + timePoints * 2 + avgSpeedPoints;
     }
 
     /// <summary> Get information about genome. </summary>
@@ -151,7 +149,6 @@ public class Genome
             CurrentDistance,
             CurrentTime,
             _currentGene,
-            Genes.Length,
             AvgSpeed
         };
     }

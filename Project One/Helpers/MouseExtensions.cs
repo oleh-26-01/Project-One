@@ -5,7 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Project_One_Objects.Helpers;
 
-namespace Project_One;
+namespace Project_One.Helpers;
 
 public class MouseExtensions
 {

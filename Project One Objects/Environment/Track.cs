@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Project_One_Objects.AIComponents;
 using Project_One_Objects.Helpers;
 
 namespace Project_One_Objects.Environment;
@@ -6,6 +7,7 @@ namespace Project_One_Objects.Environment;
 public class Track
 {
     private float _width;
+    private Curve _curve;
     private Vector2[] _curvePoints;
     private Vector2[] _points;
     private float _minCheckpointDistance;
@@ -42,6 +44,7 @@ public class Track
         {
             if (value < 0) throw new ArgumentOutOfRangeException(nameof(value), "Width cannot be negative.");
             _width = value;
+            if (LoadStatus) _points = GetPoints();
         }
     }
 
@@ -56,7 +59,16 @@ public class Track
     }
 
     public List<int> CheckpointsIndexes => _checkpointIndexes;
-    public int CurrentCheckpointIndex => _currentCheckpointIndex;
+
+    public int CurrentCheckpointIndex
+    {
+        get => _currentCheckpointIndex;
+        set
+        {
+            if (value < 0 || value >= _checkpointIndexes.Count) throw new ArgumentOutOfRangeException(nameof(value), "Index is out of range.");
+            _currentCheckpointIndex = value;
+        }
+    }
 
     public Vector2 CurrentCheckpointCenter { get; set; } = Vector2.Zero;
 
@@ -65,24 +77,25 @@ public class Track
 
     public Track Load(string path)
     {
-        _curvePoints = new Curve().Load(path).Points.ToArray();
+        _curve = new Curve().Load(path);
+        _curvePoints = _curve.Points.ToArray();
         _points = GetPoints();
         _checkpointIndexes = GetCheckpointIndexes();
-        DropCheckpoint();
+        CurrentCheckpointIndex = 0;
         LoadStatus = true;
         return this;
     }
 
     private Vector2[] GetPoints()
     {
-        var points = _curvePoints.Select(p => p - _curvePoints[1]).ToArray();
+        var points = _curve.Points.ToArray().Select(p => p - _curve.Points[1]).ToArray();
         var newCurvePoints = new Vector2[points.Length - 1];
         //var points = _curvePoints;
         var result = new Vector2[(points.Length - 1) * 2];
 
         var rotateLeft = Matrix3x2.CreateRotation((float)-90d.ToRad());
         var rotateRight = Matrix3x2.CreateRotation((float)90d.ToRad());
-        for (var i = 0; i < _curvePoints.Length - 1; i++)
+        for (var i = 0; i < points.Length - 1; i++)
         {
             var vector = (points[i + 1] - points[i]) / 2;
             var shift = Vector2.Normalize(vector) * _width;
@@ -99,8 +112,6 @@ public class Track
     {
         var points = _points;
         var checkpoints = new List<int>();
-        var checkpoint = (_points[0] + _points[^1]) / 2;
-        // skip first point
         var lastPointIndex = _curvePoints.Length - 1;
         var distance = 0f;
         for (var i = 0; i < lastPointIndex - 1; i++)
@@ -111,6 +122,11 @@ public class Track
             if (distance < _minCheckpointDistance) continue;
             checkpoints.Add(i + 1);
             distance = 0;
+        }
+
+        for (var i = 0; i < Config.StepWidth; i++)
+        {
+            checkpoints.Add(checkpoints[^1]);
         }
 
         return checkpoints;
@@ -149,10 +165,5 @@ public class Track
         }
 
         return false;
-    }
-
-    public void DropCheckpoint()
-    {
-        _currentCheckpointIndex = 0;
     }
 }

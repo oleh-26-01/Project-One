@@ -2,15 +2,16 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using Project_One.Drawing.Wrappers;
 using Project_One_Objects.Helpers;
 
-namespace Project_One;
+namespace Project_One.Controls;
 
 public partial class FirstSidePanel : UserControl
 {
     public const string FilesType = "crv";
     private Camera _camera;
-    private WpfCurve _curve;
+    private CurveWPF _curve;
     private ObservableCollection<CurveViewModel> _curveViewModels;
     private string _filesPath;
     private FirstTopPanel _firstTopPanel;
@@ -50,7 +51,7 @@ public partial class FirstSidePanel : UserControl
         foreach (var file in files)
         {
             if (!file.EndsWith(FilesType)) continue;
-            var curve = new WpfCurve(file);
+            var curve = new CurveWPF(file);
             var curveViewModel = new CurveViewModel
             {
                 FileName = file,

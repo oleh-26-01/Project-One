@@ -2,21 +2,21 @@
 using System.Diagnostics;
 using System.Numerics;
 using System.Reactive.Linq;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Project_One.Drawing.WpfOnly;
+using Project_One.Drawing.Wrappers;
 using Project_One.Helpers;
 using Project_One_Objects.Helpers;
 
-namespace Project_One;
+namespace Project_One.Controls;
 
 public partial class FirstCanvas : UserControl
 {
     private readonly WpfCrosshair _crosshair;
 
     private FirstTopPanel _firstTopPanel;
-    private IDisposable? _keyEventSubscription;
     private int _tickRate = 60;
 
     private IDisposable? _updateSubscription;
@@ -28,19 +28,22 @@ public partial class FirstCanvas : UserControl
     {
         InitializeComponent();
         Camera = new Camera(new Vector2((float)ActualWidth, (float)ActualHeight), new Vector2(0, 0));
-        Curve = new WpfCurve();
+        CameraZoomLabel = new WpfText(Strings.CameraZoom(Camera), new Vector2(0, 0), 16);
+        Curve = new CurveWPF();
         CurveEraser = new WpfCurveEraser();
         _crosshair = new WpfCrosshair(new Vector2(0, 0));
     }
 
     /// <summary>The curve drawn on the canvas.</summary>
-    public WpfCurve Curve { get; }
+    public CurveWPF Curve { get; }
 
     /// <summary>The curve eraser drawn on the canvas.</summary>
     public WpfCurveEraser CurveEraser { get; }
 
     /// <summary>The camera used to draw all objects on the canvas.</summary>
     public Camera Camera { get; }
+
+    public WpfText CameraZoomLabel { get; }
 
     /// <summary>The time in milliseconds between each update.</summary>
     public double TargetRefreshTime => 1000d / _tickRate;
@@ -65,6 +68,8 @@ public partial class FirstCanvas : UserControl
     {
         _firstTopPanel = firstTopPanel;
 
+        CameraZoomLabel.DrawOn(CanvasControl);
+        Camera.SetZoomUpdater(() => CameraZoomLabel.SetText(Strings.CameraZoom(Camera)));
         Curve.DrawOn(CanvasControl);
         CurveEraser.DrawOn(CanvasControl);
         _crosshair.DrawOn(CanvasControl);
@@ -123,9 +128,6 @@ public partial class FirstCanvas : UserControl
         }
     }
 
-    [DllImport("user32.dll")]
-    private static extern bool SetCursorPos(int a, int b);
-
     public void Canvas_OnMouseMove(object sender, MouseEventArgs e)
     {
         var position = e.GetPosition(CanvasControl);
@@ -141,7 +143,7 @@ public partial class FirstCanvas : UserControl
             switch (_firstTopPanel.OnCurveAction)
             {
                 case Strings.DrawAction:
-                    Curve.AddPoint(mousePositionWorld);
+                    Curve.AddPoint(mousePositionWorld, 10 / Camera.Zoom);
                     break;
                 case Strings.EraseAction:
                     CurveEraser.ErasePoints(Curve.Points, mousePositionWorld, Camera.Zoom);
@@ -181,6 +183,8 @@ public partial class FirstCanvas : UserControl
             Camera.ZoomIn(e.Delta / 1000f);
         else
             Camera.ZoomOut(-e.Delta / 1000f);
+
+        CameraZoomLabel.SetText(Strings.CameraZoom(Camera));
     }
 
     private void Canvas_OnSizeChanged(object sender, SizeChangedEventArgs e)

@@ -40,6 +40,8 @@ public partial class MainWindow
             ThirdCanvas.StopUpdates();
         };
 
+        ChangePart(PrevPartControl, null!);
+
         // Render.Transform
     }
 

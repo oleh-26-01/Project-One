@@ -1,17 +1,13 @@
 ﻿using System.Windows.Controls;
-using Project_One.Drawing;
+using Project_One.Drawing.Wrappers;
 using Project_One_Objects.Helpers;
 
-namespace Project_One;
+namespace Project_One.Controls;
 
-/// <summary>
-///     Interaction logic for SecondTopPanel.xaml
-/// </summary>
 public partial class SecondTopPanel : UserControl
 {
     private Camera _camera;
-    private WpfCar _car;
-    private FpsMeter _fpsMeter;
+    private CarWPF _car;
 
     public SecondTopPanel()
     {

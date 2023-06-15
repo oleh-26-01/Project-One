@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using Project_One_Objects.Environment;
 using System.Numerics;
+using Microsoft.CodeAnalysis;
 using Microsoft.Diagnostics.Tracing.Parsers.Clr;
 
 namespace Project_One_Objects.AIComponents;
@@ -8,11 +9,12 @@ namespace Project_One_Objects.AIComponents;
 public class PopulationManager
 {
     private Genome[] _population;
+    private int _checkpointEvolutionStep = 0;
     private readonly Track _progenitorTrack;
-    private readonly Car _progenitorCar;
+    private Car _progenitorCar;
     private static readonly Random Random = new();
-    private int _generation = 1;
-    private const bool SurvivorIssue = false;
+    private int _generation = 0;
+    private const bool SurvivorIssue = false; // TODO: fix crushing on true
     private int _survivorIssueGeneration;
     private const int MaxSurvivorIssueGenerations = 10;
 
@@ -24,19 +26,15 @@ public class PopulationManager
         _progenitorTrack = progenitorTrack;
         _population = new Genome[populationSize * 10];
 
-        _progenitorCar = new Car(new Vector2(0, 0), 0)
-        {
-            Track = _progenitorTrack,
-            IsVisionActive = true
-        };
-        
+        _progenitorCar = new Car(new Vector2(0, 0), 0) { Track = _progenitorTrack, IsVisionActive = true };
+
         Console.WriteLine("Creating starting population...");
         var stopwatch = new Stopwatch();
         stopwatch.Start();
 
         Parallel.For(0, _population.Length, i =>
         {
-            _population[i] = new Genome(new Car(_progenitorCar), Config.TickRate)
+            _population[i] = new Genome(new Car(_progenitorCar), Config.TickRate, _checkpointEvolutionStep)
             {
                 Origin = Config.OriginsKeys["Random"]
             };
@@ -49,6 +47,7 @@ public class PopulationManager
 
     public Genome[] Population => _population;
     public int Generation => _generation;
+    public List<int> BestGenes { get; set; } = new();
 
     public static void FillWithRandomGenes(int[] genes)
     {
@@ -58,21 +57,23 @@ public class PopulationManager
         }
     }
 
-    public void RunSimulation()
+    public void RunSimulation(bool print = false)
     {
         var stopwatch = new Stopwatch();
         stopwatch.Start();
-        Console.WriteLine("Starting simulation...");
+        if (print)
+            Console.WriteLine("Starting simulation...");
         foreach (var genome in _population)
         {
-            genome.Track.DropCheckpoint();
+            genome.Track.CurrentCheckpointIndex = _checkpointEvolutionStep;
             while (genome.IsAlive)
             {
                 genome.Update();
             }
         }
         stopwatch.Stop();
-        Console.WriteLine($"Simulation took {stopwatch.ElapsedMilliseconds}ms");
+        if (print)
+            Console.WriteLine($"Simulation took {stopwatch.ElapsedMilliseconds}ms");
     }
 
     public void RunSimulationParallel(bool optimize = false, bool print = false)
@@ -86,7 +87,7 @@ public class PopulationManager
         {
             Parallel.ForEach(_population, Config.OptimizationOptions, genome =>
             {
-                genome.Track.DropCheckpoint();
+                genome.Track.CurrentCheckpointIndex = _checkpointEvolutionStep;
                 while (genome.IsAlive)
                 {
                     genome.Update();
@@ -97,7 +98,7 @@ public class PopulationManager
         {
             Parallel.ForEach(_population, genome =>
             {
-                genome.Track.DropCheckpoint();
+                genome.Track.CurrentCheckpointIndex = _checkpointEvolutionStep;
                 while (genome.IsAlive)
                 {
                     genome.Update();
@@ -129,7 +130,8 @@ public class PopulationManager
     public static void CrossOverGenomes(Genome parent1, Genome parent2, Genome child1, Genome child2)
     {
         var crossOverPoint = Random.Next(0, parent1.Genes.Length);
-        for (var i = 0; i < parent1.Genes.Length; i++)
+        var maxIindex = new[] { parent1.Genes.Length, child1.Genes.Length, parent2.Genes.Length, child2.Genes.Length }.Min();
+        for (var i = 0; i < maxIindex; i++)
         {
             if (i < crossOverPoint)
             {
@@ -151,7 +153,8 @@ public class PopulationManager
     /// <summary> Randomly cross over two genomes to create two new genomes. </summary>
     public static void RandomCrossGenomes(Genome parent1, Genome parent2, Genome child1, Genome child2)
     {
-        for (var i = 0; i < parent1.Genes.Length; i++)
+        var maxIndex = new[] { parent1.Genes.Length, child1.Genes.Length, parent2.Genes.Length, child2.Genes.Length }.Min();
+        for (var i = 0; i < maxIndex; i++)
         {
             if (Random.NextDouble() < 0.5)
             {
@@ -174,7 +177,8 @@ public class PopulationManager
     public static void ValueCrossGenomes(Genome parent1, Genome parent2, Genome child)
     {
         // add a diversion one from bad genes
-        for (var i = 0; i < parent1.Genes.Length; i++)
+        var maxIndex = new[] { parent1.Genes.Length, parent2.Genes.Length, child.Genes.Length }.Min();
+        for (var i = 0; i < maxIndex; i++)
         {
             if (parent1.Values[i] > parent2.Values[i])
             {
@@ -189,6 +193,33 @@ public class PopulationManager
         }
     }
 
+    public static void SmoothCrossGenomes(Genome parent1, Genome parent2, Genome child)
+    {
+        var maxIndex = new[] { parent1.Genes.Length, parent2.Genes.Length, child.Genes.Length }.Min();
+        for (var i = 0; i < maxIndex; i++)
+        {
+            // rules
+            //1 + 2 => 0
+            // 3 + 4 => 0
+            // 5 + 6 => 1
+            // 7 + 8 => 2
+            // 5 + 7 => 3
+            // 6 + 8 => 4
+
+            var action = parent1.Genes[i] + parent2.Genes[i];
+            child.Genes[i] = action switch
+            {
+                3 => 0,
+                7 => 0,
+                11 => 1,
+                15 => 2,
+                12 => 3,
+                14 => 4,
+                _ => child.Genes[i]
+            };
+        }
+    }
+
     public string AnalyzeGeneration(bool print = false)
     {
         var stopwatch = new Stopwatch();
@@ -197,9 +228,9 @@ public class PopulationManager
         // Sort population by fitness.
         Array.Sort(_population, (x, y) => y.Fitness.CompareTo(x.Fitness));
 
-        var avgReport = new float[6];
-        var minReport = new float[6];
-        var maxReport = new float[6];
+        var avgReport = new float[5];
+        var minReport = new float[5];
+        var maxReport = new float[5];
         
         for (var i = 0; i < minReport.Length; i++)
         {
@@ -236,8 +267,7 @@ public class PopulationManager
                      $"Distance: {avgReport[1]} avg. (min: {minReport[1]}, max: {maxReport[1]})\n" +
                      $"Time: {avgReport[2]} avg. (min: {minReport[2]}, max: {maxReport[2]})\n" +
                      $"Current gene: {avgReport[3]} avg. (min: {minReport[3]}, max: {maxReport[3]})\n" +
-                     $"Genes: {avgReport[4]} avg. (min: {minReport[4]}, max: {maxReport[4]})\n" +
-                     $"Speed: {avgReport[5]} avg. (min: {minReport[5]}, max: {maxReport[5]})\n" +
+                     $"Speed: {avgReport[4]} avg. (min: {minReport[4]}, max: {maxReport[4]})\n" +
                      $"Origins: {string.Join(", ", originReport)}\n";
 
         stopwatch.Stop();
@@ -246,23 +276,78 @@ public class PopulationManager
         return report;
     }
 
-    public void PrepareNextGeneration(bool print = false)
+    /// <summary> Prepare next generation of genomes. </summary>
+    /// <param name="specialAction"> 0 - nothing, 1 - save best genes, 2 - reset population </param>
+    /// <param name="print"> </param>
+    /// <returns> True if next generation is possible, false otherwise. </returns>
+    public bool PrepareNextGeneration(int specialAction = 0, bool print = false)
     {
         var stopwatch = new Stopwatch();
         stopwatch.Start();
-        
+
+        switch (specialAction)
+        {
+            case 0:
+                break;
+            case 1:
+                var bestGenome = _population[0];
+                _progenitorCar = bestGenome.MiddleCarState;
+                var count = bestGenome.Genes.Length - bestGenome.MiddleGeneIndex;
+                BestGenes.AddRange(bestGenome.Genes.Take(bestGenome.MiddleGeneIndex));
+            
+                if (_checkpointEvolutionStep + 1 + Config.StepWidth == _progenitorTrack.GetCheckpoints().Count)
+                {
+                    return false;
+                }
+
+                for (var i = 0; i < _population.Length; i++)
+                {
+                    var newGenome = new Genome(new Car(_progenitorCar), Config.TickRate,    
+                        _checkpointEvolutionStep + 1)
+                    {
+                        Origin = Config.OriginsKeys["Random"]
+                    };
+                    FillWithRandomGenes(newGenome.Genes);
+                    //Array.Copy(bestGenome.Genes, bestGenome.MiddleGeneIndex, newGenome.Genes, 0,
+                    //    Math.Min(count, newGenome.Genes.Length));
+                    _population[i] = newGenome;
+                }
+
+                _checkpointEvolutionStep++;
+                break;
+            case 2:
+                //_checkpointEvolutionStep--;
+                for (var i = 0; i < _population.Length; i++)
+                {
+                    var newGenome = new Genome(new Car(_progenitorCar), Config.TickRate,    
+                        _checkpointEvolutionStep)
+                    {
+                        Origin = Config.OriginsKeys["Random"]
+                    };
+                    FillWithRandomGenes(newGenome.Genes);
+                    _population[i] = newGenome;
+                }
+                break;
+        }
+
         // Create new population.
         var newPopulation = new Genome[_population.Length];
         
         var bestGenomeSize = (int) (_population.Length * Config.BestGenomesRate);
         var upIndex = bestGenomeSize;
+        var selectedIndexes = new List<int>();
         // Add best genomes to new population.
         if (_survivorIssueGeneration != 0 && SurvivorIssue)
         {
             var half = bestGenomeSize / 2;
             for (var i = 0; i < half; i++)
             {
-                newPopulation[i] = _population[Random.Next(0, _population.Length)];
+                var randomSelectedIndex = Random.Next(half, _population.Length);
+                while (selectedIndexes.Contains(randomSelectedIndex))
+                {
+                    randomSelectedIndex = Random.Next(half, _population.Length);
+                }
+                newPopulation[i] = _population[randomSelectedIndex];
                 newPopulation[i].Origin = Config.OriginsKeys["SurvivorIssue"];
 
                 newPopulation[i + half] = _population[i];
@@ -293,11 +378,11 @@ public class PopulationManager
         {
             var parent1 = _population[Random.Next(0, bestGenomeSize)];
             var parent2 = _population[Random.Next(0, bestGenomeSize)];
-            var child1 = new Genome(new Car(_progenitorCar), Config.TickRate)
+            var child1 = new Genome(new Car(_progenitorCar), Config.TickRate, _checkpointEvolutionStep)
             {
                 Origin = Config.OriginsKeys["Crossover"]
             };
-            var child2 = new Genome(new Car(_progenitorCar), Config.TickRate)
+            var child2 = new Genome(new Car(_progenitorCar), Config.TickRate, _checkpointEvolutionStep)
             {
                 Origin = Config.OriginsKeys["Crossover"]
             };
@@ -314,11 +399,11 @@ public class PopulationManager
         {
             var parent1 = _population[Random.Next(0, bestGenomeSize)];
             var parent2 = _population[Random.Next(0, bestGenomeSize)];
-            var child1 = new Genome(new Car(_progenitorCar), Config.TickRate)
+            var child1 = new Genome(new Car(_progenitorCar), Config.TickRate, _checkpointEvolutionStep)
             {
                 Origin = Config.OriginsKeys["RandomCross"]
             };
-            var child2 = new Genome(new Car(_progenitorCar), Config.TickRate)
+            var child2 = new Genome(new Car(_progenitorCar), Config.TickRate, _checkpointEvolutionStep)
             {
                 Origin = Config.OriginsKeys["RandomCross"]
             };
@@ -335,7 +420,7 @@ public class PopulationManager
         {
             var parent1 = _population[Random.Next(0, bestGenomeSize)];
             var parent2 = _population[Random.Next(0, bestGenomeSize)];
-            var child = new Genome(new Car(_progenitorCar), Config.TickRate)
+            var child = new Genome(new Car(_progenitorCar), Config.TickRate, _checkpointEvolutionStep)
             {
                 Origin = Config.OriginsKeys["ValueCross"]
             };
@@ -343,6 +428,21 @@ public class PopulationManager
             newPopulation[i] = child;
         }
 
+        var smoothCrossGenomeSize = (int)(_population.Length * Config.SmoothCrossGenomesRate);
+        upIndex += smoothCrossGenomeSize;
+        // Add smooth cross over genomes to new population.
+        // Add cross over genomes to new population.
+        for (var i = upIndex - smoothCrossGenomeSize; i < upIndex; i++)
+        {
+            var parent1 = _population[Random.Next(0, bestGenomeSize)];
+            var parent2 = _population[Random.Next(0, bestGenomeSize)];
+            var child = new Genome(new Car(_progenitorCar), Config.TickRate, _checkpointEvolutionStep)
+            {
+                Origin = Config.OriginsKeys["SmoothCross"]
+            };
+            SmoothCrossGenomes(parent1, parent2, child);
+            newPopulation[i] = child;
+        }
 
         var mutateGenomeSize = (int)(_population.Length * Config.MutatedGenomesRate);
         upIndex += mutateGenomeSize;
@@ -350,11 +450,11 @@ public class PopulationManager
         for (var i = upIndex - mutateGenomeSize; i < upIndex; i++)
         {
             var parent = _population[Random.Next(0, bestGenomeSize)];
-            var child = new Genome(new Car(_progenitorCar), Config.TickRate)
+            var child = new Genome(new Car(_progenitorCar), Config.TickRate, _checkpointEvolutionStep)
             {
                 Origin = Config.OriginsKeys["Mutate"]
             };
-            Array.Copy(parent.Genes, child.Genes, parent.Genes.Length);
+            Array.Copy(parent.Genes, child.Genes, Math.Min(parent.Genes.Length, child.Genes.Length));
             MutateGenome(child, Config.MutationRate);
             newPopulation[i] = child;
         }
@@ -362,7 +462,7 @@ public class PopulationManager
         // Add random genomes to new population.
         for (var i = upIndex; i < _population.Length; i++)
         {
-            newPopulation[i] = new Genome(new Car(_progenitorCar), Config.TickRate)
+            newPopulation[i] = new Genome(new Car(_progenitorCar), Config.TickRate, _checkpointEvolutionStep)
             {
                 Origin = Config.OriginsKeys["Random"]
             };
@@ -376,5 +476,7 @@ public class PopulationManager
         stopwatch.Stop();
         if (print)
             Console.WriteLine($"Generation {_generation} prepared in {stopwatch.ElapsedMilliseconds}ms");
+
+        return true;
     }
 }

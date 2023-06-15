@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Shapes;
 using Project_One_Objects.Helpers;
 
-namespace Project_One;
+namespace Project_One.Drawing.WpfOnly;
 
-public class WpfCurveEraser
+public class WpfCurveEraser : WpfAbstract
 {
     private readonly Ellipse _ellipse;
     private int _radius;
@@ -16,6 +15,7 @@ public class WpfCurveEraser
     public WpfCurveEraser(Vector2 position = new(), int radius = 10)
     {
         _ellipse = WpfObjects.EraserEllipse();
+        Objects.Add(_ellipse);
         Radius = radius;
         Position = position;
     }
@@ -56,22 +56,7 @@ public class WpfCurveEraser
         }
     }
 
-    public void DrawOn(Canvas canvas)
-    {
-        if (!canvas.Children.Contains(_ellipse)) canvas.Children.Add(_ellipse);
-    }
-
-    public void RemoveFrom(Canvas canvas)
-    {
-        canvas.Children.Remove(_ellipse);
-    }
-
-    public void SetVisibility(bool visible)
-    {
-        _ellipse.Visibility = visible ? Visibility.Visible : Visibility.Hidden;
-    }
-
-    public void Update(Camera camera)
+    public new void Update(Camera camera)
     {
         var position = camera.ConvertOut(Position);
         Canvas.SetLeft(_ellipse, position.X - _radius);
