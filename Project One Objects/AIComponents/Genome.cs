@@ -46,23 +46,14 @@ public class Genome
         }
     }
 
-    public Car Car
-    {
-        get => _car;
-        set => _car = value;
-    }
     public Track Track => _track;
     public float TickRate => _tickRate;
     public float TickTime => 1 / _tickRate;
     public bool IsAlive => _isAlive;
-    public float FullDistance => _fullDistance;
-    public Vector2[] CheckPoints => _checkPoints;
-    public int CurrentGene => _currentGene;
     public float CurrentDistance { get; set; }
     public float CurrentTime => _currentGene * TickTime;
     public List<float> Speeds { get; set; } = new();
     public float AvgSpeed => Speeds.Average();
-
 
     /// <summary>
     /// Perform one tick of simulation.
@@ -104,7 +95,6 @@ public class Genome
                 Fitness = GetFitness();
                 _track.CurrentCheckpointIndex = _checkpointEvolutionStep;
                 _isAlive = false;
-                return; // to prevent IndexOutOfRangeException on line 89
             }
             
             _firstCheckpoint = false;

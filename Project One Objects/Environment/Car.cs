@@ -137,25 +137,48 @@ public class Car
 
     public Vector2[] VisionPoints => _visionPoints;
 
+    public void ResetState()
+    {
+        if (_track is null) return;
+
+        _position = (_track.Points[1] + _track.Points[^2]) / 2;
+        _bodyAngle = Math.Atan2(_track.Points[2].Y - _track.Points[1].Y, _track.Points[2].X - _track.Points[1].X);
+        _frontWheelsAngle = _bodyAngle;
+        _speed = 0;
+        if (_isVisionActive) UpdateVision();
+    }
+
+    public void UpdateVisionData(Track track)
+    {
+        _trackPointsAngles = new float[track.Points.Length];
+        _sortedTrackPointsAngles = new Vector2[track.Points.Length];
+        _trackSlopeIntercepts = new Vector2[track.Points.Length];
+
+        for (var i = 1; i < track.Points.Length; i++)
+        {
+            _trackSlopeIntercepts[i] = MathExtensions.SlopeIntercept(track.Points[i - 1], track.Points[i]);
+        }
+        _trackSlopeIntercepts[0] = MathExtensions.SlopeIntercept(track.Points[^1], track.Points[0]);
+    }
+
     public Track Track
     {
         get => _track!;
         set
         {
-            _trackPointsAngles = new float[value.Points.Length];
-            _sortedTrackPointsAngles = new Vector2[value.Points.Length];
-            _trackSlopeIntercepts = new Vector2[value.Points.Length];
-
             _track = value;
-            for (var i = 1; i < _track.Points.Length; i++)
-            {
-                _trackSlopeIntercepts[i] = MathExtensions.SlopeIntercept(_track.Points[i - 1], _track.Points[i]);
-            }
-            _trackSlopeIntercepts[0] = MathExtensions.SlopeIntercept(_track.Points[^1], _track.Points[0]);
+            UpdateVisionData(_track);
+            ResetState();
+        }
+    }
 
-            _position = (_track.Points[1] + _track.Points[^2]) / 2;
-            _bodyAngle = Math.Atan2(_track.Points[2].Y - _track.Points[1].Y, _track.Points[2].X - _track.Points[1].X);
-            if (_isVisionActive) UpdateVision();
+    public float TrackWidth
+    {
+        get => Track.Width;
+        set
+        {
+            Track.Width = value;
+            UpdateVisionData(_track!);
         }
     }
 

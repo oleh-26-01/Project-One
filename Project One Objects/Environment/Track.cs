@@ -7,7 +7,7 @@ namespace Project_One_Objects.Environment;
 public class Track
 {
     private float _width;
-    private Curve _curve;
+    private Curve? _curve;
     private Vector2[] _curvePoints;
     private Vector2[] _points;
     private float _minCheckpointDistance;
@@ -88,7 +88,7 @@ public class Track
 
     private Vector2[] GetPoints()
     {
-        var points = _curve.Points.ToArray().Select(p => p - _curve.Points[1]).ToArray();
+        var points = _curve!.Points.ToArray().Select(p => p - _curve.Points[1]).ToArray();
         var newCurvePoints = new Vector2[points.Length - 1];
         //var points = _curvePoints;
         var result = new Vector2[(points.Length - 1) * 2];

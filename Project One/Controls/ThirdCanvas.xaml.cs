@@ -37,11 +37,17 @@ public partial class ThirdCanvas : UserControl
         InitializeComponent();
         Camera = new Camera(new Vector2((float)ActualWidth, (float)ActualHeight), new Vector2(0, 0), CameraZoom);
         CameraZoomLabel = new WpfText(Strings.CameraZoom(Camera), new Vector2(0, 0), 16);
-        Track = new TrackWPF();
+        Track = new TrackWPF()
+        {
+            Width = 5f,
+        };
         Track.Load(_trackPath);
-        Track.Width = 5f;
         //Track.ShowCheckpoints = false;
-        Car = new CarWPF(new Vector2(0, 0), 0);
+        Car = new CarWPF(new Vector2(0, 0), 0)
+        {
+            Track = Track,
+            IsVisionActive = true,
+        };
         _populationManager = new PopulationManager(20, Track);
     }
 
@@ -58,12 +64,18 @@ public partial class ThirdCanvas : UserControl
     public double TargetRefreshTime => 1000d / _tickRate;
 
     public PopulationManager PopulationManager { get; set; }
-    public List<Genome> BestOnGeneration { get; set; }
+    public List<Genome>? BestOnGeneration { get; set; }
 
     public void Init()
     {
+        CameraZoomLabel.DrawOn(CanvasControl);
+        Camera.SetZoomUpdater(() => CameraZoomLabel.SetText(Strings.CameraZoom(Camera)));
+        Track.DrawOn(CanvasControl);
+        Car.DrawOn(CanvasControl);
+
         _populationManager.RunSimulationParallel();
 
+        // temporary code
         var isNextCheckpoint = false;
         var checkpoint = 0;
 
@@ -133,18 +145,11 @@ public partial class ThirdCanvas : UserControl
         }
 
         stopwatch.Stop();
+        Car.TrackWidth = 6f;
         Evolution = false;
-        Track.Width = 6;
 
         Console.WriteLine($"Genome Time: {_populationManager.BestGenes.Count * 1000f / Config.TickRate}ms");
         Console.WriteLine($"Time: {stopwatch.ElapsedMilliseconds}ms");
-
-        CameraZoomLabel.DrawOn(CanvasControl);
-        Camera.SetZoomUpdater(() => CameraZoomLabel.SetText(Strings.CameraZoom(Camera)));
-        Track.DrawOn(CanvasControl);
-        Car.DrawOn(CanvasControl);
-        Car.IsVisionActive = true;
-        Car.Track = Track;
     }
 
     public void StartUpdates()
@@ -172,15 +177,8 @@ public partial class ThirdCanvas : UserControl
                         if (_playingIndex == _populationManager.BestGenes.Count)
                         {
                             _playingIndex = 0;
-                            Car.RemoveFrom(CanvasControl);
-                            Car = new CarWPF(new Vector2(0, 0), 0)
-                            {
-                                IsVisionActive = Car.IsVisionActive
-                            };
-                            Car.DrawOn(CanvasControl);
                             Track.CurrentCheckpointIndex = 0;
-                            Car.Track = Track;
-                            Camera.Follow(() => Car.Position);
+                            Car.ResetState();
                         }
                     }
 
