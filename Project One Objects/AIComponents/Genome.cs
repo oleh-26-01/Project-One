@@ -7,7 +7,7 @@ public class Genome
 {
     private Car _car;
     private readonly Track _track;
-    private readonly Vector2[] _checkPoints;
+    private readonly Vector2[] _checkpoints;
     private bool _firstCheckpoint = true;
     private readonly int _checkpointEvolutionStep = 0;
     public int MiddleGeneIndex = -1;
@@ -29,12 +29,12 @@ public class Genome
         _track = car.Track;
         _tickRate = tickRate;
         _checkpointEvolutionStep = checkpointEvolutionStep;
-        _checkPoints = _track.GetCheckpoints().ToArray();
+        _checkpoints = _track.CheckpointCenters;
 
-        _fullDistance = Vector2.Distance(_car.Position, _checkPoints[_checkpointEvolutionStep]);
+        _fullDistance = Vector2.Distance(_car.Position, _checkpoints[_checkpointEvolutionStep]);
         for (var i = _checkpointEvolutionStep; i < checkpointEvolutionStep + Config.StepWidth; i++)
         {
-            _fullDistance += Vector2.Distance(_checkPoints[i], _checkPoints[i + 1]);
+            _fullDistance += Vector2.Distance(_checkpoints[i], _checkpoints[i + 1]);
         }
 
         var size = (int)(_fullDistance / (car.MaxSpeed * TickTime / 4));
@@ -105,10 +105,10 @@ public class Genome
     /// <returns> Fitness from 0 to 100 points. </returns>
     private double GetFitness()
     {
-        CurrentDistance = Vector2.Distance(_car.Position, _checkPoints[_track.CurrentCheckpointIndex]);
+        CurrentDistance = Vector2.Distance(_car.Position, _checkpoints[_track.CurrentCheckpointIndex]);
         for (var i = _track.CurrentCheckpointIndex; i < _checkpointEvolutionStep + Config.StepWidth; i++)
         {
-            CurrentDistance += Vector2.Distance(_checkPoints[i], _checkPoints[i + 1]);
+            CurrentDistance += Vector2.Distance(_checkpoints[i], _checkpoints[i + 1]);
         }
 
         if (CurrentDistance > _fullDistance)

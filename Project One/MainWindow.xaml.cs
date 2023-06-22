@@ -41,8 +41,6 @@ public partial class MainWindow
         };
 
         ChangePart(PrevPartControl, null!);
-
-        // Render.Transform
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)

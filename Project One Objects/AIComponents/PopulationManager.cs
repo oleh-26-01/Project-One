@@ -295,7 +295,7 @@ public class PopulationManager
                 var count = bestGenome.Genes.Length - bestGenome.MiddleGeneIndex;
                 BestGenes.AddRange(bestGenome.Genes.Take(bestGenome.MiddleGeneIndex));
             
-                if (_checkpointEvolutionStep + 1 + Config.StepWidth == _progenitorTrack.GetCheckpoints().Count)
+                if (_checkpointEvolutionStep + 1 + Config.StepWidth == _progenitorTrack.Checkpoints.Length)
                 {
                     return false;
                 }

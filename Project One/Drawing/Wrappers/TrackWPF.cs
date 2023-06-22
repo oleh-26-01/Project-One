@@ -49,11 +49,11 @@ public class TrackWPF : Track
         foreach (var point in points) pointsCollection.Add(new Point(point.X, point.Y));
         if (points.Length > 0) pointsCollection.Add(new Point(points[0].X, points[0].Y));
 
-        if (ShowCheckpoints && CheckpointsIndexes.Count > 0)
+        if (ShowCheckpoints && Checkpoints.Length > 0)
         {
-            var checkpointIndex = CheckpointsIndexes[CurrentCheckpointIndex];
-            var firstPoint = camera.ConvertOut(Points[checkpointIndex]);
-            var secondPoint = camera.ConvertOut(Points[^(checkpointIndex + 1)]);
+            var checkpoint = Checkpoints[CurrentCheckpointIndex];
+            var firstPoint = camera.ConvertOut(checkpoint.Item1);
+            var secondPoint = camera.ConvertOut(checkpoint.Item2);
             _checkpointLine.X1 = firstPoint.X;
             _checkpointLine.Y1 = firstPoint.Y;
             _checkpointLine.X2 = secondPoint.X;

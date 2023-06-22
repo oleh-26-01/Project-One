@@ -9,10 +9,12 @@ public class Track
     private float _width;
     private Curve? _curve;
     private Vector2[] _curvePoints;
+    private Vector2[] _shiftedCurvePoints;
     private Vector2[] _points;
-    private float _minCheckpointDistance;
-    private List<int> _checkpointIndexes;
+    private float _checkpointDistance;
     private int _currentCheckpointIndex = 0;
+    private Tuple<Vector2, Vector2>[] _checkpoints = Array.Empty<Tuple<Vector2, Vector2>>();
+    private Vector2[] _checkpointCenters = Array.Empty<Vector2>();
     public bool LoadStatus = false;
 
     public Track(float width = 10, float minCheckpointDistance = 10)
@@ -21,7 +23,6 @@ public class Track
         MinCheckpointDistance = minCheckpointDistance;
         _curvePoints = Array.Empty<Vector2>();
         _points = Array.Empty<Vector2>();
-        _checkpointIndexes = new List<int>();
     }
 
     public Track(Track track)
@@ -29,10 +30,15 @@ public class Track
         _width = track._width;
         _curvePoints = new Vector2[track._curvePoints.Length];
         track._curvePoints.CopyTo(_curvePoints, 0);
+        _shiftedCurvePoints = new Vector2[track._shiftedCurvePoints.Length];
+        track._shiftedCurvePoints.CopyTo(_shiftedCurvePoints, 0);
         _points = new Vector2[track._points.Length];
         track._points.CopyTo(_points, 0);
-        _minCheckpointDistance = track._minCheckpointDistance;
-        _checkpointIndexes = track._checkpointIndexes;
+        _checkpoints = new Tuple<Vector2, Vector2>[track._checkpoints.Length];
+        track._checkpoints.CopyTo(_checkpoints, 0);
+        _checkpointCenters = new Vector2[track._checkpointCenters.Length];
+        track._checkpointCenters.CopyTo(_checkpointCenters, 0);
+        _checkpointDistance = track._checkpointDistance;
         _currentCheckpointIndex = track._currentCheckpointIndex;
         LoadStatus = track.LoadStatus;
     }
@@ -42,7 +48,8 @@ public class Track
         get => _width;
         set
         {
-            if (value < 0) throw new ArgumentOutOfRangeException(nameof(value), "Width cannot be negative.");
+            if (value < 0) 
+                throw new ArgumentOutOfRangeException(nameof(value), "Width cannot be negative.");
             _width = value;
             if (LoadStatus) _points = GetPoints();
         }
@@ -50,27 +57,28 @@ public class Track
 
     public float MinCheckpointDistance
     {
-        get => _minCheckpointDistance;
+        get => _checkpointDistance;
         set
         {
-            if (value < 0) throw new ArgumentOutOfRangeException(nameof(value), "MinCheckpointDistance cannot be negative.");
-            _minCheckpointDistance = value;
+            if (value < 0) 
+                throw new ArgumentOutOfRangeException(nameof(value), "MinCheckpointDistance cannot be negative.");
+            _checkpointDistance = value;
         }
     }
-
-    public List<int> CheckpointsIndexes => _checkpointIndexes;
 
     public int CurrentCheckpointIndex
     {
         get => _currentCheckpointIndex;
         set
         {
-            if (value < 0 || value >= _checkpointIndexes.Count) throw new ArgumentOutOfRangeException(nameof(value), "Index is out of range.");
+            if (value < 0 || value >= _checkpoints.Length) 
+                throw new ArgumentOutOfRangeException(nameof(value), "Index is out of range.");
             _currentCheckpointIndex = value;
         }
     }
 
-    public Vector2 CurrentCheckpointCenter { get; set; } = Vector2.Zero;
+    public Tuple<Vector2, Vector2>[] Checkpoints => _checkpoints;
+    public Vector2[] CheckpointCenters => _checkpointCenters;
 
     public Vector2[] Points => _points;
     public Vector2[] CurvePoints => _curvePoints;
@@ -79,8 +87,9 @@ public class Track
     {
         _curve = new Curve().Load(path);
         _curvePoints = _curve.Points.ToArray();
+        _shiftedCurvePoints = _curvePoints.Select(p => p - _curvePoints[1]).ToArray();
         _points = GetPoints();
-        _checkpointIndexes = GetCheckpointIndexes();
+        UpdateCheckpoints();
         CurrentCheckpointIndex = 0;
         LoadStatus = true;
         return this;
@@ -88,9 +97,8 @@ public class Track
 
     private Vector2[] GetPoints()
     {
-        var points = _curve!.Points.ToArray().Select(p => p - _curve.Points[1]).ToArray();
+        var points = _shiftedCurvePoints;
         var newCurvePoints = new Vector2[points.Length - 1];
-        //var points = _curvePoints;
         var result = new Vector2[(points.Length - 1) * 2];
 
         var rotateLeft = Matrix3x2.CreateRotation((float)-90d.ToRad());
@@ -108,59 +116,54 @@ public class Track
         return result;
     }
 
-    private List<int> GetCheckpointIndexes()
+    public void UpdateCheckpoints()
     {
-        var points = _points;
-        var checkpoints = new List<int>();
-        var lastPointIndex = _curvePoints.Length - 1;
-        var distance = 0f;
-        for (var i = 0; i < lastPointIndex - 1; i++)
+        var trackLength = 0f;
+        var curvePoints = _curvePoints;
+        for (var i = 0; i < curvePoints.Length - 1; i++)
         {
-            var point1 = (points[i] + points[^(i + 1)]) / 2;
-            var point2 = (points[i + 1] + points[^(i + 2)]) / 2;
-            distance += Vector2.Distance(point1, point2);
-            if (distance < _minCheckpointDistance) continue;
-            checkpoints.Add(i + 1);
-            distance = 0;
+            trackLength += Vector2.Distance(curvePoints[i], curvePoints[i + 1]);
+        }
+        var checkpointCount = (int)(trackLength / _checkpointDistance);
+        var checkpoints = new List<Tuple<Vector2, Vector2>>(checkpointCount);
+        var checkpointCenters = new List<Vector2>(checkpointCount);
+
+        var distanceRemainder = 0f;
+
+        for (var i = 1; i < curvePoints.Length - 1; i++)
+        {
+            var segments = Vector2.Distance(curvePoints[i], curvePoints[i + 1]) / _checkpointDistance;
+            var leftSegmentLength = Vector2.Distance(_points[i], _points[i + 1]) / segments;
+            var rightSegmentLength = Vector2.Distance(_points[^(i + 1)], _points[^(i + 2)]) / segments;
+            var leftSegment = Vector2.Normalize(_points[i + 1] - _points[i]) * leftSegmentLength;
+            var rightSegment = Vector2.Normalize(_points[^(i + 2)] - _points[^(i + 1)]) * rightSegmentLength;
+            for (var j = distanceRemainder; j < segments; j++)
+            {
+                var left = _points[i] + leftSegment * j;
+                var right = _points[^(i + 1)] + rightSegment * j;
+                checkpoints.Add(new Tuple<Vector2, Vector2>(left, right));
+                checkpointCenters.Add((left + right) / 2);
+            }
+
+            distanceRemainder = segments - (int)segments;
         }
 
-        for (var i = 0; i < Config.StepWidth; i++)
-        {
-            checkpoints.Add(checkpoints[^1]);
-        }
-
-        return checkpoints;
-    }
-
-    public List<Vector2> GetCheckpoints()
-    {
-        var checkpoints = new List<Vector2>();
-        foreach (var index in _checkpointIndexes)
-        {
-            var firstPoint = _points[index];
-            var secondPoint = _points[^(index + 1)];
-            checkpoints.Add((firstPoint + secondPoint) / 2);
-        }
-
-        return checkpoints;
+        _checkpoints = checkpoints.ToArray();
+        _checkpointCenters = checkpointCenters.ToArray();
     }
 
     public bool OnCheckpoint(Vector2 carPosition, float checkDistance = 10)
     {
-        var checkpointIndex = _checkpointIndexes[_currentCheckpointIndex];
-        var firstPoint = _points[checkpointIndex];
-        var secondPoint = _points[^(checkpointIndex + 1)];
+        var checkpoint = _checkpoints[_currentCheckpointIndex];
 
-        var center = (firstPoint + secondPoint) / 2;
-        var distanceToCenter = Vector2.Distance(carPosition, center);
+        var distanceToCenter = Vector2.Distance(carPosition, _checkpointCenters[_currentCheckpointIndex]);
         if (distanceToCenter > _width) return false;
 
-        var distance = MathExtensions.DistanceToSegment(carPosition, firstPoint, secondPoint);
+        var distance = MathExtensions.DistanceToSegment(carPosition, checkpoint.Item1, checkpoint.Item2);
         if (distance < checkDistance)
         {
             _currentCheckpointIndex++;
-            if (_currentCheckpointIndex >= _checkpointIndexes.Count) _currentCheckpointIndex = 0;
-            CurrentCheckpointCenter = center;
+            if (_currentCheckpointIndex >= _checkpoints.Length) _currentCheckpointIndex = 0;
             return true;
         }
 

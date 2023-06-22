@@ -90,8 +90,6 @@ public partial class ThirdCanvas : UserControl
         var stopwatch = new Stopwatch();
         stopwatch.Start();
 
-        var checkpointsCount = Track.GetCheckpoints().Count;
-
         while (_populationManager.PrepareNextGeneration(isNextCheckpoint ? 1 : 0))
         {
             isNextCheckpoint = false;
@@ -135,7 +133,7 @@ public partial class ThirdCanvas : UserControl
             iterationsWithoutImprovement = 0;
             isNextCheckpoint = true;
             checkpoint++;
-            Console.WriteLine($"Checkpoint {checkpoint}/{checkpointsCount - 2}");
+            Console.WriteLine($"Checkpoint {checkpoint}/{Track.Checkpoints.Length - 2}");
             Console.WriteLine(report);
             var bestInfo = _populationManager.Population[0].GetInfo();
             Console.WriteLine($"Best's info: " +

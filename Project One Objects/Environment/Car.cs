@@ -179,6 +179,7 @@ public class Car
         {
             Track.Width = value;
             UpdateVisionData(_track!);
+            Track.UpdateCheckpoints();
         }
     }
 
