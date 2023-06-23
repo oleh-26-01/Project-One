@@ -104,7 +104,6 @@ public partial class ThirdSidePanel : UserControl
         _track.Load(trackViewModel.FileName);
         var newPopulationManager = new PopulationManager(100, _track);
         _thirdCanvas.PopulationManager = newPopulationManager;
-        _thirdCanvas.BestOnGeneration.Clear();
         _car.Track = _track;
         _camera.Position = -_camera.Center;
         _camera.Zoom = _cameraZoom;

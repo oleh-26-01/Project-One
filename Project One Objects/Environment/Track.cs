@@ -145,7 +145,10 @@ public class Track
                 checkpointCenters.Add((left + right) / 2);
             }
 
-            distanceRemainder = segments - (int)segments;
+            if (distanceRemainder < segments)
+                distanceRemainder = 1 - (segments - distanceRemainder) % 1;
+            else
+                distanceRemainder -= segments;
         }
 
         _checkpoints = checkpoints.ToArray();

@@ -12,7 +12,7 @@ public class Genome
     private readonly int _checkpointEvolutionStep = 0;
     public int MiddleGeneIndex = -1;
     public bool GetSecondCheckpoint = false;
-    public Car MiddleCarState = null;
+    public Car? MiddleCarState = null;
     public int[] Genes { get; set; }
     public short[] Values { get; set; }
     public int Origin { get; set; }
@@ -43,6 +43,23 @@ public class Genome
         for (var i = 0; i < Values.Length; i++)
         {
             Values[i] = 1;
+        }
+    }
+
+    public Genome(Genome genome, bool copyArrays = false)
+    {
+        _car = new Car(genome._car);
+        _track = genome._track;
+        _tickRate = genome._tickRate;
+        _checkpointEvolutionStep = genome._checkpointEvolutionStep;
+        _checkpoints = genome._checkpoints;
+        _fullDistance = genome._fullDistance;
+        Genes = new int[genome.Genes.Length];
+        Values = new short[genome.Values.Length];
+        if (copyArrays)
+        {
+            genome.Genes.CopyTo(Genes, 0);
+            genome.Values.CopyTo(Values, 0);
         }
     }
 
@@ -114,7 +131,7 @@ public class Genome
         if (CurrentDistance > _fullDistance)
             CurrentDistance = _fullDistance;
 
-        var distancePoints = 1000 * Math.Sqrt(1 - CurrentDistance / _fullDistance);
+        var distancePoints = 666 * Math.Sqrt(1 - CurrentDistance / _fullDistance);
         var timePoints = 666 * Math.Sqrt(1 - (float)_currentGene / Genes.Length);
         var avgSpeedPoints = 333 * (AvgSpeed / _car.MaxSpeed);
 

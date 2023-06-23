@@ -13,7 +13,7 @@ public class TrackWPF : Track
     private readonly Polyline _polyLine;
 
     public TrackWPF(string filePath = "",
-        float width = 6, float minCheckpointDistance = 10) : base(width, minCheckpointDistance)
+        float width = 6, float minCheckpointDistance = 15) : base(width, minCheckpointDistance)
     {
         _polyLine = WpfObjects.Polyline();
         _checkpointLine = WpfObjects.CheckpointLine();

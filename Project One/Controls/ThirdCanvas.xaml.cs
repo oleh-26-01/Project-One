@@ -16,8 +16,7 @@ namespace Project_One.Controls;
 
 public partial class ThirdCanvas : UserControl
 {
-    private readonly string _trackPath = "C:\\Coding\\C#\\Project One\\Project One\\Curves\\curve009.crv";
-    private FpsMeter _fpsMeter = new();
+    private readonly string _trackPath = "C:\\Coding\\C#\\Project One\\Project One\\Curves\\curve001.crv";
     private readonly Stopwatch _lastUpdate = new();
     private int _playingIndex;
     private bool Evolution = true;
@@ -48,7 +47,7 @@ public partial class ThirdCanvas : UserControl
             Track = Track,
             IsVisionActive = true,
         };
-        _populationManager = new PopulationManager(20, Track);
+        _populationManager = new PopulationManager(10, Track);
     }
 
     /// <summary>The camera used to draw all objects on the canvas.</summary>
@@ -60,11 +59,9 @@ public partial class ThirdCanvas : UserControl
 
     public CarWPF Car { get; private set; }
 
-    /// <summary>The time in milliseconds between each update.</summary>
     public double TargetRefreshTime => 1000d / _tickRate;
 
     public PopulationManager PopulationManager { get; set; }
-    public List<Genome>? BestOnGeneration { get; set; }
 
     public void Init()
     {
@@ -85,7 +82,7 @@ public partial class ThirdCanvas : UserControl
         var iterationsWithoutImprovement = 0;
         const int minIterationsWithoutImprovement = 10;
         var iterationsWithoutSolution = 0;
-        const int maxIterationsWithoutSolution = (minIterations + minIterationsWithoutImprovement) * 2;
+        const int maxIterationsWithoutSolution = (minIterations + minIterationsWithoutImprovement);
 
         var stopwatch = new Stopwatch();
         stopwatch.Start();
@@ -230,7 +227,6 @@ public partial class ThirdCanvas : UserControl
         var position = e.GetPosition(CanvasControl);
         var newMousePosition = new Vector2((float)position.X, (float)position.Y);
         var mousePositionWorld = Camera.ConvertIn(newMousePosition);
-        var newCenter = newMousePosition;
 
         if (e.LeftButton == MouseButtonState.Pressed)
         {

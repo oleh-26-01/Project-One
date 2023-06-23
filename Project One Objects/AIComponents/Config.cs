@@ -79,12 +79,11 @@ public static class Config
     {
         { 0, "Random" },
         { 1, "Crossover" },
-        { 2, "RandomCross" },
+        { 2, "RandomCrossover" },
         { 3, "Mutate" },
         { 4, "Best" },
-        { 5, "SurvivorIssue" },
-        { 6, "ValueCross" },
-        { 7, "SmoothCross"}
+        { 5, "ValueCrossover" },
+        { 6, "SmoothCrossover"}
     };
     public static readonly Dictionary<string, int> OriginsKeys = Origins.ToDictionary(x => x.Value, x => x.Key);
 
