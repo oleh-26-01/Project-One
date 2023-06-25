@@ -4,7 +4,6 @@ using Project_One.Helpers;
 using Project_One_Objects.AIComponents;
 using Project_One_Objects.Helpers;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Numerics;
 using System.Reactive.Linq;
@@ -16,14 +15,11 @@ namespace Project_One.Controls;
 
 public partial class ThirdCanvas : UserControl
 {
-    private readonly string _trackPath = "C:\\Coding\\C#\\Project One\\Project One\\Curves\\curve001.crv";
+    private const string TrackPath = "C:\\Coding\\C#\\Project One\\Project One\\Curves\\curve001.crv";
     private readonly Stopwatch _lastUpdate = new();
     private int _playingIndex;
-    private bool Evolution = true;
-
+    private bool _evolution = true;
     private readonly PopulationManager _populationManager;
-
-    private readonly int _tickRate = 60;
 
     private IDisposable? _updateSubscription;
     public float CameraZoom = 12;
@@ -40,7 +36,7 @@ public partial class ThirdCanvas : UserControl
         {
             Width = 5f,
         };
-        Track.Load(_trackPath);
+        Track.Load(TrackPath);
         //Track.ShowCheckpoints = false;
         Car = new CarWPF(new Vector2(0, 0), 0)
         {
@@ -57,9 +53,7 @@ public partial class ThirdCanvas : UserControl
 
     public TrackWPF Track { get; }
 
-    public CarWPF Car { get; private set; }
-
-    public double TargetRefreshTime => 1000d / _tickRate;
+    public CarWPF Car { get; }
 
     public PopulationManager PopulationManager { get; set; }
 
@@ -82,7 +76,7 @@ public partial class ThirdCanvas : UserControl
         var iterationsWithoutImprovement = 0;
         const int minIterationsWithoutImprovement = 10;
         var iterationsWithoutSolution = 0;
-        const int maxIterationsWithoutSolution = (minIterations + minIterationsWithoutImprovement);
+        const int maxIterationsWithoutSolution = (minIterations + minIterationsWithoutImprovement) * 10;
 
         var stopwatch = new Stopwatch();
         stopwatch.Start();
@@ -93,10 +87,11 @@ public partial class ThirdCanvas : UserControl
 
             _populationManager.RunSimulationParallel(true);
             var report = _populationManager.AnalyzeGeneration();
+            var bestOnGeneration = _populationManager.Population[0];
 
-            if (bestFitness < _populationManager.Population[0].Fitness && iteration >= minIterations)
+            if (bestFitness < bestOnGeneration.Fitness && iteration >= minIterations)
             {
-                bestFitness = _populationManager.Population[0].Fitness;
+                bestFitness = bestOnGeneration.Fitness;
                 iterationsWithoutImprovement = 0;
             }
             else if (iteration >= minIterations)
@@ -104,7 +99,7 @@ public partial class ThirdCanvas : UserControl
                 iterationsWithoutImprovement++;
             }
 
-            if (!_populationManager.Population[0].GetSecondCheckpoint)
+            if (!bestOnGeneration.OnNextCheckpoint)
             {
                 iterationsWithoutSolution++;
                 if (iterationsWithoutSolution >= maxIterationsWithoutSolution)
@@ -125,14 +120,14 @@ public partial class ThirdCanvas : UserControl
 
             iteration++;
 
-            if (iteration < minIterations || iterationsWithoutImprovement < minIterationsWithoutImprovement || !_populationManager.Population[0].GetSecondCheckpoint) continue;
+            if (iteration < minIterations || iterationsWithoutImprovement < minIterationsWithoutImprovement || !bestOnGeneration.OnNextCheckpoint) continue;
             iteration = 0;
             iterationsWithoutImprovement = 0;
             isNextCheckpoint = true;
             checkpoint++;
             Console.WriteLine($"Checkpoint {checkpoint}/{Track.Checkpoints.Length - 2}");
             Console.WriteLine(report);
-            var bestInfo = _populationManager.Population[0].GetInfo();
+            var bestInfo = bestOnGeneration.GetInfo();
             Console.WriteLine($"Best's info: " +
                               $"Fitness: {bestInfo[0]} " +
                               $"Cur. gene: {bestInfo[3]} " +
@@ -141,7 +136,7 @@ public partial class ThirdCanvas : UserControl
 
         stopwatch.Stop();
         Car.TrackWidth = 6f;
-        Evolution = false;
+        _evolution = false;
 
         Console.WriteLine($"Genome Time: {_populationManager.BestGenes.Count * 1000f / Config.TickRate}ms");
         Console.WriteLine($"Time: {stopwatch.ElapsedMilliseconds}ms");
@@ -150,7 +145,7 @@ public partial class ThirdCanvas : UserControl
     public void StartUpdates()
     {
         _updateSubscription = Observable.Interval(TimeSpan.FromMilliseconds(1000f / Config.TickRate))
-            .Subscribe(l =>
+            .Subscribe(_ =>
             {
                 Dispatcher.Invoke(() =>
                 {
@@ -163,7 +158,7 @@ public partial class ThirdCanvas : UserControl
                     Car.Update(Camera);
                     MoveCamera();
 
-                    if (Evolution == false)
+                    if (_evolution == false)
                     {
                         Config.CarActions[_populationManager.BestGenes[_playingIndex]](Car, 1f / Config.TickRate);
                         Car.Move(1f / Config.TickRate);

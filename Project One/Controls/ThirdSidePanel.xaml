@@ -14,43 +14,86 @@
                                          SelectedBrush="{StaticResource SelectedTrackViewModel}" />
         <DataTemplate x:Key="TrackListItemTemplate"
                       DataType="{x:Type projectOne:TrackViewModel}">
-            <Border BorderThickness="0 0 0 0" BorderBrush="Black">
+            <Border BorderThickness="0 1 0 0" BorderBrush="Black">
                 <Grid ShowGridLines="False"
                       Background="{Binding IsVisible, Converter={StaticResource BoolToColorConverter}}"
-                      Margin="0 0 0 1">
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
+                      Margin="0 0 0 0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="2*" />
                         <ColumnDefinition Width="1*" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Column="0" Grid.Row="0" Text="{Binding DisplayFileName}"
+                    <TextBlock Grid.Column="0" Text="{Binding ShortInfo}"
                                FontSize="16" Margin="4 2 2 2" />
-                    <TextBlock Grid.Column="0" Grid.Row="1" Text="{Binding DisplayPointCount}"
-                               FontSize="16" Margin="4 2 2 2" />
-                    <Button Grid.Column="1" Grid.Row="0" Focusable="False" Click="Delete_OnClick"
-                            Foreground="#CC0000" FontSize="16" FontWeight="SemiBold"
-                            Content="Delete" Margin="3 3 3 0" />
-                    <Button Grid.Column="1" Grid.Row="1" Focusable="False" Click="Select_OnClick"
-                            Foreground="{Binding ButtonBrush}" FontSize="16" FontWeight="SemiBold"
-                            Content="{Binding DisplayButtonContext}" Margin="3" />
+                    <Button Grid.Column="1" Focusable="False" Click="Select_OnClick"
+                            Foreground="#CC9900" FontSize="16" FontWeight="SemiBold"
+                            Content="Select" Margin="3" />
                 </Grid>
             </Border>
         </DataTemplate>
     </UserControl.Resources>
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <!--<ScrollViewer.Resources>
-                    <system:Double x:Key="{x:Static SystemParameters.VerticalScrollBarWidthKey}">10</system:Double>
-                </ScrollViewer.Resources>-->
-        <ItemsControl x:Name="TracksList" Focusable="False">
-            <ItemsControl.ItemTemplate>
-                <StaticResource ResourceKey="TrackListItemTemplate" />
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-    </ScrollViewer>
+    <Grid x:Name="GridContent" Background="WhiteSmoke" MouseMove="GridContent_OnMouseMove">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.5*" />
+            <RowDefinition Height="10" />
+            <RowDefinition Height="0.5*" />
+        </Grid.RowDefinitions>
+
+        <Expander Grid.Row="0" IsExpanded="True" 
+                  Expanded="ExpanderExpand"
+                  Collapsed="TracksExpanderCollapse"
+                  x:Name="TracksExpander">
+            <Expander.Header>
+                <TextBlock x:Name="ExpanderTracksTextBlock"
+                    Text="Tracks" FontSize="16" FontWeight="SemiBold" />
+            </Expander.Header>
+            <Expander.Content>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl x:Name="TracksList" Focusable="False">
+                        <ItemsControl.ItemTemplate>
+                            <StaticResource ResourceKey="TrackListItemTemplate" />
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Expander.Content>
+        </Expander>
+
+        <!-- add line -->
+        <Grid Grid.Row="1" x:Name="ExpanderControlStackPanel"
+                    Cursor="Hand"
+                    Background="LightGray"
+                    PreviewMouseDown="StackPanelMouseClick"
+                    PreviewMouseUp="StackPanelMouseClick">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.1*"/>
+                <ColumnDefinition Width="0.8*" />
+                <ColumnDefinition Width="0.1*"/>
+            </Grid.ColumnDefinitions>
+
+            <Rectangle Grid.Row="1" Grid.Column="1" Fill="Black" Height="1" />
+        </Grid>
+
+        <Expander Grid.Row="2" IsExpanded="True" x:Name="SettingsExpander"
+                  Expanded="ExpanderExpand"
+                  Collapsed="SettingsExpanderCollapse">
+            <Expander.Header>
+                <TextBlock Text="Settings" FontSize="16" FontWeight="SemiBold"></TextBlock>
+            </Expander.Header>
+
+            <StackPanel>
+                <TextBlock Text="Some text" />
+                <Button Content="Some button" />
+            </StackPanel>
+        </Expander>
+    </Grid>
+
+
 
 </UserControl>

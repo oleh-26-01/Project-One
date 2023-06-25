@@ -8,8 +8,9 @@ internal class TrackViewModel
     public string DisplayFileName => "name: " + FileName.Split("\\").Last();
     public int PointCount { get; set; }
     public string DisplayPointCount => "points: " + PointCount;
+    public string ShortInfo => FileName.Split("\\").Last() + " (" + PointCount + ")";
     public bool IsVisible { get; set; }
     public bool IsSelected { get; set; }
-    public string DisplayButtonContext => IsSelected ? "Unselect" : "Select";
-    public string ButtonBrush => IsSelected ? "#CC0000" : "#CC9900";
+    public string DisplayButtonContext => IsSelected ? "❌" : "✔️";
+    public string ButtonBrush => IsSelected ? "#CC0000" : "#339900";
 }

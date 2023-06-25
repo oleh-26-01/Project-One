@@ -14,27 +14,21 @@
                                          SelectedBrush="{StaticResource SelectedTrackViewModel}" />
         <DataTemplate x:Key="TrackListItemTemplate"
                       DataType="{x:Type projectOne:TrackViewModel}">
-            <Border BorderThickness="0 0 0 0" BorderBrush="Black">
+            <Border BorderThickness="0 0 0 1" BorderBrush="Black">
                 <Grid ShowGridLines="False"
-                      Background="{Binding IsVisible, Converter={StaticResource BoolToColorConverter}}"
-                      Margin="0 0 0 1">
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
+                      Background="{Binding IsVisible, Converter={StaticResource BoolToColorConverter}}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="2*" />
                         <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Column="0" Grid.Row="0" Text="{Binding DisplayFileName}"
-                               FontSize="16" Margin="4 2 2 2" />
-                    <TextBlock Grid.Column="0" Grid.Row="1" Text="{Binding DisplayPointCount}"
-                               FontSize="16" Margin="4 2 2 2" />
+                    <TextBlock Grid.Column="0" Text="{Binding ShortInfo}"
+                               FontSize="16" Margin="4 3 2 2" />
                     <Button Grid.Column="1" Grid.Row="0" Focusable="False" Click="View_OnClick"
-                            Foreground="#339900" FontSize="16" FontWeight="SemiBold"
-                            Content="View" Margin="3 3 3 0" />
-                    <Button Grid.Column="1" Grid.Row="1" Focusable="False" Click="Select_OnClick"
+                            Foreground="#CC9900" FontSize="16" FontWeight="SemiBold"
+                            Content="View" Margin="3 3 0 2" />
+                    <Button Grid.Column="2" Focusable="False" Click="Select_OnClick"
                             Foreground="{Binding ButtonBrush}" FontSize="16" FontWeight="SemiBold"
                             Content="{Binding DisplayButtonContext}" Margin="3" />
                 </Grid>
@@ -46,7 +40,7 @@
         <!--<ScrollViewer.Resources>
                     <system:Double x:Key="{x:Static SystemParameters.VerticalScrollBarWidthKey}">10</system:Double>
                 </ScrollViewer.Resources>-->
-        <ItemsControl x:Name="TracksList" Focusable="False">
+        <ItemsControl x:Name="TracksList" Focusable="False" Background="WhiteSmoke">
             <ItemsControl.ItemTemplate>
                 <StaticResource ResourceKey="TrackListItemTemplate" />
             </ItemsControl.ItemTemplate>

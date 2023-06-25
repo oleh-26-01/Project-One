@@ -336,7 +336,7 @@ public class PopulationManager
                 _progenitorCar = bestGenome.MiddleCarState!;
                 BestGenes.AddRange(bestGenome.Genes.Take(bestGenome.MiddleGeneIndex));
             
-                if (_checkpointEvolutionStep + 1 + Config.StepWidth == _progenitorTrack.Checkpoints.Length)
+                if (_checkpointEvolutionStep + Config.StepWidth + 1 == _progenitorTrack.Checkpoints.Length)
                 {
                     return false;
                 }

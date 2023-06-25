@@ -70,7 +70,6 @@ public static class Config
             }
         }
     };
-    public static readonly List<int> CarActionsKeys = CarActions.Keys.ToList();
 
     public static readonly int TickRate = 30; // minimum 18
     public static readonly float MutationRate = 0.03f; // minimum 0.01f

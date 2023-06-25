@@ -1,7 +1,9 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using Project_One.Drawing.Wrappers;
 using Project_One_Objects.AIComponents;
 using Project_One_Objects.Helpers;
@@ -19,6 +21,8 @@ public partial class ThirdSidePanel : UserControl
     private ThirdCanvas _thirdCanvas;
     private TrackWPF _track;
     private ObservableCollection<TrackViewModel> _trackViewModels;
+
+    private bool _propChanging = false;
 
     public ThirdSidePanel()
     {
@@ -71,46 +75,72 @@ public partial class ThirdSidePanel : UserControl
         }
     }
 
-    public void Delete_OnClick(object sender, RoutedEventArgs e)
-    {
-        var messageBoxResult = MessageBox.Show("Confirm deleting?", "Confirm", MessageBoxButton.YesNo);
-
-        switch (messageBoxResult)
-        {
-            case MessageBoxResult.Yes:
-            {
-                if (((Button)sender).DataContext is TrackViewModel trackViewModel)
-                {
-                    File.Delete(trackViewModel.FileName);
-                    _trackViewModels.Remove(trackViewModel);
-                }
-
-                break;
-            }
-            case MessageBoxResult.No:
-                break;
-        }
-
-
-        Update();
-    }
-
     public void Select_OnClick(object sender, RoutedEventArgs e)
     {
         if (((Button)sender).DataContext is not TrackViewModel trackViewModel) return;
 
-        trackViewModel.IsSelected = !trackViewModel.IsSelected;
-
-        _track.Load(trackViewModel.FileName);
-        var newPopulationManager = new PopulationManager(100, _track);
-        _thirdCanvas.PopulationManager = newPopulationManager;
-        _car.Track = _track;
-        _camera.Position = -_camera.Center;
-        _camera.Zoom = _cameraZoom;
-        if (_selectedTrack != null) _selectedTrack.IsVisible = false;
-        _selectedTrack = trackViewModel;
-        trackViewModel.IsVisible = true;
+        //_track.Load(trackViewModel.FileName);
+        //var newPopulationManager = new PopulationManager(100, _track);
+        //_thirdCanvas.PopulationManager = newPopulationManager;
+        //_car.Track = _track;
+        //_camera.Position = -_camera.Center;
+        //_camera.Zoom = _cameraZoom;
+        //if (_selectedTrack != null) _selectedTrack.IsVisible = false;
+        //_selectedTrack = trackViewModel;
+        //trackViewModel.IsVisible = true;
 
         Update();
+    }
+
+    private void StackPanelMouseClick(object sender, MouseButtonEventArgs e)
+    {
+        var isDown = e.LeftButton == MouseButtonState.Pressed;
+        Mouse.Capture(isDown ? ExpanderControlStackPanel : null);
+        Mouse.SetCursor(isDown ? Cursors.Hand : Cursors.Arrow);
+        _propChanging = isDown;
+    }
+
+    private void GridContent_OnMouseMove(object sender, MouseEventArgs e)
+    {
+        if (!_propChanging) return;
+        var trackListHeight = e.GetPosition(GridContent).Y / GridContent.ActualHeight;
+        trackListHeight = Math.Clamp(trackListHeight, 0, 1);
+        var settingsHeight = 1 - trackListHeight - GridContent.RowDefinitions[1].Height.Value / GridContent.ActualHeight;
+        settingsHeight = Math.Clamp(settingsHeight, 0, 1);
+        GridContent.RowDefinitions[0].Height = new GridLength(trackListHeight, GridUnitType.Star);
+        GridContent.RowDefinitions[2].Height = new GridLength(settingsHeight, GridUnitType.Star);
+    }
+
+    private void TracksExpanderCollapse(object sender, RoutedEventArgs e)
+    {
+        GridContent.RowDefinitions[0].Height = new GridLength(1, GridUnitType.Auto);
+        GridContent.RowDefinitions[1].Height = new GridLength(0, GridUnitType.Pixel);
+        GridContent.RowDefinitions[2].Height = new GridLength(1, GridUnitType.Star);
+    }
+    private void SettingsExpanderCollapse(object sender, RoutedEventArgs e)
+    {
+        GridContent.RowDefinitions[1].Height = new GridLength(0, GridUnitType.Pixel);
+        if (!TracksExpander.IsExpanded) return;
+        GridContent.RowDefinitions[0].Height = new GridLength(1, GridUnitType.Star);
+        GridContent.RowDefinitions[2].Height = new GridLength(1, GridUnitType.Auto);
+    }
+
+    private void ExpanderExpand(object sender, RoutedEventArgs e)
+    {
+        if (TracksExpander == null || SettingsExpander == null) return;
+
+        var isFirstExpander = (Expander)sender == TracksExpander;
+        if (isFirstExpander)
+        {
+            GridContent.RowDefinitions[0].Height = new GridLength(0.5, GridUnitType.Star);
+            if (SettingsExpander.IsExpanded)
+                GridContent.RowDefinitions[1].Height = new GridLength(10, GridUnitType.Pixel);
+        }
+        else
+        {
+            GridContent.RowDefinitions[2].Height = new GridLength(0.5, GridUnitType.Star);
+            if (TracksExpander.IsExpanded)
+                GridContent.RowDefinitions[1].Height = new GridLength(10, GridUnitType.Pixel);
+        }
     }
 }

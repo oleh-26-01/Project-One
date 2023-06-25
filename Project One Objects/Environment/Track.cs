@@ -151,6 +151,13 @@ public class Track
                 distanceRemainder -= segments;
         }
 
+        var lastLeftPoint = _points[_points.Length / 2 - 1];
+        var lastRightPoint = _points[^(_points.Length / 2)];
+        for (var i = 0; i < Config.StepWidth - 2; i++)
+        {
+            checkpoints.Add(new Tuple<Vector2, Vector2>(lastLeftPoint, lastRightPoint));
+            checkpointCenters.Add((lastLeftPoint + lastRightPoint) / 2);
+        }
         _checkpoints = checkpoints.ToArray();
         _checkpointCenters = checkpointCenters.ToArray();
     }
