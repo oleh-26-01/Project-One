@@ -133,8 +133,7 @@ public partial class ThirdSidePanel : UserControl
         if (isFirstExpander)
         {
             GridContent.RowDefinitions[0].Height = new GridLength(0.5, GridUnitType.Star);
-            if (SettingsExpander.IsExpanded)
-                GridContent.RowDefinitions[1].Height = new GridLength(10, GridUnitType.Pixel);
+            GridContent.RowDefinitions[1].Height = new GridLength(10, GridUnitType.Pixel);
         }
         else
         {

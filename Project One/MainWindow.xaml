@@ -22,10 +22,10 @@
         </Grid.RowDefinitions>
 
         <Grid Grid.Column="0" Grid.Row="0" x:Name="TopPanel"
-              Margin="0 0 1 1">
+              Margin="0 0 0 1">
             <controls:FirstTopPanel x:Name="FirstTopPanel"  Visibility="Visible" />
             <controls:SecondTopPanel x:Name="SecondTopPanel" Visibility="Hidden" />
-            <controls:ThirdTopPanel x:Name="ThirdTopPanel" Visibility="Hidden"/>
+            <controls:ThirdTopPanel x:Name="ThirdTopPanel" Visibility="Hidden" />
         </Grid>
 
         <Grid Grid.Column="1" Grid.Row="0" Background="WhiteSmoke"

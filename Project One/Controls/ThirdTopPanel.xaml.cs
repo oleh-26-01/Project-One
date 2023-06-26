@@ -1,9 +1,13 @@
 ﻿using System.Windows.Controls;
+using Project_One.ViewModels;
 
 namespace Project_One.Controls;
 
 public partial class ThirdTopPanel : UserControl
 {
+    private EvolutionViewModel _evolutionViewModel;
+
+
     public ThirdTopPanel()
     {
         InitializeComponent();
@@ -11,7 +15,7 @@ public partial class ThirdTopPanel : UserControl
 
     public void Init(ThirdCanvas thirdCanvas, ThirdSidePanel thirdSidePanel)
     {
-        FollowCarCheckBox.Click += (sender, e) =>
+        FollowCarCheckBox.Click += (_, _) =>
         {
             if (FollowCarCheckBox.IsChecked == true)
                 thirdCanvas.Camera.Follow(() => thirdCanvas.Car.Position);
@@ -19,6 +23,8 @@ public partial class ThirdTopPanel : UserControl
                 thirdCanvas.Camera.FollowStop();
         };
         thirdCanvas.Camera.Follow(FollowCarCheckBox.IsChecked == true ? () => thirdCanvas.Car.Position : null);
-        ShowVisionCheckBox.Click += (sender, e) => { thirdCanvas.Car.IsVisionActive = ShowVisionCheckBox.IsChecked == true; };
+
+        _evolutionViewModel = new EvolutionViewModel();
+        DataContext = _evolutionViewModel;
     }
 }

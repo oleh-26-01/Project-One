@@ -4,9 +4,27 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
-             d:DesignHeight="45" d:DesignWidth="1000">
-    <Grid ShowGridLines="False"
-          Background="DarkSlateGray">
+             d:DesignHeight="33" d:DesignWidth="1010">
+    <UserControl.Resources>
+        <Style TargetType="RadioButton" x:Key="RadioButtonStyle">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Margin" Value="3,0,3,0" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="Button" x:Key="ButtonStyle">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+        <Style TargetType="Grid" x:Key="GridStyle">
+            <Setter Property="Margin" Value="0,0,1,0" />
+            <Setter Property="Background" Value="WhiteSmoke" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid ShowGridLines="False" Background="DarkSlateGray">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*" MinWidth="130" />
             <ColumnDefinition Width="3.4*" MinWidth="195" />
@@ -15,30 +33,27 @@
             <ColumnDefinition Width="3.2*" />
         </Grid.ColumnDefinitions>
 
-        <Grid Grid.Column="0" Background="WhiteSmoke"
-              Margin="0,0,1,0">
+        <Grid Grid.Column="0" Style="{StaticResource GridStyle}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
-            <RadioButton Grid.Column="0" x:Name="DrawCurve" Content="Draw" IsChecked="True"
-                         Focusable="False" FontSize="16" Margin="3,0,3,0"
-                         HorizontalAlignment="Center" VerticalContentAlignment="Center" />
-            <RadioButton Grid.Column="1" x:Name="EraseCurve" Content="Erase"
-                         Focusable="False" FontSize="16" Margin="0,0,3,0"
-                         HorizontalAlignment="Center" VerticalContentAlignment="Center" />
+            <RadioButton Grid.Column="0" x:Name="DrawCurve" 
+                         Style="{StaticResource RadioButtonStyle}"
+                         Content="Draw" IsChecked="True" />
+            <RadioButton Grid.Column="1" x:Name="EraseCurve" 
+                         Style="{StaticResource RadioButtonStyle}"
+                         Content="Erase" />
         </Grid>
 
-        <Grid Grid.Column="1" Background="WhiteSmoke"
-              Margin="0,0,1,0">
+        <Grid Grid.Column="1" Style="{StaticResource GridStyle}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*" />
                 <ColumnDefinition Width="5*" />
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Column="0" x:Name="CurveOptAngleLabel" Content="OptAngle:"
-                   FontSize="16" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+            <Label Grid.Column="0" x:Name="CurveOptAngleLabel" Content="OptAngle:" FontSize="16" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
             <Grid Grid.Column="1" Margin="0,3,3,3">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*" />
@@ -47,47 +62,47 @@
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="0" x:Name="DecreaseOptAngle" Click="DecreaseOptAngle_OnClick"
-                        Content="-" Focusable="False" FontSize="16" VerticalContentAlignment="Stretch" />
-                <TextBox Grid.Column="1" x:Name="CurveOptAngle" FontSize="16" BorderThickness="0 1 0 1"
+                <Button Grid.Column="0" x:Name="DecreaseOptAngle" 
+                        Click="DecreaseOptAngle_OnClick" Content="-" 
+                        Style="{StaticResource ButtonStyle}"
+                        VerticalContentAlignment="Stretch" />
+                <TextBox Grid.Column="1" x:Name="CurveOptAngle" 
+                         FontSize="16" BorderThickness="0 1 0 1" 
                          HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
-                <Button Grid.Column="2" x:Name="IncreaseOptAngle" Click="IncreaseOptAngle_OnClick"
-                        Content="+" Focusable="False" FontSize="16" VerticalContentAlignment="Stretch" />
-                <Button Grid.Column="3" x:Name="ConfirmOptAngle" Click="ConfirmOptAngle_OnClick"
-                        Content="✓" Focusable="False" FontSize="16" FontWeight="Bold" Foreground="Black"
+                <Button Grid.Column="2" x:Name="IncreaseOptAngle" 
+                        Click="IncreaseOptAngle_OnClick" Content="+" 
+                        Style="{StaticResource ButtonStyle}"
+                        VerticalContentAlignment="Stretch" />
+                <Button Grid.Column="3" x:Name="ConfirmOptAngle" 
+                        Click="ConfirmOptAngle_OnClick" Content="✓" 
+                        Style="{StaticResource ButtonStyle}"
                         Margin="3 0 0 0" />
             </Grid>
         </Grid>
 
-        <Label Grid.Column="2" x:Name="CurvePointsLabel" Background="WhiteSmoke"
-               FontSize="16" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
-               Margin="0,0,1,0" />
+        <Label Grid.Column="2" x:Name="CurvePointsLabel" Background="WhiteSmoke" FontSize="16" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,1,0" />
 
-        <Grid Grid.Column="3" Background="WhiteSmoke"
-              Margin="0,0,1,0">
+        <Grid Grid.Column="3" Style="{StaticResource GridStyle}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" x:Name="NewCurve" Click="NewCurve_OnClick"
-                    Content="New" Focusable="False"
-                    Foreground="#CC9900" FontSize="16" FontWeight="SemiBold"
+            <Button Grid.Column="0" x:Name="NewCurve" Click="NewCurve_OnClick" 
+                    Content="New" Foreground="#CC9900" 
+                    Style="{StaticResource ButtonStyle}"
                     Margin="3" />
-
-            <Button Grid.Column="1" x:Name="SaveCurve" Click="SaveCurve_OnClick"
-                    Content="Save" Focusable="False"
-                    Foreground="#339900" FontSize="16" FontWeight="SemiBold"
+            <Button Grid.Column="1" x:Name="SaveCurve" Click="SaveCurve_OnClick" 
+                    Content="Save" Foreground="#339900" 
+                    Style="{StaticResource ButtonStyle}"
                     Margin="0 3 3 3" />
-
-            <Button Grid.Column="2" x:Name="ClearCurve" Click="ClearCurve_OnClick"
-                    Content="Clear" Focusable="False"
-                    Foreground="#CC0000" FontSize="16" FontWeight="SemiBold"
+            <Button Grid.Column="2" x:Name="ClearCurve" Click="ClearCurve_OnClick" 
+                    Content="Clear" Foreground="#CC0000"
+                    Style="{StaticResource ButtonStyle}"
                     Margin="0 3 3 3" />
         </Grid>
 
-        <Grid Grid.Column="4" Background="WhiteSmoke" />
+        <Grid Grid.Column="4" Style="{StaticResource GridStyle}" />
     </Grid>
-
 </UserControl>

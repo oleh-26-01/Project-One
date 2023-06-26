@@ -1,8 +1,6 @@
 ﻿using System.Diagnostics;
 using Project_One_Objects.Environment;
 using System.Numerics;
-using Microsoft.CodeAnalysis;
-using Microsoft.Diagnostics.Tracing.Parsers.Clr;
 
 namespace Project_One_Objects.AIComponents;
 
@@ -10,6 +8,8 @@ public class PopulationManager
 {
     private Genome[] _population;
     private int _checkpointEvolutionStep = 0;
+    public int EvolutionStep => _checkpointEvolutionStep;
+    public int StepsCount => _progenitorTrack.Checkpoints.Length;
     private readonly Track _progenitorTrack;
     private Car _progenitorCar;
     private static readonly Random Random = new();
@@ -336,7 +336,7 @@ public class PopulationManager
                 _progenitorCar = bestGenome.MiddleCarState!;
                 BestGenes.AddRange(bestGenome.Genes.Take(bestGenome.MiddleGeneIndex));
             
-                if (_checkpointEvolutionStep + Config.StepWidth + 1 == _progenitorTrack.Checkpoints.Length)
+                if (_checkpointEvolutionStep + Config.StepWidth + 1 == StepsCount)
                 {
                     return false;
                 }
