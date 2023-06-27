@@ -43,7 +43,7 @@ public partial class ThirdCanvas : UserControl
             Track = Track,
             IsVisionActive = true,
         };
-        _populationManager = new PopulationManager(10, Track);
+        _populationManager = new PopulationManager(20, Track);
     }
 
     /// <summary>The camera used to draw all objects on the canvas.</summary>
@@ -64,7 +64,7 @@ public partial class ThirdCanvas : UserControl
         Track.DrawOn(CanvasControl);
         Car.DrawOn(CanvasControl);
 
-        _populationManager.RunSimulationParallel();
+        _populationManager.RunSimulationParallel(true);
 
         // temporary code
         var isNextCheckpoint = false;
@@ -72,7 +72,7 @@ public partial class ThirdCanvas : UserControl
 
         var bestFitness = _populationManager.Population[0].Fitness;
         var iteration = 0;
-        const int minIterations = 50;
+        const int minIterations = 20;
         var iterationsWithoutImprovement = 0;
         const int minIterationsWithoutImprovement = 10;
         var iterationsWithoutSolution = 0;
@@ -86,7 +86,7 @@ public partial class ThirdCanvas : UserControl
             isNextCheckpoint = false;
 
             _populationManager.RunSimulationParallel(true);
-            var report = _populationManager.AnalyzeGeneration();
+            _populationManager.AnalyzeGeneration();
             var bestOnGeneration = _populationManager.Population[0];
 
             if (bestFitness < bestOnGeneration.Fitness && iteration >= minIterations)
@@ -107,7 +107,7 @@ public partial class ThirdCanvas : UserControl
                     Console.WriteLine("No solution found, restarting...");
                     _populationManager.PrepareNextGeneration(2);
                     _populationManager.RunSimulationParallel(true);
-                    report = _populationManager.AnalyzeGeneration();
+                    _populationManager.AnalyzeGeneration();
                     iteration = 0;
                     iterationsWithoutImprovement = 0;
                     iterationsWithoutSolution = 0;
@@ -126,6 +126,7 @@ public partial class ThirdCanvas : UserControl
             isNextCheckpoint = true;
             checkpoint++;
             Console.WriteLine($"Checkpoint {checkpoint}/{Track.Checkpoints.Length - 2}");
+            var report = _populationManager.AnalyzeGeneration(true);
             Console.WriteLine(report);
             var bestInfo = bestOnGeneration.GetInfo();
             Console.WriteLine($"Best's info: " +

@@ -1,6 +1,4 @@
-﻿using System.Data;
-using System.Numerics;
-using Project_One_Objects.AIComponents;
+﻿using System.Numerics;
 using Project_One_Objects.Helpers;
 
 namespace Project_One_Objects.Environment;
@@ -93,25 +91,8 @@ public class Car
     public double BodyAngle => _bodyAngle;
     public float Speed => _speed;
     public double FrontWheelsAngle => _frontWheelsAngle;
-
     public int Width => 2;
     public int Height => 4;
-
-    /* need to trigger graphic wrapper 
-    public int VisionCount
-    {
-        get => _visionCount;
-        set
-        {
-            if (value < 1)
-                throw new ArgumentOutOfRangeException(nameof(value), "Vision count must be greater than 0.");
-            _visionCount = (int)value;
-            _visionPoints = new Vector2[_visionCount];
-        }
-    }
-    */
-
-    // genome necessary value
     public float MaxSpeed => _maxSpeed;
 
     public int VisionCount
@@ -146,6 +127,16 @@ public class Car
         _frontWheelsAngle = _bodyAngle;
         _speed = 0;
         if (_isVisionActive) UpdateVision();
+    }
+
+    public Car CopyStateTo(Car car)
+    {
+        car._position = _position;
+        car._speed = _speed;
+        car._bodyAngle = _bodyAngle;
+        car._frontWheelsAngle = _frontWheelsAngle;
+        //if (_isVisionActive) UpdateVision();
+        return car;
     }
 
     public void UpdateVisionData(Track track)

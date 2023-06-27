@@ -1,11 +1,12 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics;
+using System.Numerics;
 using Project_One_Objects.Environment;
 
 namespace Project_One_Objects.AIComponents;
 
 public class Genome
 {
-    private readonly Car _car;
+    public Car Car { get; }
     private readonly Track _track;
     private readonly Vector2[] _checkpoints;
     private bool _firstCheckpoint = true;
@@ -25,13 +26,13 @@ public class Genome
     private readonly float _fullDistance = 0;
     public Genome(Car car, float tickRate, int checkpointEvolutionStep)
     {
-        _car = car;
+        Car = car;
         _track = car.Track;
         _tickRate = tickRate;
         _checkpointEvolutionStep = checkpointEvolutionStep;
         _checkpoints = _track.CheckpointCenters;
 
-        _fullDistance = Vector2.Distance(_car.Position, _checkpoints[_checkpointEvolutionStep]);
+        _fullDistance = Vector2.Distance(Car.Position, _checkpoints[_checkpointEvolutionStep]);
         for (var i = _checkpointEvolutionStep; i < checkpointEvolutionStep + Config.StepWidth; i++)
             _fullDistance += Vector2.Distance(_checkpoints[i], _checkpoints[i + 1]);
 
@@ -44,7 +45,7 @@ public class Genome
 
     public Genome(Genome genome, bool copyArrays = false)
     {
-        _car = new Car(genome._car);
+        Car = new Car(genome.Car);
         _track = genome._track;
         _tickRate = genome._tickRate;
         _checkpointEvolutionStep = genome._checkpointEvolutionStep;
@@ -78,29 +79,30 @@ public class Genome
     public void Update()
     {
         if (!_isAlive) return;
-        Config.CarActions[Genes[_currentGene]](_car, TickTime);
+        Config.CarActions[Genes[_currentGene]](Car, TickTime);
         _currentGene++;
-        _car.Move(TickTime);
+        Car.Move(TickTime);
 
-        Speeds.Add(_car.Speed);
+        Speeds.Add(Car.Speed);
 
-        _car.UpdateVisionOpt(TickTime);
+        Car.UpdateVisionOpt(TickTime);
 
-        if (_car.IsCollision() || _currentGene + 1 == Genes.Length)
+        if (Car.IsCollision() || _currentGene + 1 == Genes.Length)
         {
             Fitness = GetFitness();
             _track.CurrentCheckpointIndex = _checkpointEvolutionStep;
             _isAlive = false;
         }
-        else if (_track.OnCheckpoint(_car.Position, _car.Width))
+        else if (_track.OnCheckpoint(Car.Position, Car.Width))
         {
             if (_track.CurrentCheckpointIndex == _checkpointEvolutionStep + 1)
             {
                 MiddleGeneIndex = _currentGene;
-                MiddleCarState = new Car(_car);
+                MiddleCarState = new Car(Car);
             }
 
-            if (_track.CurrentCheckpointIndex == _checkpointEvolutionStep + Config.StepWidth && !_firstCheckpoint)
+            if (_track.CurrentCheckpointIndex == _checkpointEvolutionStep + Config.StepWidth && !_firstCheckpoint
+                && MiddleCarState is not null)
             {
                 OnNextCheckpoint = true;
                 Fitness = GetFitness();
@@ -116,7 +118,7 @@ public class Genome
     /// <returns> Fitness from 0 to 100 points. </returns>
     private double GetFitness()
     {
-        CurrentDistance = Vector2.Distance(_car.Position, _checkpoints[_track.CurrentCheckpointIndex]);
+        CurrentDistance = Vector2.Distance(Car.Position, _checkpoints[_track.CurrentCheckpointIndex]);
         for (var i = _track.CurrentCheckpointIndex; i < _checkpointEvolutionStep + Config.StepWidth; i++)
         {
             CurrentDistance += Vector2.Distance(_checkpoints[i], _checkpoints[i + 1]);
@@ -127,7 +129,7 @@ public class Genome
 
         var distancePoints = 1 - CurrentDistance / _fullDistance;
         var timePoints =  (double)_currentGene / Genes.Length;
-        var avgSpeedPoints = (double)AvgSpeed / _car.MaxSpeed;
+        var avgSpeedPoints = (double)AvgSpeed / Car.MaxSpeed;
 
         return distancePoints + avgSpeedPoints * (OnNextCheckpoint ? 1 : 0) - timePoints;
     }
@@ -139,8 +141,7 @@ public class Genome
     /// - distance to last checkpoint <br/>
     /// - time spent <br/>
     /// - current gene <br/>
-    /// - total genes <br/>
-    /// - origin <br/>
+    /// - average speed <br/>
     /// </remarks>
     public float[] GetInfo()
     {
