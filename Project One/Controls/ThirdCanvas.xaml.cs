@@ -42,6 +42,7 @@ public partial class ThirdCanvas : UserControl
         {
             Track = Track,
             IsVisionActive = true,
+            OptimizedCalculation = false,
         };
         _populationManager = new PopulationManager(20, Track);
     }
@@ -126,8 +127,7 @@ public partial class ThirdCanvas : UserControl
             isNextCheckpoint = true;
             checkpoint++;
             Console.WriteLine($"Checkpoint {checkpoint}/{Track.Checkpoints.Length - 2}");
-            var report = _populationManager.AnalyzeGeneration(true);
-            Console.WriteLine(report);
+            Console.WriteLine(_populationManager.AnalyzeGeneration(true));
             var bestInfo = bestOnGeneration.GetInfo();
             Console.WriteLine($"Best's info: " +
                               $"Fitness: {bestInfo[0]} " +

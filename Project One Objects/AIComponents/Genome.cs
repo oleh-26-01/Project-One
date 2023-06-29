@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Numerics;
+﻿using System.Numerics;
 using Project_One_Objects.Environment;
 
 namespace Project_One_Objects.AIComponents;
@@ -10,20 +9,20 @@ public class Genome
     private readonly Track _track;
     private readonly Vector2[] _checkpoints;
     private bool _firstCheckpoint = true;
-    private readonly int _checkpointEvolutionStep = 0;
+    private readonly int _checkpointEvolutionStep;
     public int MiddleGeneIndex = -1;
-    public bool OnNextCheckpoint = false;
-    public Car? MiddleCarState = null;
+    public bool OnNextCheckpoint;
+    public Car.State MiddleCarState;
     public int[] Genes { get; set; }
     public short[] Values { get; set; }
     public int Origin { get; set; }
     public double Fitness;
     private readonly float _tickRate;
 
-    private int _currentGene = 0;
+    private int _currentGene;
     private bool _isAlive = true;
 
-    private readonly float _fullDistance = 0;
+    private readonly float _fullDistance;
     public Genome(Car car, float tickRate, int checkpointEvolutionStep)
     {
         Car = car;
@@ -98,11 +97,11 @@ public class Genome
             if (_track.CurrentCheckpointIndex == _checkpointEvolutionStep + 1)
             {
                 MiddleGeneIndex = _currentGene;
-                MiddleCarState = new Car(Car);
+                MiddleCarState = Car.GetState();
             }
 
             if (_track.CurrentCheckpointIndex == _checkpointEvolutionStep + Config.StepWidth && !_firstCheckpoint
-                && MiddleCarState is not null)
+                && MiddleGeneIndex != -1)
             {
                 OnNextCheckpoint = true;
                 Fitness = GetFitness();

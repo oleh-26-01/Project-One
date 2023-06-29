@@ -96,10 +96,7 @@ public partial class SecondCanvas : UserControl
                     if (Track.LoadStatus)
                     {
                         Track.Update(Camera);
-                        if (Track.OnCheckpoint(Car.Position, Car.Width))
-                        {
-                            //Console.WriteLine("Checkpoint");
-                        }
+                        Track.OnCheckpoint(Car.Position, Car.Width);
                     }
 
                     //_car.UpdateVision();
@@ -111,19 +108,6 @@ public partial class SecondCanvas : UserControl
                     {
                         _labelTimer.Restart();
                         _cpsLabel.Content = $"{(int)_fpsMeter.GetAverageFps() / 10}k cps";
-                        //_cpsLabel.Content = $"Car speed: {Car.Speed}";
-                        //var checkpoints = _track.GetCheckpoints().ToArray();
-                        //if (checkpoints.Length == 0)
-                        //{
-                        //    _cpsLabel.Content = "Distance: 0";
-                        //    return;
-                        //}
-                        //var distance = Vector2.Distance(_car.Position, checkpoints[_track.CurrentCheckpointIndex]);
-                        //for (var i = _track.CurrentCheckpointIndex; i < _track.CheckpointsIndexes.Count - 1; i++)
-                        //{
-                        //    distance += Vector2.Distance(checkpoints[i], checkpoints[i + 1]);
-                        //}
-                        //_cpsLabel.Content = $"Distance: {distance}";
 
                         var isLookingForward = Car.IsLookingForward();
                         _carDirectionLabel.Content = isLookingForward ? Strings.Forward : Strings.Backward;
@@ -132,11 +116,6 @@ public partial class SecondCanvas : UserControl
                         var isCollision = Car.IsCollision();
                         _collisionLabel.Content = isCollision ? Strings.Collision : Strings.NoCollision;
                         _collisionLabel.Foreground = isCollision ? Brushes.Red : Brushes.Green;
-
-                        if (isCollision)
-                        {
-                            //Console.WriteLine("Collision");
-                        }
                     }
                 });
             });

@@ -87,7 +87,9 @@ public class Track
     {
         _curve = new Curve().Load(path);
         _curvePoints = _curve.Points.ToArray();
-        _shiftedCurvePoints = _curvePoints.Select(p => p - _curvePoints[1]).ToArray();
+        _shiftedCurvePoints = new Vector2[_curvePoints.Length];
+        for (var i = 0; i < _curvePoints.Length; i++)
+            _shiftedCurvePoints[i] = _curvePoints[i] - _curvePoints[1];
         _points = GetPoints();
         UpdateCheckpoints();
         CurrentCheckpointIndex = 0;

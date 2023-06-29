@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Project_One_Objects.Helpers;
+using HPCsharp;
 
 namespace Project_One_Objects.Environment;
 
@@ -38,6 +39,9 @@ public class Car
 
     public int NearestPointIndex = 1;
     private double _visionOptimization = 0;
+    public bool OptimizedCalculation = true;
+    private readonly IComparer<Vector2> _vector2Comparer = new Vector2Comparer();
+    private bool _firstVisionUpdate = true;
 
     public Car(Vector2 startPosition, double bodyAngle)
     {
@@ -85,6 +89,7 @@ public class Car
         _tempVectorAngles = new float[car._tempVectorAngles.Length];
         Array.Copy(car._tempVectorAngles, _tempVectorAngles, car._tempVectorAngles.Length);
         NearestPointIndex = car.NearestPointIndex;
+        OptimizedCalculation = car.OptimizedCalculation;
     }
 
     public Vector2 Position => _position;
@@ -118,6 +123,14 @@ public class Car
 
     public Vector2[] VisionPoints => _visionPoints;
 
+    public struct State
+    {
+        public Vector2 Position;
+        public float Speed;
+        public double BodyAngle;
+        public double FrontWheelsAngle;
+    }
+
     public void ResetState()
     {
         if (_track is null) return;
@@ -139,6 +152,26 @@ public class Car
         return car;
     }
 
+    public State GetState()
+    {
+        return new State
+        {
+            Position = _position,
+            Speed = _speed,
+            BodyAngle = _bodyAngle,
+            FrontWheelsAngle = _frontWheelsAngle
+        };
+    }
+
+    public void SetState(State state)
+    {
+        _position = state.Position;
+        _speed = state.Speed;
+        _bodyAngle = state.BodyAngle;
+        _frontWheelsAngle = state.FrontWheelsAngle;
+        if (_isVisionActive) UpdateVision();
+    }
+
     public void UpdateVisionData(Track track)
     {
         _trackPointsAngles = new float[track.Points.Length];
@@ -150,6 +183,7 @@ public class Car
             _trackSlopeIntercepts[i] = MathExtensions.SlopeIntercept(track.Points[i - 1], track.Points[i]);
         }
         _trackSlopeIntercepts[0] = MathExtensions.SlopeIntercept(track.Points[^1], track.Points[0]);
+        _firstVisionUpdate = true;
     }
 
     public Track Track
@@ -234,12 +268,14 @@ public class Car
         carVertices[2] = new Vector2(-Width / 2f, Height / 2f);
         carVertices[3] = new Vector2(-Width / 2f, -Height / 2f);
 
-        var nanVector = new Vector2(float.NaN, float.NaN);
         var result = new float[_visionCount];
 
         var verticesAngles = new float[carVertices.Length];
         var sortedVerticesAngles = new Vector2[carVertices.Length];
-        MathExtensions.CalcRelativeAngles(carVertices, _position, _bodyAngle, verticesAngles);
+        if (OptimizedCalculation)
+            MathExtensions.CalcRelativeAnglesOpt(carVertices, _position, verticesAngles);
+        else
+            MathExtensions.CalcRelativeAngles(carVertices, _position, verticesAngles);
         for (var i = 0; i < sortedVerticesAngles.Length; i++)
         {
             sortedVerticesAngles[i].X = i;
@@ -277,7 +313,7 @@ public class Car
                 var point = MathExtensions.LineIntersection(Vector2.Zero, visionPoint,
                     carVertices[(int)sortedVerticesAngles[v1Index].X],
                     carVertices[(int)sortedVerticesAngles[v2Index].X]);
-                if (point != nanVector)
+                if (point != MathExtensions.NaNVector2)
                 {
                     result[(int)sortedCarVisionAngles[c].X] = point.Length();
                 }
@@ -293,25 +329,43 @@ public class Car
     {
         if (!_isVisionActive || _track is null) return;
 
-        var nanVector = new Vector2(float.NaN, float.NaN);
-
         var bodyAngle = _bodyAngle.Mod(MathExtensions.TwoPi);
 
-        MathExtensions.CalcRelativeAngles(_track.Points, _position, bodyAngle, _trackPointsAngles);
-        for (var i = 0; i < _sortedTrackPointsAngles.Length; i++)
+        if (OptimizedCalculation)
+            MathExtensions.CalcRelativeAnglesOpt(_track.Points, _position, _trackPointsAngles);
+        else
+            MathExtensions.CalcRelativeAngles(_track.Points, _position, _trackPointsAngles);
+
+        if (_firstVisionUpdate)
+            for (var i = 0; i < _sortedTrackPointsAngles.Length; i++)
+            {
+                _sortedTrackPointsAngles[i].X = i;
+                _sortedTrackPointsAngles[i].Y = _trackPointsAngles[i];
+            }
+        else
         {
-            _sortedTrackPointsAngles[i].X = i;
-            _sortedTrackPointsAngles[i].Y = _trackPointsAngles[i];
+            for (var i = 0; i < _sortedTrackPointsAngles.Length; i++)
+            {
+                _sortedTrackPointsAngles[i].Y = _trackPointsAngles[(int)_sortedTrackPointsAngles[i].X];
+            }
         }
-        Array.Sort(_sortedTrackPointsAngles, (a, b) => a.Y.CompareTo(b.Y));
+        Algorithm.InsertionSort(_sortedTrackPointsAngles, 0, _sortedTrackPointsAngles.Length, _vector2Comparer);
 
         MathExtensions.CalcVectorAngles(_visionCount, bodyAngle, _carVisionAngles);
-        for (var i = 0; i < _sortedCarVisionAngles.Length; i++)
+        if (_firstVisionUpdate)
+            for (var i = 0; i < _sortedCarVisionAngles.Length; i++)
+            {
+                _sortedCarVisionAngles[i].X = i;
+                _sortedCarVisionAngles[i].Y = _carVisionAngles[i];
+            }
+        else
         {
-            _sortedCarVisionAngles[i].X = i;
-            _sortedCarVisionAngles[i].Y = _carVisionAngles[i];
+            for (var i = 0; i < _sortedCarVisionAngles.Length; i++)
+            {
+                _sortedCarVisionAngles[i].Y = _carVisionAngles[(int)_sortedCarVisionAngles[i].X];
+            }
         }
-        Array.Sort(_sortedCarVisionAngles, (a, b) => a.Y.CompareTo(b.Y));
+        Algorithm.InsertionSort(_sortedCarVisionAngles, 0, _sortedCarVisionAngles.Length, _vector2Comparer);
 
         for (var i = 0; i < _visionCount; i++)
         {
@@ -320,9 +374,9 @@ public class Car
 
         MathExtensions.AngleToSlopeIntercept(_tempVectorAngles, _position, _vectorSlopeIntercepts);
 
-        int c = 0; // car vision index
-        int t = 0; // track points index
-        int f = 0; // vectors iterated
+        var c = 0; // car vision index
+        var t = 0; // track points index
+        var f = 0; // vectors iterated
 
         while (t < _track.Points.Length && f < _visionCount + 1)
         {
@@ -389,6 +443,8 @@ public class Car
             }
             _tempPoints[i].Clear();
         }
+
+        _firstVisionUpdate = false;
     }
 
     public void UpdateVisionOpt(double dt)
@@ -429,14 +485,7 @@ public class Car
     {
         if (_speed == 0) return;
 
-        if (_speed > 0)
-        {
-            _bodyAngle += _frontWheelsAngle * dt * _speed / 6;
-        }
-        else
-        {
-            _bodyAngle += _frontWheelsAngle * dt * _speed / 6;
-        }
+        _bodyAngle += _frontWheelsAngle * dt * _speed / 6;
         _position += new Vector2(1, 0).Rotate((float)_bodyAngle) * _speed * dt;
     }
 

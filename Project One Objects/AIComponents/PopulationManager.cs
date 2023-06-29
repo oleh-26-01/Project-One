@@ -11,7 +11,7 @@ public class PopulationManager
     public int EvolutionStep => _checkpointEvolutionStep;
     public int StepsCount => _progenitorTrack.Checkpoints.Length;
     private readonly Track _progenitorTrack;
-    private Car _progenitorCar;
+    private readonly Car _progenitorCar;
     private static readonly Random Random = new();
     private int _generation = 0;
 
@@ -41,7 +41,7 @@ public class PopulationManager
 
     public static void FillWithRandomGenes(Genome genome, bool setOrigin = false)
     {
-        for (var i = 0; i < genome.Genes.Length; i++) 
+        for (var i = 0; i < genome.Genes.Length; i++)
             genome.Genes[i] = Random.Next(0, Config.CarActions.Count);
 
         if (setOrigin)
@@ -312,12 +312,12 @@ public class PopulationManager
             case 1:
                 var bestGenome = _population[0];
                 var bestGenes = bestGenome.Genes.Take(bestGenome.MiddleGeneIndex).ToList();
-                _progenitorCar = bestGenome.MiddleCarState!;
+                _progenitorCar.SetState(bestGenome.MiddleCarState);
                 BestGenes.AddRange(bestGenes);
             
                 if (_checkpointEvolutionStep + Config.StepWidth + 1 == StepsCount)
                     return false;
-                
+
                 FillRandomGeneration(_population, GetProgenitorGenome());
                 _checkpointEvolutionStep++;
                 break;
