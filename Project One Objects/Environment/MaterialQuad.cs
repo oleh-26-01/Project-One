@@ -5,24 +5,19 @@ namespace Project_One_Objects.Environment;
 
 public class MaterialQuad
 {
-    private readonly float _width;
-    private readonly float _height;
-
     private readonly Vector2[] _vertices;
 
     public MaterialQuad(float width, float height, Vector2 position, double angle)
     {
-        _width = width;
-        _height = height;
         Position = position;
         Angle = angle;
 
         _vertices = new Vector2[4]
         {
-            new(_height / 2f, -_width / 2f),
-            new(_height / 2f, _width / 2f),
-            new(-_height / 2f, _width / 2f),
-            new(-_height / 2f, -_width / 2f)
+            new(height / 2f, -width / 2f),
+            new(height / 2f, width / 2f),
+            new(-height / 2f, width / 2f),
+            new(-height / 2f, -width / 2f)
         };
     }
 
@@ -37,10 +32,7 @@ public class MaterialQuad
 
         var positionOffset = Position.Rotate((float)angle) + position;
 
-        for (var i = 0; i < 4; i++)
-        {
-            vertices[i] = Vector2.Transform(_vertices[i], rotation) + positionOffset;
-        }
+        for (var i = 0; i < 4; i++) vertices[i] = Vector2.Transform(_vertices[i], rotation) + positionOffset;
         return vertices;
     }
 }

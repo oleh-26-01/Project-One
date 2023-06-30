@@ -31,6 +31,7 @@ public class WpfCrosshair : WpfAbstract
         set
         {
             if (value < 1) throw new ArgumentOutOfRangeException(nameof(value), "Size must be greater than 0.");
+
             _size = value;
             _relativePositions = new[]
             {

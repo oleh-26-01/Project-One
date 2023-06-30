@@ -21,7 +21,7 @@ public class MaterialQuadWPF : MaterialQuad
 
     public void DrawOn(Canvas canvas)
     {
-        if (!canvas.Children.Contains(_polygon)) canvas.Children.Add(_polygon);
+        if (!canvas.Children.Contains(_polygon)) _ = canvas.Children.Add(_polygon);
     }
 
     public void RemoveFrom(Canvas canvas)

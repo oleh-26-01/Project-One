@@ -16,13 +16,13 @@ namespace Project_One.Controls;
 
 public partial class SecondCanvas : UserControl
 {
+    private readonly FpsMeter _fpsMeter = new();
+    private readonly Stopwatch _labelTimer = new();
     private Label _carDirectionLabel;
     private Thread _carUpdateThread;
     private Label _collisionLabel;
     private Label _cpsLabel;
-    private readonly FpsMeter _fpsMeter = new();
     private bool _isCarUpdateThreadRunning;
-    private readonly Stopwatch _labelTimer = new();
     private int _tickRate = 60;
 
     private IDisposable? _updateSubscription;
@@ -64,6 +64,7 @@ public partial class SecondCanvas : UserControl
         set
         {
             if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value), "Tick rate must be greater than 0.");
+
             _tickRate = value;
             LastUpdate.Restart();
         }
@@ -96,7 +97,7 @@ public partial class SecondCanvas : UserControl
                     if (Track.LoadStatus)
                     {
                         Track.Update(Camera);
-                        Track.OnCheckpoint(Car.Position, Car.Width);
+                        _ = Track.OnCheckpoint(Car.Position, Car.Width);
                     }
 
                     //_car.UpdateVision();
@@ -127,8 +128,8 @@ public partial class SecondCanvas : UserControl
             while (_isCarUpdateThreadRunning)
                 Dispatcher.Invoke(() =>
                 {
-                    for (var i = 0; i < 100; i++)
-                        Car.UpdateVisionOpt(1f / _tickRate);
+                    for (var i = 0; i < 100; i++) Car.UpdateVisionOpt(1f / _tickRate);
+
                     _fpsMeter.Tick();
                 });
         });
@@ -151,7 +152,7 @@ public partial class SecondCanvas : UserControl
         }
         else
         {
-            var cameraMoveDirection = new Vector2(0, 0);
+            Vector2 cameraMoveDirection = new(0, 0);
             cameraMoveDirection.X += Keyboard.IsKeyDown(Key.Right) ? 1 : 0;
             cameraMoveDirection.X -= Keyboard.IsKeyDown(Key.Left) ? 1 : 0;
             cameraMoveDirection.Y += Keyboard.IsKeyDown(Key.Down) ? 1 : 0;
@@ -196,7 +197,7 @@ public partial class SecondCanvas : UserControl
     public void Canvas_OnMouseMove(object sender, MouseEventArgs e)
     {
         var position = e.GetPosition(CanvasControl);
-        var newMousePosition = new Vector2((float)position.X, (float)position.Y);
+        Vector2 newMousePosition = new((float)position.X, (float)position.Y);
         var mousePositionWorld = Camera.ConvertIn(newMousePosition);
         var newCenter = newMousePosition;
 
@@ -229,7 +230,8 @@ public partial class SecondCanvas : UserControl
     {
         var mousePosition = e.GetPosition(CanvasControl);
         if (mousePosition.X < 0 || mousePosition.Y < 0 || mousePosition.X > ActualWidth ||
-            mousePosition.Y > ActualHeight) return;
+            mousePosition.Y > ActualHeight)
+            return;
 
         if (e.Delta > 0)
             Camera.ZoomIn(e.Delta / 1000f);
@@ -239,7 +241,7 @@ public partial class SecondCanvas : UserControl
 
     private void Canvas_OnSizeChanged(object sender, SizeChangedEventArgs e)
     {
-        var canvasSize = new Vector2((float)e.NewSize.Width, (float)e.NewSize.Height);
+        Vector2 canvasSize = new((float)e.NewSize.Width, (float)e.NewSize.Height);
         var newCenter = canvasSize / 2;
 
         Camera.Move(Camera.Center - newCenter);

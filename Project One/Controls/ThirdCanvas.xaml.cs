@@ -1,25 +1,24 @@
-﻿using Project_One.Drawing.WpfOnly;
-using Project_One.Drawing.Wrappers;
-using Project_One.Helpers;
-using Project_One_Objects.AIComponents;
-using Project_One_Objects.Helpers;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Numerics;
 using System.Reactive.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
+using Project_One.Drawing.WpfOnly;
+using Project_One.Drawing.Wrappers;
+using Project_One.Helpers;
+using Project_One_Objects.AIComponents;
+using Project_One_Objects.Helpers;
 
 namespace Project_One.Controls;
 
-public partial class ThirdCanvas : UserControl
+public partial class ThirdCanvas
 {
     private const string TrackPath = "C:\\Coding\\C#\\Project One\\Project One\\Curves\\curve001.crv";
     private readonly Stopwatch _lastUpdate = new();
-    private int _playingIndex;
-    private bool _evolution = true;
     private readonly PopulationManager _populationManager;
+    private bool _evolution = true;
+    private int _playingIndex;
 
     private IDisposable? _updateSubscription;
     public float CameraZoom = 12;
@@ -32,9 +31,9 @@ public partial class ThirdCanvas : UserControl
         InitializeComponent();
         Camera = new Camera(new Vector2((float)ActualWidth, (float)ActualHeight), new Vector2(0, 0), CameraZoom);
         CameraZoomLabel = new WpfText(Strings.CameraZoom(Camera), new Vector2(0, 0), 16);
-        Track = new TrackWPF()
+        Track = new TrackWPF
         {
-            Width = 5f,
+            Width = 5f
         };
         Track.Load(TrackPath);
         //Track.ShowCheckpoints = false;
@@ -42,9 +41,9 @@ public partial class ThirdCanvas : UserControl
         {
             Track = Track,
             IsVisionActive = true,
-            OptimizedCalculation = false,
+            OptimizedCalculation = false
         };
-        _populationManager = new PopulationManager(20, Track);
+        _populationManager = new PopulationManager(100, Track);
     }
 
     /// <summary>The camera used to draw all objects on the canvas.</summary>
@@ -55,8 +54,6 @@ public partial class ThirdCanvas : UserControl
     public TrackWPF Track { get; }
 
     public CarWPF Car { get; }
-
-    public PopulationManager PopulationManager { get; set; }
 
     public void Init()
     {
@@ -73,13 +70,13 @@ public partial class ThirdCanvas : UserControl
 
         var bestFitness = _populationManager.Population[0].Fitness;
         var iteration = 0;
-        const int minIterations = 20;
+        const int minIterations = 50;
         var iterationsWithoutImprovement = 0;
         const int minIterationsWithoutImprovement = 10;
         var iterationsWithoutSolution = 0;
         const int maxIterationsWithoutSolution = (minIterations + minIterationsWithoutImprovement) * 10;
 
-        var stopwatch = new Stopwatch();
+        Stopwatch stopwatch = new();
         stopwatch.Start();
 
         while (_populationManager.PrepareNextGeneration(isNextCheckpoint ? 1 : 0))
@@ -87,7 +84,7 @@ public partial class ThirdCanvas : UserControl
             isNextCheckpoint = false;
 
             _populationManager.RunSimulationParallel(true);
-            _populationManager.AnalyzeGeneration();
+            _ = _populationManager.AnalyzeGeneration();
             var bestOnGeneration = _populationManager.Population[0];
 
             if (bestFitness < bestOnGeneration.Fitness && iteration >= minIterations)
@@ -106,9 +103,9 @@ public partial class ThirdCanvas : UserControl
                 if (iterationsWithoutSolution >= maxIterationsWithoutSolution)
                 {
                     Console.WriteLine("No solution found, restarting...");
-                    _populationManager.PrepareNextGeneration(2);
+                    _ = _populationManager.PrepareNextGeneration(2);
                     _populationManager.RunSimulationParallel(true);
-                    _populationManager.AnalyzeGeneration();
+                    _ = _populationManager.AnalyzeGeneration();
                     iteration = 0;
                     iterationsWithoutImprovement = 0;
                     iterationsWithoutSolution = 0;
@@ -121,7 +118,9 @@ public partial class ThirdCanvas : UserControl
 
             iteration++;
 
-            if (iteration < minIterations || iterationsWithoutImprovement < minIterationsWithoutImprovement || !bestOnGeneration.OnNextCheckpoint) continue;
+            if (iteration < minIterations || iterationsWithoutImprovement < minIterationsWithoutImprovement ||
+                !bestOnGeneration.OnNextCheckpoint) continue;
+
             iteration = 0;
             iterationsWithoutImprovement = 0;
             isNextCheckpoint = true;
@@ -146,14 +145,14 @@ public partial class ThirdCanvas : UserControl
     public void StartUpdates()
     {
         _updateSubscription = Observable.Interval(TimeSpan.FromMilliseconds(1000f / Config.TickRate))
-            .Subscribe(_ =>
+            .Subscribe(l =>
             {
                 Dispatcher.Invoke(() =>
                 {
                     if (Track.LoadStatus)
                     {
                         Track.Update(Camera);
-                        Track.OnCheckpoint(Car.Position, Car.Width);
+                        _ = Track.OnCheckpoint(Car.Position, Car.Width);
                     }
 
                     Car.Update(Camera);
@@ -183,12 +182,10 @@ public partial class ThirdCanvas : UserControl
     public void StopUpdates()
     {
         _updateSubscription?.Dispose();
-        //_isCarUpdateThreadRunning = false;
     }
 
     public void MoveCamera()
     {
-        //Console.WriteLine($"camera center abs position: {_camera.Position + _camera.Center }, car position: {_car.Position}");
         if (Camera.IsFollowing)
         {
             //Camera.FollowUpdate(_lastUpdate.ElapsedMilliseconds / 1000f);
@@ -196,7 +193,7 @@ public partial class ThirdCanvas : UserControl
         }
         else
         {
-            var cameraMoveDirection = new Vector2(0, 0);
+            Vector2 cameraMoveDirection = new(0, 0);
             cameraMoveDirection.X += Keyboard.IsKeyDown(Key.Right) ? 1 : 0;
             cameraMoveDirection.X -= Keyboard.IsKeyDown(Key.Left) ? 1 : 0;
             cameraMoveDirection.Y += Keyboard.IsKeyDown(Key.Down) ? 1 : 0;
@@ -221,7 +218,7 @@ public partial class ThirdCanvas : UserControl
     public void Canvas_OnMouseMove(object sender, MouseEventArgs e)
     {
         var position = e.GetPosition(CanvasControl);
-        var newMousePosition = new Vector2((float)position.X, (float)position.Y);
+        Vector2 newMousePosition = new((float)position.X, (float)position.Y);
         var mousePositionWorld = Camera.ConvertIn(newMousePosition);
 
         if (e.LeftButton == MouseButtonState.Pressed)
@@ -252,7 +249,8 @@ public partial class ThirdCanvas : UserControl
     {
         var mousePosition = e.GetPosition(CanvasControl);
         if (mousePosition.X < 0 || mousePosition.Y < 0 || mousePosition.X > ActualWidth ||
-            mousePosition.Y > ActualHeight) return;
+            mousePosition.Y > ActualHeight)
+            return;
 
         if (e.Delta > 0)
             Camera.ZoomIn(e.Delta / 1000f);
@@ -262,7 +260,7 @@ public partial class ThirdCanvas : UserControl
 
     private void Canvas_OnSizeChanged(object sender, SizeChangedEventArgs e)
     {
-        var canvasSize = new Vector2((float)e.NewSize.Width, (float)e.NewSize.Height);
+        Vector2 canvasSize = new((float)e.NewSize.Width, (float)e.NewSize.Height);
         var newCenter = canvasSize / 2;
 
         Camera.Move(Camera.Center - newCenter);

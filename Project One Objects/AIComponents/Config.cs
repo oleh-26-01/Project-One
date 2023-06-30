@@ -74,6 +74,7 @@ public static class Config
     public static readonly int TickRate = 30; // minimum 18
     public static readonly float MutationRate = 0.03f; // minimum 0.01f
     public static readonly int StepWidth = 3; // minimum 2
+
     public static readonly Dictionary<int, string> Origins = new()
     {
         { 0, "Random" },
@@ -82,8 +83,9 @@ public static class Config
         { 3, "Mutate" },
         { 4, "Best" },
         { 5, "ValueCrossover" },
-        { 6, "SmoothCrossover"}
+        { 6, "SmoothCrossover" }
     };
+
     public static readonly Dictionary<string, int> OriginsKeys = Origins.ToDictionary(x => x.Value, x => x.Key);
 
     public static readonly float BestGenomesRate = 0.3f;
@@ -95,6 +97,7 @@ public static class Config
     public static readonly float ValueCrossGenomesRate = 0.1f;
 
     public static readonly int MaxDegreeOfParallelism = 8;
+
     public static readonly ParallelOptions OptimizationOptions = new()
     {
         MaxDegreeOfParallelism = MaxDegreeOfParallelism

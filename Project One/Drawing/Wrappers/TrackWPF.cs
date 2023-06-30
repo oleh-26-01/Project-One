@@ -24,8 +24,9 @@ public class TrackWPF : Track
 
     public void DrawOn(Canvas canvas)
     {
-        if (!canvas.Children.Contains(_polyLine)) canvas.Children.Add(_polyLine);
-        if (!canvas.Children.Contains(_checkpointLine)) canvas.Children.Add(_checkpointLine);
+        if (!canvas.Children.Contains(_polyLine)) _ = canvas.Children.Add(_polyLine);
+
+        if (!canvas.Children.Contains(_checkpointLine)) _ = canvas.Children.Add(_checkpointLine);
     }
 
     public void RemoveFrom(Canvas canvas)
@@ -47,6 +48,7 @@ public class TrackWPF : Track
         var pointsCollection = _polyLine.Points;
         pointsCollection.Clear();
         foreach (var point in points) pointsCollection.Add(new Point(point.X, point.Y));
+
         if (points.Length > 0) pointsCollection.Add(new Point(points[0].X, points[0].Y));
 
         if (ShowCheckpoints && Checkpoints.Length > 0)

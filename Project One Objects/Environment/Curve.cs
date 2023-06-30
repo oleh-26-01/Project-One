@@ -33,6 +33,7 @@ public class Curve
         {
             if (value < 0)
                 throw new ArgumentOutOfRangeException(nameof(value), "Value must be equal or greater than 0");
+
             _optAngle = value;
         }
     }
@@ -86,11 +87,11 @@ public class Curve
     {
         var json = File.ReadAllText(path);
         var data = JsonConvert.DeserializeObject<dynamic>(json);
-
-        DateTime date = data.Date;
+        _ = data.Date;
         OptAngle = data.Accuracy;
         _points.Clear();
         foreach (var point in data.Points) _points.Add(new Vector2((float)point.X, (float)point.Y));
+
         return this;
     }
 
@@ -116,6 +117,7 @@ public class Curve
     {
         OptAngle = optAngle;
         if (_points.Count < 3) return;
+
         _isTempPointsSaved = false;
 
         double commonAngle = 0;

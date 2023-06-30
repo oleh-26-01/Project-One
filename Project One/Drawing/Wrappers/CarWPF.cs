@@ -47,14 +47,12 @@ public class CarWPF : Car
             Brushes.Blue);
 
         _carVectors = new Line[VisionCount];
-        for (var i = 0; i < VisionCount; i++)
-            _carVectors[i] = WpfObjects.CarVector();
+        for (var i = 0; i < VisionCount; i++) _carVectors[i] = WpfObjects.CarVector();
     }
 
     public void DrawOn(Canvas canvas)
     {
-        for (var i = 0; i < VisionCount; i++)
-            canvas.Children.Add(_carVectors[i]);
+        for (var i = 0; i < VisionCount; i++) _ = canvas.Children.Add(_carVectors[i]);
 
         _body.DrawOn(canvas);
         _wheelFrontLeft.DrawOn(canvas);
@@ -71,8 +69,7 @@ public class CarWPF : Car
         _wheelBackLeft.RemoveFrom(canvas);
         _wheelBackRight.RemoveFrom(canvas);
 
-        for (var i = 0; i < VisionCount; i++)
-            canvas.Children.Remove(_carVectors[i]);
+        for (var i = 0; i < VisionCount; i++) canvas.Children.Remove(_carVectors[i]);
     }
 
     public void SetVisibility(bool visible)

@@ -10,19 +10,19 @@ using Project_One_Objects.Helpers;
 
 namespace Project_One.Controls;
 
-public partial class ThirdSidePanel : UserControl
+public partial class ThirdSidePanel
 {
     public const string FilesType = "crv";
+    private TrackViewModel _selectedTrack;
     private Camera _camera;
     private float _cameraZoom;
     private CarWPF _car;
     private string _filesPath;
-    private TrackViewModel? _selectedTrack;
+
+    private bool _propChanging;
     private ThirdCanvas _thirdCanvas;
     private TrackWPF _track;
     private ObservableCollection<TrackViewModel> _trackViewModels;
-
-    private bool _propChanging = false;
 
     public ThirdSidePanel()
     {
@@ -35,6 +35,7 @@ public partial class ThirdSidePanel : UserControl
         set
         {
             if (!Directory.Exists(value)) return;
+
             _filesPath = value;
         }
     }
@@ -60,8 +61,9 @@ public partial class ThirdSidePanel : UserControl
         foreach (var file in files)
         {
             if (!file.EndsWith(FilesType)) continue;
-            var track = new TrackWPF(file);
-            var trackViewModel = new TrackViewModel
+
+            TrackWPF track = new(file);
+            TrackViewModel trackViewModel = new()
             {
                 FileName = file,
                 PointCount = track.Points.Length,
@@ -79,15 +81,13 @@ public partial class ThirdSidePanel : UserControl
     {
         if (((Button)sender).DataContext is not TrackViewModel trackViewModel) return;
 
-        //_track.Load(trackViewModel.FileName);
-        //var newPopulationManager = new PopulationManager(100, _track);
-        //_thirdCanvas.PopulationManager = newPopulationManager;
-        //_car.Track = _track;
-        //_camera.Position = -_camera.Center;
-        //_camera.Zoom = _cameraZoom;
-        //if (_selectedTrack != null) _selectedTrack.IsVisible = false;
-        //_selectedTrack = trackViewModel;
-        //trackViewModel.IsVisible = true;
+        _track.Load(trackViewModel.FileName);
+        _car.Track = _track;
+        _camera.Position = -_camera.Center;
+        _camera.Zoom = _cameraZoom;
+        _selectedTrack.IsVisible = false;
+        _selectedTrack = trackViewModel;
+        trackViewModel.IsVisible = true;
 
         Update();
     }
@@ -96,16 +96,18 @@ public partial class ThirdSidePanel : UserControl
     {
         var isDown = e.LeftButton == MouseButtonState.Pressed;
         Mouse.Capture(isDown ? ExpanderControlStackPanel : null);
-        Mouse.SetCursor(isDown ? Cursors.Hand : Cursors.Arrow);
+        _ = Mouse.SetCursor(isDown ? Cursors.Hand : Cursors.Arrow);
         _propChanging = isDown;
     }
 
     private void GridContent_OnMouseMove(object sender, MouseEventArgs e)
     {
         if (!_propChanging) return;
+
         var trackListHeight = e.GetPosition(GridContent).Y / GridContent.ActualHeight;
         trackListHeight = Math.Clamp(trackListHeight, 0, 1);
-        var settingsHeight = 1 - trackListHeight - GridContent.RowDefinitions[1].Height.Value / GridContent.ActualHeight;
+        var settingsHeight =
+            1 - trackListHeight - GridContent.RowDefinitions[1].Height.Value / GridContent.ActualHeight;
         settingsHeight = Math.Clamp(settingsHeight, 0, 1);
         GridContent.RowDefinitions[0].Height = new GridLength(trackListHeight, GridUnitType.Star);
         GridContent.RowDefinitions[2].Height = new GridLength(settingsHeight, GridUnitType.Star);
@@ -117,10 +119,12 @@ public partial class ThirdSidePanel : UserControl
         GridContent.RowDefinitions[1].Height = new GridLength(0, GridUnitType.Pixel);
         GridContent.RowDefinitions[2].Height = new GridLength(1, GridUnitType.Star);
     }
+
     private void SettingsExpanderCollapse(object sender, RoutedEventArgs e)
     {
         GridContent.RowDefinitions[1].Height = new GridLength(0, GridUnitType.Pixel);
         if (!TracksExpander.IsExpanded) return;
+
         GridContent.RowDefinitions[0].Height = new GridLength(1, GridUnitType.Star);
         GridContent.RowDefinitions[2].Height = new GridLength(1, GridUnitType.Auto);
     }

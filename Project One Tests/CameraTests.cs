@@ -1,5 +1,5 @@
 using System.Numerics;
-using Project_One_Objects;
+using Project_One_Objects.Helpers;
 
 namespace Project_One_Tests;
 
@@ -7,6 +7,11 @@ public class Tests
 {
     private List<Vector2> _convertArray;
     private int _convertArraySize;
+
+    public Tests(List<Vector2> convertArray)
+    {
+        _convertArray = convertArray;
+    }
 
 
     [SetUp]
@@ -48,11 +53,14 @@ public class Tests
     public void ConvertIn_Array()
     {
         var camera = new Camera(new Vector2(1280, 720), new Vector2(100, 100));
-        var points = new List<Vector2>(_convertArray);
+        List<Vector2> points = new(_convertArray);
 
         var result = camera.ConvertIn(points);
         var expected = new Vector2[_convertArraySize];
-        for (var i = 0; i < _convertArraySize; i++) expected[i] = camera.ConvertIn(points[i]);
+        for (var i = 0; i < _convertArraySize; i++)
+        {
+            expected[i] = camera.ConvertIn(points[i]);
+        }
 
         Assert.That(expected, Is.EqualTo(result));
         Assert.That(points, Is.EqualTo(_convertArray));
@@ -62,11 +70,14 @@ public class Tests
     public void ConvertOut_Array()
     {
         var camera = new Camera(new Vector2(1280, 720), new Vector2(100, 100));
-        var points = new List<Vector2>(_convertArray);
+        List<Vector2> points = new(_convertArray);
 
         var result = camera.ConvertOut(points);
         var expected = new Vector2[_convertArraySize];
-        for (var i = 0; i < _convertArraySize; i++) expected[i] = camera.ConvertOut(points[i]);
+        for (var i = 0; i < _convertArraySize; i++)
+        {
+            expected[i] = camera.ConvertOut(points[i]);
+        }
 
         Assert.That(expected, Is.EqualTo(result));
         Assert.That(points, Is.EqualTo(_convertArray));

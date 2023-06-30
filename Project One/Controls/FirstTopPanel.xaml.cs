@@ -12,7 +12,7 @@ using Project_One_Objects.Helpers;
 
 namespace Project_One.Controls;
 
-public partial class FirstTopPanel : UserControl
+public partial class FirstTopPanel
 {
     public readonly double TextBoxMaxValue = 30;
     public readonly double TextBoxMinValue = 1;
@@ -47,23 +47,21 @@ public partial class FirstTopPanel : UserControl
     public void Update()
     {
         var curveOptAngle = Math.Round(_curve.OptAngle.ToDeg(), 1).ToString(CultureInfo.InvariantCulture);
-        if (CurveOptAngle.Text != curveOptAngle)
-            CurveOptAngle.Text = curveOptAngle;
+        if (CurveOptAngle.Text != curveOptAngle) CurveOptAngle.Text = curveOptAngle;
+
         CurvePointsLabel.Content = "Points: " + _curve.Points.Count;
     }
 
     public void DrawCurve_OnChecked(object sender, RoutedEventArgs e)
     {
         _curveEraser.SetVisibility(false);
-        if (OnCurveAction != Strings.ChangingOptAngleAction)
-            OnCurveAction = Strings.DrawAction;
+        if (OnCurveAction != Strings.ChangingOptAngleAction) OnCurveAction = Strings.DrawAction;
     }
 
     public void EraseCurve_OnChecked(object sender, RoutedEventArgs e)
     {
         _curveEraser.SetVisibility(true);
-        if (OnCurveAction != Strings.ChangingOptAngleAction)
-            OnCurveAction = Strings.EraseAction;
+        if (OnCurveAction != Strings.ChangingOptAngleAction) OnCurveAction = Strings.EraseAction;
     }
 
     private void CurveOptAngle_OnTextChanged(object sender, TextChangedEventArgs e)
@@ -98,10 +96,11 @@ public partial class FirstTopPanel : UserControl
     public void ConfirmOptAngle_OnClick(object sender, RoutedEventArgs e)
     {
         if (DrawCurve.IsChecked is not { } drawCurveIsChecked) return;
+
         if (!double.TryParse(CurveOptAngle.Text, out _)) return;
 
-        if (OnCurveAction == Strings.ChangingOptAngleAction)
-            _curve.ApplyChanges();
+        if (OnCurveAction == Strings.ChangingOptAngleAction) _curve.ApplyChanges();
+
         FocusManager.SetFocusedElement(FocusManager.GetFocusScope(CurveOptAngle), _window);
         OnCurveAction = drawCurveIsChecked ? Strings.DrawAction : Strings.EraseAction;
         _curveEraser.SetVisibility(OnCurveAction == Strings.EraseAction);

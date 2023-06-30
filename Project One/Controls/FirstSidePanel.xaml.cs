@@ -7,7 +7,7 @@ using Project_One_Objects.Helpers;
 
 namespace Project_One.Controls;
 
-public partial class FirstSidePanel : UserControl
+public partial class FirstSidePanel
 {
     public const string FilesType = "crv";
     private Camera _camera;
@@ -28,6 +28,7 @@ public partial class FirstSidePanel : UserControl
         set
         {
             if (!Directory.Exists(value)) return;
+
             _filesPath = value;
         }
     }
@@ -51,8 +52,9 @@ public partial class FirstSidePanel : UserControl
         foreach (var file in files)
         {
             if (!file.EndsWith(FilesType)) continue;
-            var curve = new CurveWPF(file);
-            var curveViewModel = new CurveViewModel
+
+            CurveWPF curve = new(file);
+            CurveViewModel curveViewModel = new()
             {
                 FileName = file,
                 PointCount = curve.Points.Count,
@@ -70,11 +72,12 @@ public partial class FirstSidePanel : UserControl
     public string FindFreeCurveName()
     {
         var index = 1;
-        var curveFileName = "";
+        string curveFileName;
         while (true)
         {
             curveFileName = FilesPath + "curve" + index.ToString().PadLeft(3, '0') + "." + FilesType;
             if (!File.Exists(curveFileName)) break;
+
             index++;
         }
 
@@ -106,10 +109,11 @@ public partial class FirstSidePanel : UserControl
     {
         if (((Button)sender).DataContext is not CurveViewModel curveViewModel) return;
 
-        _curve.Load(curveViewModel.FileName);
+        _ = _curve.Load(curveViewModel.FileName);
         _camera.Position = -_camera.Center;
         _camera.Zoom = 1;
         if (_selectedCurve != null) _selectedCurve.IsSelected = false;
+
         _selectedCurve = curveViewModel;
         curveViewModel.IsSelected = true;
 
@@ -129,7 +133,7 @@ public partial class FirstSidePanel : UserControl
                 if (((Button)sender).DataContext is CurveViewModel curveViewModel)
                 {
                     File.Delete(curveViewModel.FileName);
-                    _curveViewModels.Remove(curveViewModel);
+                    _ = _curveViewModels.Remove(curveViewModel);
                 }
 
                 break;

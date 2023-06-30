@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Reactive.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using Project_One.Drawing.WpfOnly;
 using Project_One.Drawing.Wrappers;
@@ -12,12 +11,12 @@ using Project_One_Objects.Helpers;
 
 namespace Project_One.Controls;
 
-public partial class FirstCanvas : UserControl
+public partial class FirstCanvas
 {
     private readonly WpfCrosshair _crosshair;
 
-    private FirstTopPanel _firstTopPanel;
-    private int _tickRate = 60;
+    private FirstTopPanel? _firstTopPanel;
+    private const int TickRate = 60;
 
     private IDisposable? _updateSubscription;
 
@@ -46,20 +45,7 @@ public partial class FirstCanvas : UserControl
     public WpfText CameraZoomLabel { get; }
 
     /// <summary>The time in milliseconds between each update.</summary>
-    public double TargetRefreshTime => 1000d / _tickRate;
-
-    /// <summary>The number of times per second the canvas will be updated.</summary>
-    /// <exception cref="ArgumentOutOfRangeException">TickRate must be greater than 0.</exception>
-    /// <remarks>TickRate is not guaranteed to be accurate.</remarks>
-    public int TickRate
-    {
-        get => _tickRate;
-        set
-        {
-            if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value), "Tick rate must be greater than 0.");
-            _tickRate = value;
-        }
-    }
+    public double TargetRefreshTime => 1000d / TickRate;
 
     /// <summary>The time since the last update.</summary>
     public Stopwatch LastUpdate { get; } = new();
@@ -79,7 +65,7 @@ public partial class FirstCanvas : UserControl
     public void StartUpdates()
     {
         _updateSubscription = Observable.Interval(TimeSpan.FromMilliseconds(TargetRefreshTime))
-            .Subscribe(l =>
+            .Subscribe(_ =>
             {
                 Dispatcher.Invoke(() =>
                 {
@@ -100,7 +86,7 @@ public partial class FirstCanvas : UserControl
 
     private void UpdateCamera()
     {
-        var cameraMoveDirection = new Vector2(0, 0);
+        Vector2 cameraMoveDirection = new(0, 0);
         cameraMoveDirection.X += Keyboard.IsKeyDown(Key.Right) ? 1 : 0;
         cameraMoveDirection.X -= Keyboard.IsKeyDown(Key.Left) ? 1 : 0;
         cameraMoveDirection.Y += Keyboard.IsKeyDown(Key.Down) ? 1 : 0;
@@ -114,7 +100,7 @@ public partial class FirstCanvas : UserControl
 
     public void Canvas_OnMouseClick(object sender, MouseButtonEventArgs e)
     {
-        if (_firstTopPanel.OnCurveAction != Strings.EraseAction)
+        if (_firstTopPanel!.OnCurveAction != Strings.EraseAction)
         {
             Mouse.Capture(e.ButtonState == MouseButtonState.Pressed ? CanvasControl : null);
             return;
@@ -122,7 +108,7 @@ public partial class FirstCanvas : UserControl
 
         if (e is { ChangedButton: MouseButton.Left, LeftButton: MouseButtonState.Released })
         {
-            CurveEraser.EraseNearestPoint(Curve.Points, MousePositionWorld);
+            WpfCurveEraser.EraseNearestPoint(Curve.Points, MousePositionWorld);
             CurveEraser.MoveToNearestPoint(Curve.Points, MousePositionWorld);
             _firstTopPanel.Update();
         }
@@ -133,14 +119,14 @@ public partial class FirstCanvas : UserControl
         var position = e.GetPosition(CanvasControl);
         //Console.WriteLine(position);
 
-        var newMousePosition = new Vector2((float)position.X, (float)position.Y);
+        Vector2 newMousePosition = new((float)position.X, (float)position.Y);
         var mousePositionWorld = Camera.ConvertIn(newMousePosition);
 
         CurveEraser.MoveToNearestPoint(Curve.Points, mousePositionWorld);
 
         if (e.LeftButton == MouseButtonState.Pressed)
         {
-            switch (_firstTopPanel.OnCurveAction)
+            switch (_firstTopPanel!.OnCurveAction)
             {
                 case Strings.DrawAction:
                     Curve.AddPoint(mousePositionWorld, 10 / Camera.Zoom);
@@ -177,7 +163,8 @@ public partial class FirstCanvas : UserControl
     {
         var mousePosition = e.GetPosition(CanvasControl);
         if (mousePosition.X < 0 || mousePosition.Y < 0 || mousePosition.X > ActualWidth ||
-            mousePosition.Y > ActualHeight) return;
+            mousePosition.Y > ActualHeight)
+            return;
 
         if (e.Delta > 0)
             Camera.ZoomIn(e.Delta / 1000f);
@@ -189,7 +176,7 @@ public partial class FirstCanvas : UserControl
 
     private void Canvas_OnSizeChanged(object sender, SizeChangedEventArgs e)
     {
-        var canvasSize = new Vector2((float)e.NewSize.Width, (float)e.NewSize.Height);
+        Vector2 canvasSize = new((float)e.NewSize.Width, (float)e.NewSize.Height);
         var newCenter = canvasSize / 2;
 
         Camera.Move(Camera.Center - newCenter);

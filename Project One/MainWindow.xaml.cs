@@ -33,7 +33,7 @@ public partial class MainWindow
 
         AddHandler(Keyboard.KeyDownEvent, new KeyEventHandler(CloseWindow), true);
 
-        Closed += (sender, e) =>
+        Closed += (_, _) =>
         {
             FirstCanvas.StopUpdates();
             SecondCanvas.StopUpdates();
@@ -41,10 +41,6 @@ public partial class MainWindow
         };
 
         ChangePart(PrevPartControl, null!);
-    }
-
-    private void OnLoaded(object sender, RoutedEventArgs e)
-    {
     }
 
     private void CloseWindow(object sender, RoutedEventArgs e)
@@ -62,8 +58,7 @@ public partial class MainWindow
     {
         if ((Button)sender == NextPartControl)
             _partIndex++;
-        else if ((Button)sender == PrevPartControl)
-            _partIndex--;
+        else if ((Button)sender == PrevPartControl) _partIndex--;
 
         _partIndex += _parts.Length;
         _partIndex %= _parts.Length;

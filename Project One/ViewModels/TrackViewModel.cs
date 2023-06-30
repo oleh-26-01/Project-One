@@ -4,10 +4,8 @@ namespace Project_One;
 
 internal class TrackViewModel
 {
-    public string FileName { get; set; }
-    public string DisplayFileName => "name: " + FileName.Split("\\").Last();
+    public string FileName { get; set; } = "";
     public int PointCount { get; set; }
-    public string DisplayPointCount => "points: " + PointCount;
     public string ShortInfo => FileName.Split("\\").Last() + " (" + PointCount + ")";
     public bool IsVisible { get; set; }
     public bool IsSelected { get; set; }

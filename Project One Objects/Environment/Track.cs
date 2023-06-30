@@ -6,38 +6,34 @@ namespace Project_One_Objects.Environment;
 
 public class Track
 {
-    private float _width;
-    private Curve? _curve;
-    private Vector2[] _curvePoints;
-    private Vector2[] _shiftedCurvePoints;
-    private Vector2[] _points;
+    private readonly Curve _curve = new();
     private float _checkpointDistance;
-    private int _currentCheckpointIndex = 0;
-    private Tuple<Vector2, Vector2>[] _checkpoints = Array.Empty<Tuple<Vector2, Vector2>>();
-    private Vector2[] _checkpointCenters = Array.Empty<Vector2>();
-    public bool LoadStatus = false;
+    private int _currentCheckpointIndex;
+    private Vector2[]? _shiftedCurvePoints;
+    private float _width;
+    public bool LoadStatus;
 
     public Track(float width = 10, float minCheckpointDistance = 10)
     {
         Width = width;
         MinCheckpointDistance = minCheckpointDistance;
-        _curvePoints = Array.Empty<Vector2>();
-        _points = Array.Empty<Vector2>();
+        CurvePoints = Array.Empty<Vector2>();
+        Points = Array.Empty<Vector2>();
     }
 
     public Track(Track track)
     {
         _width = track._width;
-        _curvePoints = new Vector2[track._curvePoints.Length];
-        track._curvePoints.CopyTo(_curvePoints, 0);
-        _shiftedCurvePoints = new Vector2[track._shiftedCurvePoints.Length];
+        CurvePoints = new Vector2[track.CurvePoints.Length];
+        track.CurvePoints.CopyTo(CurvePoints, 0);
+        _shiftedCurvePoints = new Vector2[track._shiftedCurvePoints!.Length];
         track._shiftedCurvePoints.CopyTo(_shiftedCurvePoints, 0);
-        _points = new Vector2[track._points.Length];
-        track._points.CopyTo(_points, 0);
-        _checkpoints = new Tuple<Vector2, Vector2>[track._checkpoints.Length];
-        track._checkpoints.CopyTo(_checkpoints, 0);
-        _checkpointCenters = new Vector2[track._checkpointCenters.Length];
-        track._checkpointCenters.CopyTo(_checkpointCenters, 0);
+        Points = new Vector2[track.Points.Length];
+        track.Points.CopyTo(Points, 0);
+        Checkpoints = new Tuple<Vector2, Vector2>[track.Checkpoints.Length];
+        track.Checkpoints.CopyTo(Checkpoints, 0);
+        CheckpointCenters = new Vector2[track.CheckpointCenters.Length];
+        track.CheckpointCenters.CopyTo(CheckpointCenters, 0);
         _checkpointDistance = track._checkpointDistance;
         _currentCheckpointIndex = track._currentCheckpointIndex;
         LoadStatus = track.LoadStatus;
@@ -48,10 +44,10 @@ public class Track
         get => _width;
         set
         {
-            if (value < 0) 
-                throw new ArgumentOutOfRangeException(nameof(value), "Width cannot be negative.");
+            if (value < 0) throw new ArgumentOutOfRangeException(nameof(value), "Width cannot be negative.");
+
             _width = value;
-            if (LoadStatus) _points = GetPoints();
+            if (LoadStatus) Points = GetPoints();
         }
     }
 
@@ -60,8 +56,9 @@ public class Track
         get => _checkpointDistance;
         set
         {
-            if (value < 0) 
+            if (value < 0)
                 throw new ArgumentOutOfRangeException(nameof(value), "MinCheckpointDistance cannot be negative.");
+
             _checkpointDistance = value;
         }
     }
@@ -71,35 +68,35 @@ public class Track
         get => _currentCheckpointIndex;
         set
         {
-            if (value < 0 || value >= _checkpoints.Length) 
+            if (value < 0 || value >= Checkpoints.Length)
                 throw new ArgumentOutOfRangeException(nameof(value), "Index is out of range.");
+
             _currentCheckpointIndex = value;
         }
     }
 
-    public Tuple<Vector2, Vector2>[] Checkpoints => _checkpoints;
-    public Vector2[] CheckpointCenters => _checkpointCenters;
+    public Tuple<Vector2, Vector2>[] Checkpoints { get; private set; } = Array.Empty<Tuple<Vector2, Vector2>>();
+    public Vector2[] CheckpointCenters { get; private set; } = Array.Empty<Vector2>();
 
-    public Vector2[] Points => _points;
-    public Vector2[] CurvePoints => _curvePoints;
+    public Vector2[] Points { get; private set; }
+    public Vector2[] CurvePoints { get; private set; }
 
-    public Track Load(string path)
+    public void Load(string path)
     {
-        _curve = new Curve().Load(path);
-        _curvePoints = _curve.Points.ToArray();
-        _shiftedCurvePoints = new Vector2[_curvePoints.Length];
-        for (var i = 0; i < _curvePoints.Length; i++)
-            _shiftedCurvePoints[i] = _curvePoints[i] - _curvePoints[1];
-        _points = GetPoints();
+        _curve.Load(path);
+        CurvePoints = _curve.Points.ToArray();
+        _shiftedCurvePoints = new Vector2[CurvePoints.Length];
+        for (var i = 0; i < CurvePoints.Length; i++) _shiftedCurvePoints[i] = CurvePoints[i] - CurvePoints[1];
+
+        Points = GetPoints();
         UpdateCheckpoints();
         CurrentCheckpointIndex = 0;
         LoadStatus = true;
-        return this;
     }
 
     private Vector2[] GetPoints()
     {
-        var points = _shiftedCurvePoints;
+        var points = _shiftedCurvePoints!;
         var newCurvePoints = new Vector2[points.Length - 1];
         var result = new Vector2[(points.Length - 1) * 2];
 
@@ -114,35 +111,33 @@ public class Track
             newCurvePoints[i] = points[i] + vector;
         }
 
-        _curvePoints = newCurvePoints;
+        CurvePoints = newCurvePoints;
         return result;
     }
 
     public void UpdateCheckpoints()
     {
         var trackLength = 0f;
-        var curvePoints = _curvePoints;
+        var curvePoints = CurvePoints;
         for (var i = 0; i < curvePoints.Length - 1; i++)
-        {
             trackLength += Vector2.Distance(curvePoints[i], curvePoints[i + 1]);
-        }
         var checkpointCount = (int)(trackLength / _checkpointDistance);
-        var checkpoints = new List<Tuple<Vector2, Vector2>>(checkpointCount);
-        var checkpointCenters = new List<Vector2>(checkpointCount);
+        List<Tuple<Vector2, Vector2>> checkpoints = new(checkpointCount);
+        List<Vector2> checkpointCenters = new(checkpointCount);
 
         var distanceRemainder = 0f;
 
         for (var i = 1; i < curvePoints.Length - 1; i++)
         {
             var segments = Vector2.Distance(curvePoints[i], curvePoints[i + 1]) / _checkpointDistance;
-            var leftSegmentLength = Vector2.Distance(_points[i], _points[i + 1]) / segments;
-            var rightSegmentLength = Vector2.Distance(_points[^(i + 1)], _points[^(i + 2)]) / segments;
-            var leftSegment = Vector2.Normalize(_points[i + 1] - _points[i]) * leftSegmentLength;
-            var rightSegment = Vector2.Normalize(_points[^(i + 2)] - _points[^(i + 1)]) * rightSegmentLength;
+            var leftSegmentLength = Vector2.Distance(Points[i], Points[i + 1]) / segments;
+            var rightSegmentLength = Vector2.Distance(Points[^(i + 1)], Points[^(i + 2)]) / segments;
+            var leftSegment = Vector2.Normalize(Points[i + 1] - Points[i]) * leftSegmentLength;
+            var rightSegment = Vector2.Normalize(Points[^(i + 2)] - Points[^(i + 1)]) * rightSegmentLength;
             for (var j = distanceRemainder; j < segments; j++)
             {
-                var left = _points[i] + leftSegment * j;
-                var right = _points[^(i + 1)] + rightSegment * j;
+                var left = Points[i] + leftSegment * j;
+                var right = Points[^(i + 1)] + rightSegment * j;
                 checkpoints.Add(new Tuple<Vector2, Vector2>(left, right));
                 checkpointCenters.Add((left + right) / 2);
             }
@@ -153,32 +148,30 @@ public class Track
                 distanceRemainder -= segments;
         }
 
-        var lastLeftPoint = _points[_points.Length / 2 - 1];
-        var lastRightPoint = _points[^(_points.Length / 2)];
+        var lastLeftPoint = Points[Points.Length / 2 - 1];
+        var lastRightPoint = Points[^(Points.Length / 2)];
         for (var i = 0; i < Config.StepWidth - 2; i++)
         {
             checkpoints.Add(new Tuple<Vector2, Vector2>(lastLeftPoint, lastRightPoint));
             checkpointCenters.Add((lastLeftPoint + lastRightPoint) / 2);
         }
-        _checkpoints = checkpoints.ToArray();
-        _checkpointCenters = checkpointCenters.ToArray();
+
+        Checkpoints = checkpoints.ToArray();
+        CheckpointCenters = checkpointCenters.ToArray();
     }
 
     public bool OnCheckpoint(Vector2 carPosition, float checkDistance = 10)
     {
-        var checkpoint = _checkpoints[_currentCheckpointIndex];
+        var checkpoint = Checkpoints[_currentCheckpointIndex];
 
-        var distanceToCenter = Vector2.Distance(carPosition, _checkpointCenters[_currentCheckpointIndex]);
+        var distanceToCenter = Vector2.Distance(carPosition, CheckpointCenters[_currentCheckpointIndex]);
         if (distanceToCenter > _width) return false;
 
         var distance = MathExtensions.DistanceToSegment(carPosition, checkpoint.Item1, checkpoint.Item2);
-        if (distance < checkDistance)
-        {
-            _currentCheckpointIndex++;
-            if (_currentCheckpointIndex >= _checkpoints.Length) _currentCheckpointIndex = 0;
-            return true;
-        }
+        if (distance > checkDistance) return false;
+        _currentCheckpointIndex++;
+        if (_currentCheckpointIndex >= Checkpoints.Length) _currentCheckpointIndex = 0;
 
-        return false;
+        return true;
     }
 }

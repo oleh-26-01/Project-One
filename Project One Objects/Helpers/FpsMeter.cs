@@ -1,15 +1,13 @@
-﻿using System.Diagnostics;
-
-namespace Project_One_Objects.Helpers;
+﻿namespace Project_One_Objects.Helpers;
 
 public class FpsMeter
 {
     private const int BufferSize = 3_000;
     private readonly DateTime[] _buffer;
+    private int _entireIndex;
+    private int _index;
     private DateTime _lastTime = DateTime.Now;
-    private int _index = 0;
-    private int _entireIndex = 0;
-    private int _osa = 0; // one second age frame index
+    private int _osa; // one second age frame index
 
     public FpsMeter()
     {
@@ -26,16 +24,15 @@ public class FpsMeter
 
     public double GetFps()
     {
-        while (_buffer[_osa] < _lastTime.AddSeconds(-1))
-            _osa = (_osa + 1) % BufferSize;
+        while (_buffer[_osa] < _lastTime.AddSeconds(-1)) _osa = (_osa + 1) % BufferSize;
+
         return (_index - _osa).Mod(BufferSize);
     }
 
     public double GetAverageFps()
     {
-        if (_entireIndex < BufferSize)
-            return _entireIndex / (_lastTime - _buffer[0]).TotalSeconds;
-
-        return BufferSize / (_lastTime - _buffer[_index]).TotalSeconds;
+        return _entireIndex < BufferSize
+            ? _entireIndex / (_lastTime - _buffer[0]).TotalSeconds
+            : BufferSize / (_lastTime - _buffer[_index]).TotalSeconds;
     }
 }

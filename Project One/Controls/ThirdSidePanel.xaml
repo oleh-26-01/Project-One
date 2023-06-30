@@ -4,12 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:projectOne="clr-namespace:Project_One"
+             xmlns:helpers="clr-namespace:Project_One.Helpers"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <SolidColorBrush x:Key="NotSelectedTrackViewModel" Color="WhiteSmoke" />
         <SolidColorBrush x:Key="SelectedTrackViewModel" Color="LightGray" />
-        <projectOne:BoolToColorConverter x:Key="BoolToColorConverter"
+        <helpers:BoolToColorConverter x:Key="BoolToColorConverter"
                                          NotSelectedBrush="{StaticResource NotSelectedTrackViewModel}"
                                          SelectedBrush="{StaticResource SelectedTrackViewModel}" />
         <DataTemplate x:Key="TrackListItemTemplate"

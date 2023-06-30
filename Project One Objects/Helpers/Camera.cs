@@ -5,9 +5,9 @@ namespace Project_One_Objects.Helpers;
 public class Camera
 {
     private Vector2 _center;
-    private float _zoom;
     private Func<Vector2>? _followPositionGetter;
     private Action? _updateZoomLabel;
+    private float _zoom;
 
     public Camera(Vector2 center, Vector2 position, float zoom = 1)
     {
@@ -62,6 +62,7 @@ public class Camera
     public void FollowUpdate(float dt)
     {
         if (_followPositionGetter == null) return;
+
         var followPosition = _followPositionGetter();
         Position += (followPosition - Center - Position).Scale(dt / 0.2);
     }
@@ -93,6 +94,7 @@ public class Camera
     public void ZoomIn(float value)
     {
         if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value), "Value must be greater than 0");
+
         _zoom *= 1 + value;
         _updateZoomLabel?.Invoke();
     }
@@ -104,6 +106,7 @@ public class Camera
     {
         if (value is <= 0 or >= 1)
             throw new ArgumentOutOfRangeException(nameof(value), "Value must be between 0 and 1");
+
         _zoom *= 1 - value;
         _updateZoomLabel?.Invoke();
     }
@@ -142,7 +145,7 @@ public class Camera
     /// <returns>New List with converted points.</returns>
     public List<Vector2> ConvertIn(List<Vector2> points)
     {
-        var result = new List<Vector2>(points);
+        List<Vector2> result = new(points);
         for (var i = 0; i < points.Count; i++)
         {
             result[i] -= _center;
@@ -187,7 +190,7 @@ public class Camera
     /// <returns>New List with converted points.</returns>
     public List<Vector2> ConvertOut(List<Vector2> points)
     {
-        var result = new List<Vector2>(points);
+        List<Vector2> result = new(points);
         for (var i = 0; i < points.Count; i++)
         {
             result[i] -= Position + _center;
@@ -197,5 +200,4 @@ public class Camera
 
         return result;
     }
-
 }

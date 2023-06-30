@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace Project_One.Drawing.WpfOnly;
@@ -20,6 +21,6 @@ public class WpfText : WpfAbstract
 
     public void SetPosition(Vector2 position)
     {
-        _textBlock.Margin = new System.Windows.Thickness(position.X, position.Y, 0, 0);
+        _textBlock.Margin = new Thickness(position.X, position.Y, 0, 0);
     }
 }

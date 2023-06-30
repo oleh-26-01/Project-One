@@ -12,26 +12,17 @@ public abstract class WpfAbstract
 
     public void DrawOn(Canvas canvas)
     {
-        foreach (var obj in Objects.Where(obj => !canvas.Children.Contains(obj)))
-        {
-            canvas.Children.Add(obj);
-        }
+        foreach (var obj in Objects.Where(obj => !canvas.Children.Contains(obj))) canvas.Children.Add(obj);
     }
 
     public void RemoveFrom(Canvas canvas)
     {
-        foreach (var obj in Objects.Where(obj => canvas.Children.Contains(obj)))
-        {
-            canvas.Children.Remove(obj);
-        }
+        foreach (var obj in Objects.Where(obj => canvas.Children.Contains(obj))) canvas.Children.Remove(obj);
     }
 
     public void SetVisibility(bool visible)
     {
-        foreach (var obj in Objects)
-        {
-            obj.Visibility = visible ? Visibility.Visible : Visibility.Hidden;
-        }
+        foreach (var obj in Objects) obj.Visibility = visible ? Visibility.Visible : Visibility.Hidden;
     }
 
     public void Update(Camera camera)

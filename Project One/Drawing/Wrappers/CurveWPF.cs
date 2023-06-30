@@ -14,12 +14,12 @@ public class CurveWPF : Curve
     public CurveWPF(string filePath = "", double optimizationAngle = 0) : base(optimizationAngle)
     {
         _polyLine = WpfObjects.Polyline();
-        if (filePath != "") Load(filePath);
+        if (filePath != "") _ = Load(filePath);
     }
 
     public void DrawOn(Canvas canvas)
     {
-        if (!canvas.Children.Contains(_polyLine)) canvas.Children.Add(_polyLine);
+        if (!canvas.Children.Contains(_polyLine)) _ = canvas.Children.Add(_polyLine);
     }
 
     public void RemoveFrom(Canvas canvas)

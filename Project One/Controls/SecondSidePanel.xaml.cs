@@ -7,7 +7,7 @@ using Project_One_Objects.Helpers;
 
 namespace Project_One.Controls;
 
-public partial class SecondSidePanel : UserControl
+public partial class SecondSidePanel
 {
     public const string FilesType = "crv";
     private Camera _camera;
@@ -29,6 +29,7 @@ public partial class SecondSidePanel : UserControl
         set
         {
             if (!Directory.Exists(value)) return;
+
             _filesPath = value;
         }
     }
@@ -53,8 +54,9 @@ public partial class SecondSidePanel : UserControl
         foreach (var file in files)
         {
             if (!file.EndsWith(FilesType)) continue;
-            var track = new TrackWPF(file);
-            var trackViewModel = new TrackViewModel
+
+            TrackWPF track = new(file);
+            TrackViewModel trackViewModel = new()
             {
                 FileName = file,
                 PointCount = track.Points.Length,
@@ -77,6 +79,7 @@ public partial class SecondSidePanel : UserControl
         _camera.Position = -_camera.Center;
         _camera.Zoom = _cameraZoom;
         if (_selectedTrack != null) _selectedTrack.IsVisible = false;
+
         _selectedTrack = trackViewModel;
         trackViewModel.IsVisible = true;
 
