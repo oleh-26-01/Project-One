@@ -27,6 +27,7 @@ public partial class MainWindow
         SecondSidePanel.Init(SecondCanvas, FilesPath);
 
         ThirdCanvas.Init();
+        Close();
         ThirdTopPanel.Init(ThirdCanvas, ThirdSidePanel);
 
         ThirdSidePanel.Init(ThirdCanvas, FilesPath);

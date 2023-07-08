@@ -5,10 +5,9 @@ namespace Project_One_Objects.AIComponents;
 
 public class Genome
 {
-    private readonly int _checkpointEvolutionStep;
-
+    private int _evolutionStep;
     private readonly Vector2[] _checkpoints;
-    private readonly float _fullDistance;
+    private float _fullDistance;
     private int _currentGene;
     private bool _firstCheckpoint = true;
     public double Fitness;
@@ -16,31 +15,22 @@ public class Genome
     public int MiddleGeneIndex = -1;
     public bool OnNextCheckpoint;
 
-    public Genome(Car car, float tickRate, int checkpointEvolutionStep)
+    public Genome(Car car, float tickRate, int evolutionStep)
     {
         Car = car;
         Track = car.Track;
         TickRate = tickRate;
-        _checkpointEvolutionStep = checkpointEvolutionStep;
         _checkpoints = Track.CheckpointCenters;
-
-        _fullDistance = Vector2.Distance(Car.Position, _checkpoints[_checkpointEvolutionStep]);
-        for (var i = _checkpointEvolutionStep; i < checkpointEvolutionStep + Config.StepWidth; i++)
-            _fullDistance += Vector2.Distance(_checkpoints[i], _checkpoints[i + 1]);
-
-        var size = (int)(_fullDistance / (car.MaxSpeed * TickTime / 4));
-        Genes = new int[size];
-        Values = new short[size];
-        for (var i = 0; i < Values.Length; i++) Values[i] = 1;
+        EvolutionStep = evolutionStep;
     }
 
     public Genome(Genome genome, bool copyArrays = false)
     {
         Car = new Car(genome.Car);
-        Track = genome.Track;
+        Track = Car.Track;
         TickRate = genome.TickRate;
-        _checkpointEvolutionStep = genome._checkpointEvolutionStep;
         _checkpoints = genome._checkpoints;
+        EvolutionStep = genome.EvolutionStep;
         _fullDistance = genome._fullDistance;
         Genes = new int[genome.Genes.Length];
         Values = new short[genome.Values.Length];
@@ -50,12 +40,24 @@ public class Genome
         genome.Values.CopyTo(Values, 0);
     }
 
+    public void LightReset()
+    {
+        _currentGene = 0;
+        _firstCheckpoint = true;
+        CurrentDistance = 0;
+        IsAlive = true;
+        Fitness = 0;
+        Speeds.Clear();
+        MiddleGeneIndex = -1;
+        OnNextCheckpoint = false;
+    }
+
     public Car Car { get; }
+    public Track Track { get; }
     public int[] Genes { get; set; }
     public short[] Values { get; set; }
     public int Origin { get; set; }
 
-    public Track Track { get; }
     public float TickRate { get; }
     public float TickTime => 1 / TickRate;
     public bool IsAlive { get; private set; } = true;
@@ -63,6 +65,25 @@ public class Genome
     public float CurrentTime => _currentGene * TickTime;
     public List<float> Speeds { get; set; } = new();
     public float AvgSpeed => Speeds.Average();
+
+    public int EvolutionStep
+    {
+        get => _evolutionStep;
+        set
+        {
+            LightReset();
+            _evolutionStep = value;
+            _fullDistance = Vector2.Distance(Car.Position, _checkpoints[EvolutionStep]);
+            for (var i = EvolutionStep; i < EvolutionStep + Config.StepWidth; i++)
+                _fullDistance += Vector2.Distance(_checkpoints[i], _checkpoints[i + 1]);
+
+            var size = (int)(_fullDistance / (Car.Speed * 0.1 + Car.MaxSpeed / 4) / 2 * TickRate);
+            //var size = (int)(_fullDistance / (Car.MaxSpeed * TickTime / 4));
+            Genes = new int[size];
+            Values = new short[size];
+            for (var i = 0; i < Values.Length; i++) Values[i] = 1;
+        }
+    }
 
     /// <summary>
     ///     Perform one tick of simulation.
@@ -88,23 +109,23 @@ public class Genome
         if (Car.IsCollision() || _currentGene + 1 == Genes.Length)
         {
             Fitness = GetFitness();
-            Track.CurrentCheckpointIndex = _checkpointEvolutionStep;
+            Track.CurrentCheckpointIndex = EvolutionStep;
             IsAlive = false;
         }
         else if (Track.OnCheckpoint(Car.Position, Car.Width))
         {
-            if (Track.CurrentCheckpointIndex == _checkpointEvolutionStep + 1)
+            if (Track.CurrentCheckpointIndex == EvolutionStep + 1)
             {
                 MiddleGeneIndex = _currentGene;
                 MiddleCarState = Car.GetState();
             }
 
-            if (Track.CurrentCheckpointIndex == _checkpointEvolutionStep + Config.StepWidth && !_firstCheckpoint
+            if (Track.CurrentCheckpointIndex == EvolutionStep + Config.StepWidth && !_firstCheckpoint
                 && MiddleGeneIndex != -1)
             {
                 OnNextCheckpoint = true;
                 Fitness = GetFitness();
-                Track.CurrentCheckpointIndex = _checkpointEvolutionStep;
+                Track.CurrentCheckpointIndex = EvolutionStep;
                 IsAlive = false;
             }
 
@@ -117,7 +138,7 @@ public class Genome
     private double GetFitness()
     {
         CurrentDistance = Vector2.Distance(Car.Position, _checkpoints[Track.CurrentCheckpointIndex]);
-        for (var i = Track.CurrentCheckpointIndex; i < _checkpointEvolutionStep + Config.StepWidth; i++)
+        for (var i = Track.CurrentCheckpointIndex; i < EvolutionStep + Config.StepWidth; i++)
             CurrentDistance += Vector2.Distance(_checkpoints[i], _checkpoints[i + 1]);
 
         if (CurrentDistance > _fullDistance) CurrentDistance = _fullDistance;

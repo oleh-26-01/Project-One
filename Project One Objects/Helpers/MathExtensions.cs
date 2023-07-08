@@ -1,5 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using Project_One_Objects.AIComponents;
 
 // ReSharper disable InconsistentNaming
 
@@ -12,21 +15,45 @@ public static class MathExtensions
     public const float FTwoPi = (float)Math.PI * 2;
     public const float CloseToZero = 1e-5f;
     public static readonly Vector2 NaNVector2 = new(float.NaN, float.NaN);
-    private static int _tanAproxCount = 3600;
-    private static readonly float[] _tanAprox = GetTanAproximation();
+    private static readonly Random Random = new();
+    private const int _pseudoTanCount = 3600;
+    private const int _pseudoRandomCount = 10_000;
+    private const int _pseudoRandomDoubleCount = 10_000;
+    private static readonly float[] _pseudoTan = GetPseudoTan();
+    public static int[] PseudoRandomCarActions { get; private set; } = GetPseudoRandom();
+    public static double[] PseudoRandomDouble { get; private set; } = GetPseudoRandomDouble();
 
-    private static float[] GetTanAproximation()
+    private static T[] GenerateArray<T>(int count, Func<int, T> generator, string arrayName)
     {
         Stopwatch start = new();
-        var tanAprox = new float[_tanAproxCount];
-        for (var i = 0; i < _tanAproxCount; i++) tanAprox[i] = (float)Math.Tan(TwoPi * i / _tanAproxCount);
+        start.Start();
+
+        var array = new T[count + 1];
+        for (var i = 0; i < count + 1; i++)
+            array[i] = generator(i);
 
         start.Stop();
-        Console.WriteLine($"Tan aproximation took {start.ElapsedMilliseconds}ms");
-        Console.WriteLine($"Size of tan aproximation: {tanAprox.Length * sizeof(float) / 1024}kb");
-        _tanAproxCount--;
-        return tanAprox;
+        Console.WriteLine($"{arrayName} took {start.ElapsedMilliseconds}ms");
+        Console.WriteLine($"Size of {arrayName}: {array.Length * Unsafe.SizeOf<T>() / 1024}kb");
+
+        return array;
     }
+
+    private static int[] GetPseudoRandom()
+    {
+        return GenerateArray(_pseudoRandomCount, _ => Random.Next(0, Config.CarActions.Count), "Pseudo random");
+    }
+
+    private static float[] GetPseudoTan()
+    {
+        return GenerateArray(_pseudoTanCount, i => (float)Math.Tan(TwoPi * i / _pseudoTanCount), "Tan approximation");
+    }
+
+    private static double[] GetPseudoRandomDouble()
+    {
+        return GenerateArray(_pseudoRandomDoubleCount, _ => Random.NextDouble(), "Pseudo random double");
+    }
+
 
     public static double ToRad(this double degrees)
     {
@@ -118,25 +145,36 @@ public static class MathExtensions
     /// <param name="points"> The points to find the angles of. </param>
     /// <param name="position"> The position to find the angles relative to. </param>
     /// <param name="targetArray"> The array to store the angles in. </param>
-    public static void CalcRelativeAngles(Vector2[] points, Vector2 position, float[] targetArray)
+    public static void CalcRelativeAngles(Vector2[] points, Vector2 position, float[] targetArray, bool optimization = false)
     {
-        for (var i = 0; i < points.Length; i++)
+        if (optimization)
         {
-            var point = points[i];
-            var angle = Math.Atan2(point.Y - position.Y, point.X - position.X);
-            targetArray[i] = (float)angle.Mod(TwoPi);
+            for (var i = 0; i < points.Length; i++)
+            {
+                var point = points[i];
+                targetArray[i] = PseudoAngle(point.X - position.X, point.Y - position.Y);
+            }
+        }
+        else
+        {
+            for (var i = 0; i < points.Length; i++)
+            {
+                var point = points[i];
+                var angle = Math.Atan2(point.Y - position.Y, point.X - position.X);
+                targetArray[i] = (float)angle.Mod(TwoPi);
+            }
         }
     }
 
-    /// <inheritdoc cref="CalcRelativeAngles(Vector2[],Vector2,float[])" />
-    public static void CalcRelativeAnglesOpt(Vector2[] points, Vector2 position, float[] targetArray)
-    {
-        for (var i = 0; i < points.Length; i++)
-        {
-            var point = points[i];
-            targetArray[i] = PseudoAngle(point.X - position.X, point.Y - position.Y);
-        }
-    }
+    ///// <inheritdoc cref="CalcRelativeAngles(Vector2[],Vector2,float[])" />
+    //public static void CalcRelativeAnglesOpt(Vector2[] points, Vector2 position, float[] targetArray)
+    //{
+    //    for (var i = 0; i < points.Length; i++)
+    //    {
+    //        var point = points[i];
+    //        targetArray[i] = PseudoAngle(point.X - position.X, point.Y - position.Y);
+    //    }
+    //}
 
     /// <summary>
     ///     Calculate angles of the vectors, released in a circle, relative to the specific body angle.
@@ -218,7 +256,52 @@ public static class MathExtensions
 
     private static float PseudoTan(float angle)
     {
-        var index = (int)(angle / TwoPi * _tanAproxCount);
-        return _tanAprox[index];
+        var index = (int)(angle / TwoPi * _pseudoTanCount);
+        return _pseudoTan[index];
+    }
+
+    /// <summary>
+    /// Sorts an array of Vector2 objects by their Y coordinate using the Insertion Sort algorithm.
+    /// </summary>
+    /// <param name="array">The array of Vector2 objects to be sorted.</param>
+    public static void InsertionSort(Vector2[] array)
+    {
+        for (var i = 1; i < array.Length; i++)
+        {
+            var key = array[i];
+            var j = i - 1;
+
+            while (j >= 0 && array[j].Y > key.Y)
+            {
+                array[j + 1] = array[j];
+                j--;
+            }
+
+            array[j + 1] = key;
+        }
+    }
+
+    [DllImport("CMathExtension.dll")]
+    public static extern void insertion_sort(IntPtr array, int length);
+
+    public static void CInsertionSort(Vector2[] array)
+    {
+        var vectorSize = Marshal.SizeOf<Vector2>();
+        var arraySize = array.Length;
+        var vectorArrayPtr = Marshal.AllocHGlobal(vectorSize * arraySize);
+
+        for (var i = 0; i < arraySize; i++)
+        {
+            Marshal.StructureToPtr(array[i], vectorArrayPtr + vectorSize * i, false);
+        }
+
+        insertion_sort(vectorArrayPtr, arraySize);
+
+        for (var i = 0; i < arraySize; i++)
+        {
+            array[i] = Marshal.PtrToStructure<Vector2>(vectorArrayPtr + vectorSize * i);
+        }
+
+        Marshal.FreeHGlobal(vectorArrayPtr);
     }
 }

@@ -77,7 +77,6 @@ public class Track
 
     public Tuple<Vector2, Vector2>[] Checkpoints { get; private set; } = Array.Empty<Tuple<Vector2, Vector2>>();
     public Vector2[] CheckpointCenters { get; private set; } = Array.Empty<Vector2>();
-
     public Vector2[] Points { get; private set; }
     public Vector2[] CurvePoints { get; private set; }
 

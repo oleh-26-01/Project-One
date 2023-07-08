@@ -62,7 +62,7 @@ public partial class ThirdCanvas
         Track.DrawOn(CanvasControl);
         Car.DrawOn(CanvasControl);
 
-        _populationManager.RunSimulationParallel(true);
+        _populationManager.RunSimulationParallel();
 
         // temporary code
         var isNextCheckpoint = false;
@@ -83,7 +83,7 @@ public partial class ThirdCanvas
         {
             isNextCheckpoint = false;
 
-            _populationManager.RunSimulationParallel(true);
+            _populationManager.RunSimulationParallel();
             _ = _populationManager.AnalyzeGeneration();
             var bestOnGeneration = _populationManager.Population[0];
 
@@ -104,7 +104,7 @@ public partial class ThirdCanvas
                 {
                     Console.WriteLine("No solution found, restarting...");
                     _ = _populationManager.PrepareNextGeneration(2);
-                    _populationManager.RunSimulationParallel(true);
+                    _populationManager.RunSimulationParallel();
                     _ = _populationManager.AnalyzeGeneration();
                     iteration = 0;
                     iterationsWithoutImprovement = 0;

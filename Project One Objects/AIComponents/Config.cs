@@ -89,17 +89,41 @@ public static class Config
     public static readonly Dictionary<string, int> OriginsKeys = Origins.ToDictionary(x => x.Value, x => x.Key);
 
     public static readonly float BestGenomesRate = 0.3f;
-    public static readonly float RandomCrossGenomesRate = 0.1f;
     public static readonly float CrossoverGenomesRate = 0.1f;
+    public static readonly float RandomCrossGenomesRate = 0.1f;
+    public static readonly float ValueCrossGenomesRate = 0.1f;
     public static readonly float SmoothCrossGenomesRate = 0.1f;
     public static readonly float MutatedGenomesRate = 0.2f;
     public static readonly float RandomGenomesRate = 0.1f; // equal what left
-    public static readonly float ValueCrossGenomesRate = 0.1f;
 
-    public static readonly int MaxDegreeOfParallelism = 8;
+    public static readonly int MaxDegreeOfParallelism = 12;
 
     public static readonly ParallelOptions OptimizationOptions = new()
     {
         MaxDegreeOfParallelism = MaxDegreeOfParallelism
     };
+
+    public static readonly int[] SumToAction = GetSumToAction();
+
+    private static int[] GetSumToAction()
+    {
+        var size = CarActions.Count * 2;
+        var newArray = new int[size];
+
+        for (var i = 0; i < size; i++)
+        {
+            newArray[i] = i switch
+            {
+                3 => 0,
+                7 => 0,
+                11 => 1,
+                15 => 2,
+                12 => 3,
+                14 => 4,
+                _ => 0
+            };
+        }
+
+        return newArray;
+    }
 }
