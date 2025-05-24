@@ -6,21 +6,15 @@
              mc:Ignorable="d"
              d:DesignHeight="33" d:DesignWidth="1010">
     <UserControl.Resources>
-        <Style TargetType="CheckBox" x:Key="CheckBoxStyle">
-            <Setter Property="FontSize" Value="16" />
-            <Setter Property="FlowDirection" Value="RightToLeft" />
-            <Setter Property="Focusable" Value="False" />
-            <Setter Property="HorizontalAlignment" Value="Center" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-        </Style>
-        <Style TargetType="Label" x:Key="LabelStyle">
-            <Setter Property="FontSize" Value="16" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="HorizontalAlignment" Value="Center" />
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Themes/GlobalStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <!-- Removed local CheckBoxStyle and LabelStyle -->
+        </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid ShowGridLines="False" Background="DarkSlateGray">
+    <Grid ShowGridLines="False" Background="{StaticResource PrimaryBrush}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1.5*" />
             <ColumnDefinition Width="2*" />
@@ -28,47 +22,59 @@
             <ColumnDefinition Width="2*" />
             <ColumnDefinition Width="1*" />
         </Grid.ColumnDefinitions>
-        <Grid Grid.Column="0" Background="WhiteSmoke" Margin="0,0,1,0">
+        <Grid Grid.Column="0" Background="{StaticResource ListItemBackgroundBrush}" Margin="0,0,1,0">
             <CheckBox x:Name="FollowCarCheckBox" 
+                      Style="{StaticResource BaseCheckBoxStyle}"
                       Content="Follow Car" IsChecked="True" 
-                      Style="{StaticResource CheckBoxStyle}" />
+                      FlowDirection="RightToLeft"
+                      HorizontalAlignment="Center"/>
         </Grid>
-        <Grid Grid.Column="1" Background="WhiteSmoke" Margin="0,0,1,0">
+        <Grid Grid.Column="1" Background="{StaticResource ListItemBackgroundBrush}" Margin="0,0,1,0">
             <CheckBox x:Name="ShowVisionCheckBox" 
+                      Style="{StaticResource BaseCheckBoxStyle}"
                       Content="Show Intersections" IsChecked="True" 
-                      Style="{StaticResource CheckBoxStyle}" />
+                      FlowDirection="RightToLeft"
+                      HorizontalAlignment="Center"/>
         </Grid>
 
-        <Grid Grid.Column="2" Background="WhiteSmoke" Margin="0,0,1,0">
+        <Grid Grid.Column="2" Background="{StaticResource ListItemBackgroundBrush}" Margin="0,0,1,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Column="0" Content="Car Direction: " 
-                   Style="{StaticResource LabelStyle}" />
-            <Label Grid.Column="1" Content="Forward" x:Name="CarDirectionLabel" 
-                   Style="{StaticResource LabelStyle}" 
-                   Foreground="Blue"/>
+            <TextBlock Grid.Column="0" Text="Car Direction: " 
+                       Style="{StaticResource BaseTextBlockStyle}"
+                       HorizontalAlignment="Center"/>
+            <TextBlock Grid.Column="1" x:Name="CarDirectionLabel" 
+                       Style="{StaticResource BaseTextBlockStyle}" 
+                       Text="Forward"
+                       Foreground="{StaticResource AccentBrush}"
+                       HorizontalAlignment="Center"/>
         </Grid>
 
-        <Grid Grid.Column="3" Background="WhiteSmoke" Margin="0,0,1,0">
+        <Grid Grid.Column="3" Background="{StaticResource ListItemBackgroundBrush}" Margin="0,0,1,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Column="0" Content="Collision: " 
-                   Style="{StaticResource LabelStyle}" />
-            <Label Grid.Column="1" Content="None" x:Name="CollisionLabel" 
-                   Style="{StaticResource LabelStyle}" 
-                   Foreground="Blue"/>
+            <TextBlock Grid.Column="0" Text="Collision: " 
+                       Style="{StaticResource BaseTextBlockStyle}"
+                       HorizontalAlignment="Center"/>
+            <TextBlock Grid.Column="1" x:Name="CollisionLabel" 
+                       Style="{StaticResource BaseTextBlockStyle}" 
+                       Text="None"
+                       Foreground="{StaticResource AccentBrush}"
+                       HorizontalAlignment="Center"/>
         </Grid>
 
-        <Grid Grid.Column="4" Background="WhiteSmoke" Margin="0 0 1 0">
-            <Label Content="Cps: 25000.0" x:Name="CpsLabel"
-                   Style="{StaticResource LabelStyle}"
-                   ToolTip="Calculations per second" />
+        <Grid Grid.Column="4" Background="{StaticResource ListItemBackgroundBrush}" Margin="0 0 1 0">
+            <TextBlock x:Name="CpsLabel"
+                       Style="{StaticResource BaseTextBlockStyle}"
+                       Text="Cps: 25000.0"
+                       ToolTip="Calculations per second"
+                       HorizontalAlignment="Center"/>
         </Grid>
     </Grid>
 </UserControl>

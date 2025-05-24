@@ -8,40 +8,47 @@
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <SolidColorBrush x:Key="NotSelectedTrackViewModel" Color="WhiteSmoke" />
-        <SolidColorBrush x:Key="SelectedTrackViewModel" Color="LightGray" />
-        <helpers:BoolToColorConverter x:Key="BoolToColorConverter"
-                                         NotSelectedBrush="{StaticResource NotSelectedTrackViewModel}"
-                                         SelectedBrush="{StaticResource SelectedTrackViewModel}" />
-        <DataTemplate x:Key="TrackListItemTemplate"
-                      DataType="{x:Type projectOne:TrackViewModel}">
-            <Border BorderThickness="0 0 0 1" BorderBrush="Black">
-                <Grid ShowGridLines="False"
-                      Background="{Binding IsVisible, Converter={StaticResource BoolToColorConverter}}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="1*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Themes/GlobalStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
 
-                    <TextBlock Grid.Column="0" Text="{Binding ShortInfo}"
-                               FontSize="16" Margin="4 3 2 2" />
-                    <Button Grid.Column="1" Grid.Row="0" Focusable="False" Click="View_OnClick"
-                            Foreground="#CC9900" FontSize="16" FontWeight="SemiBold"
-                            Content="View" Margin="3 3 0 2" />
-                    <Button Grid.Column="2" Focusable="False" Click="Select_OnClick"
-                            Foreground="{Binding ButtonBrush}" FontSize="16" FontWeight="SemiBold"
-                            Content="{Binding DisplayButtonContext}" Margin="3" />
-                </Grid>
-            </Border>
-        </DataTemplate>
+            <SolidColorBrush x:Key="NotSelectedTrackViewModel" Color="{StaticResource ListItemBackgroundBrush}" />
+            <SolidColorBrush x:Key="SelectedTrackViewModel" Color="{StaticResource ListItemSelectedBackgroundBrush}" />
+            <helpers:BoolToColorConverter x:Key="BoolToColorConverter"
+                                             NotSelectedBrush="{StaticResource NotSelectedTrackViewModel}"
+                                             SelectedBrush="{StaticResource SelectedTrackViewModel}" />
+            <DataTemplate x:Key="TrackListItemTemplate"
+                          DataType="{x:Type projectOne:TrackViewModel}">
+                <Border Style="{StaticResource BaseBorderStyle}">
+                    <Grid ShowGridLines="False"
+                          Background="{Binding IsVisible, Converter={StaticResource BoolToColorConverter}}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0" Text="{Binding ShortInfo}"
+                                   Style="{StaticResource BaseTextBlockStyle}" />
+                        <Button Grid.Column="1" Grid.Row="0" Focusable="False" Click="View_OnClick"
+                                Style="{StaticResource NeutralButtonStyle}"
+                                Content="View" />
+                        <Button Grid.Column="2" Focusable="False" Click="Select_OnClick"
+                                Style="{StaticResource BaseButtonStyle}"
+                                Content="{Binding DisplayButtonContext}"
+                                Foreground="{Binding ButtonBrush}" />
+                    </Grid>
+                </Border>
+            </DataTemplate>
+        </ResourceDictionary>
     </UserControl.Resources>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <!--<ScrollViewer.Resources>
                     <system:Double x:Key="{x:Static SystemParameters.VerticalScrollBarWidthKey}">10</system:Double>
                 </ScrollViewer.Resources>-->
-        <ItemsControl x:Name="TracksList" Focusable="False" Background="WhiteSmoke">
+        <ItemsControl x:Name="TracksList" Focusable="False" Background="{StaticResource ListItemBackgroundBrush}">
             <ItemsControl.ItemTemplate>
                 <StaticResource ResourceKey="TrackListItemTemplate" />
             </ItemsControl.ItemTemplate>

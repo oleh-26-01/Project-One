@@ -8,33 +8,38 @@
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <SolidColorBrush x:Key="NotSelectedTrackViewModel" Color="WhiteSmoke" />
-        <SolidColorBrush x:Key="SelectedTrackViewModel" Color="LightGray" />
-        <helpers:BoolToColorConverter x:Key="BoolToColorConverter"
-                                         NotSelectedBrush="{StaticResource NotSelectedTrackViewModel}"
-                                         SelectedBrush="{StaticResource SelectedTrackViewModel}" />
-        <DataTemplate x:Key="TrackListItemTemplate"
-                      DataType="{x:Type projectOne:TrackViewModel}">
-            <Border BorderThickness="0 1 0 0" BorderBrush="Black">
-                <Grid ShowGridLines="False"
-                      Background="{Binding IsVisible, Converter={StaticResource BoolToColorConverter}}"
-                      Margin="0 0 0 0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="1*" />
-                    </Grid.ColumnDefinitions>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Themes/GlobalStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            
+            <SolidColorBrush x:Key="NotSelectedTrackViewModel" Color="{StaticResource ListItemBackgroundBrush}" />
+            <SolidColorBrush x:Key="SelectedTrackViewModel" Color="{StaticResource ListItemSelectedBackgroundBrush}" />
+            <helpers:BoolToColorConverter x:Key="BoolToColorConverter"
+                                             NotSelectedBrush="{StaticResource NotSelectedTrackViewModel}"
+                                             SelectedBrush="{StaticResource SelectedTrackViewModel}" />
+            <DataTemplate x:Key="TrackListItemTemplate"
+                          DataType="{x:Type projectOne:TrackViewModel}">
+                <Border Style="{StaticResource BaseBorderStyle}">
+                    <Grid ShowGridLines="False"
+                          Background="{Binding IsVisible, Converter={StaticResource BoolToColorConverter}}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="1*" />
+                        </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Column="0" Text="{Binding ShortInfo}"
-                               FontSize="16" Margin="4 2 2 2" />
-                    <Button Grid.Column="1" Focusable="False" Click="Select_OnClick"
-                            Foreground="#CC9900" FontSize="16" FontWeight="SemiBold"
-                            Content="Select" Margin="3" />
-                </Grid>
-            </Border>
-        </DataTemplate>
+                        <TextBlock Grid.Column="0" Text="{Binding ShortInfo}"
+                                   Style="{StaticResource BaseTextBlockStyle}" />
+                        <Button Grid.Column="1" Focusable="False" Click="Select_OnClick"
+                                Style="{StaticResource AccentButtonStyle}"
+                                Content="Select" />
+                    </Grid>
+                </Border>
+            </DataTemplate>
+        </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid x:Name="GridContent" Background="WhiteSmoke" MouseMove="GridContent_OnMouseMove">
+    <Grid x:Name="GridContent" Background="{StaticResource ListItemBackgroundBrush}" MouseMove="GridContent_OnMouseMove">
         <Grid.RowDefinitions>
             <RowDefinition Height="0.5*" />
             <RowDefinition Height="10" />
@@ -47,11 +52,13 @@
                   x:Name="TracksExpander">
             <Expander.Header>
                 <TextBlock x:Name="ExpanderTracksTextBlock"
-                    Text="Tracks" FontSize="16" FontWeight="SemiBold" />
+                           Text="Tracks" 
+                           Style="{StaticResource BaseTextBlockStyle}" 
+                           FontWeight="SemiBold" />
             </Expander.Header>
             <Expander.Content>
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <ItemsControl x:Name="TracksList" Focusable="False">
+                    <ItemsControl x:Name="TracksList" Focusable="False" Background="{StaticResource ListItemBackgroundBrush}">
                         <ItemsControl.ItemTemplate>
                             <StaticResource ResourceKey="TrackListItemTemplate" />
                         </ItemsControl.ItemTemplate>
@@ -63,7 +70,7 @@
         <!-- add line -->
         <Grid Grid.Row="1" x:Name="ExpanderControlStackPanel"
                     Cursor="Hand"
-                    Background="LightGray"
+                    Background="{StaticResource SecondaryBrush}"
                     PreviewMouseDown="StackPanelMouseClick"
                     PreviewMouseUp="StackPanelMouseClick">
             <Grid.RowDefinitions>
@@ -78,19 +85,21 @@
                 <ColumnDefinition Width="0.1*"/>
             </Grid.ColumnDefinitions>
 
-            <Rectangle Grid.Row="1" Grid.Column="1" Fill="Black" Height="1" />
+            <Rectangle Grid.Row="1" Grid.Column="1" Fill="{StaticResource DarkTextBrush}" Height="1" />
         </Grid>
 
         <Expander Grid.Row="2" IsExpanded="True" x:Name="SettingsExpander"
                   Expanded="ExpanderExpand"
                   Collapsed="SettingsExpanderCollapse">
             <Expander.Header>
-                <TextBlock Text="Settings" FontSize="16" FontWeight="SemiBold"></TextBlock>
+                <TextBlock Text="Settings" 
+                           Style="{StaticResource BaseTextBlockStyle}" 
+                           FontWeight="SemiBold" />
             </Expander.Header>
 
             <StackPanel>
-                <TextBlock Text="Some text" />
-                <Button Content="Some button" />
+                <TextBlock Text="Some text" Style="{StaticResource BaseTextBlockStyle}" />
+                <Button Content="Some button" Style="{StaticResource BaseButtonStyle}" />
             </StackPanel>
         </Expander>
     </Grid>
