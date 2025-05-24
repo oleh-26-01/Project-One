@@ -13,6 +13,66 @@
     <SolidColorBrush x:Key="ConstructiveActionBrush" Color="#FF388E3C"/>
     <SolidColorBrush x:Key="NeutralActionBrush" Color="#FF546E7A"/>
 
+    <!-- BaseButtonTemplate Definition -->
+    <ControlTemplate x:Key="BaseButtonTemplate" TargetType="Button">
+        <Border x:Name="templateRootBorder" 
+                Background="{TemplateBinding Background}" 
+                BorderBrush="{TemplateBinding BorderBrush}" 
+                BorderThickness="{TemplateBinding BorderThickness}">
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal" />
+                    <VisualState x:Name="MouseOver">
+                        <Storyboard>
+                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="templateRootBorder" Storyboard.TargetProperty="Background">
+                                <DiscreteObjectKeyFrame KeyTime="0">
+                                    <DiscreteObjectKeyFrame.Value>
+                                        <SolidColorBrush Color="#FF454545"/>
+                                    </DiscreteObjectKeyFrame.Value>
+                                </DiscreteObjectKeyFrame>
+                            </ObjectAnimationUsingKeyFrames>
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="Pressed">
+                        <Storyboard>
+                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="templateRootBorder" Storyboard.TargetProperty="Background">
+                                <DiscreteObjectKeyFrame KeyTime="0">
+                                    <DiscreteObjectKeyFrame.Value>
+                                        <SolidColorBrush Color="#FF3A3A3A"/>
+                                    </DiscreteObjectKeyFrame.Value>
+                                </DiscreteObjectKeyFrame>
+                            </ObjectAnimationUsingKeyFrames>
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="Disabled">
+                        <Storyboard>
+                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="templateRootBorder" Storyboard.TargetProperty="Background">
+                                <DiscreteObjectKeyFrame KeyTime="0">
+                                    <DiscreteObjectKeyFrame.Value>
+                                        <SolidColorBrush Color="#FF606060"/>
+                                    </DiscreteObjectKeyFrame.Value>
+                                </DiscreteObjectKeyFrame>
+                            </ObjectAnimationUsingKeyFrames>
+                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="contentPresenter" Storyboard.TargetProperty="(TextElement.Foreground)">
+                                 <DiscreteObjectKeyFrame KeyTime="0">
+                                    <DiscreteObjectKeyFrame.Value>
+                                        <SolidColorBrush Color="#FF909090"/>
+                                    </DiscreteObjectKeyFrame.Value>
+                                </DiscreteObjectKeyFrame>
+                            </ObjectAnimationUsingKeyFrames>
+                            <DoubleAnimation Storyboard.TargetName="templateRootBorder" Storyboard.TargetProperty="Opacity" To="0.7" Duration="0"/>
+                        </Storyboard>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateManager.VisualStateGroups>
+            <ContentPresenter x:Name="contentPresenter" 
+                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" 
+                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
+                              TextElement.Foreground="{TemplateBinding Foreground}"/>
+        </Border>
+    </ControlTemplate>
+
     <!-- Base Control Styles -->
     <Style x:Key="BaseButtonStyle" TargetType="Button">
         <Setter Property="FontSize" Value="16"/>
@@ -24,55 +84,9 @@
         <Setter Property="Margin" Value="2"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            Padding="{TemplateBinding Padding}">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#FF606060"/>
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="#FF404040"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-        <Setter Property="VisualStateManager.VisualStateGroups">
-            <VisualStateGroup x:Name="CommonStates">
-                <VisualState x:Name="Normal" />
-                <VisualState x:Name="MouseOver">
-                    <!-- Handled by ControlTemplate.Triggers for Background -->
-                </VisualState>
-                <VisualState x:Name="Pressed">
-                    <!-- Handled by ControlTemplate.Triggers for Background -->
-                </VisualState>
-                <VisualState x:Name="Disabled">
-                    <Storyboard>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(Panel.Background)">
-                            <DiscreteObjectKeyFrame KeyTime="0">
-                                <DiscreteObjectKeyFrame.Value>
-                                    <SolidColorBrush Color="#FF707070"/>
-                                </DiscreteObjectKeyFrame.Value>
-                            </DiscreteObjectKeyFrame>
-                        </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(TextElement.Foreground)">
-                            <DiscreteObjectKeyFrame KeyTime="0">
-                                <DiscreteObjectKeyFrame.Value>
-                                    <SolidColorBrush Color="LightGray"/>
-                                </DiscreteObjectKeyFrame.Value>
-                            </DiscreteObjectKeyFrame>
-                        </ObjectAnimationUsingKeyFrames>
-                    </Storyboard>
-                </VisualState>
-            </VisualStateGroup>
-        </Setter>
+        <!-- Apply the new BaseButtonTemplate -->
+        <Setter Property="Template" Value="{StaticResource BaseButtonTemplate}"/>
+        <!-- VisualStateManager.VisualStateGroups removed from here, now defined in the template -->
     </Style>
 
     <Style x:Key="AccentButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
@@ -119,31 +133,81 @@
         <Setter Property="Padding" Value="2"/>
     </Style>
 
+    <!-- BaseCheckBoxTemplate Definition -->
+    <ControlTemplate x:Key="BaseCheckBoxTemplate" TargetType="CheckBox">
+        <Grid>
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroup x:Name="CheckStates">
+                    <VisualState x:Name="Checked">
+                        <Storyboard>
+                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="checkMarkPath" Storyboard.TargetProperty="Visibility">
+                                <DiscreteObjectKeyFrame KeyTime="0" Value="Visible"/>
+                            </ObjectAnimationUsingKeyFrames>
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="Unchecked"/>
+                    <VisualState x:Name="Indeterminate"/>
+                </VisualStateGroup>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal" />
+                    <VisualState x:Name="Disabled">
+                        <Storyboard>
+                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="checkBoxBorder" Storyboard.TargetProperty="BorderBrush">
+                                <DiscreteObjectKeyFrame KeyTime="0">
+                                    <DiscreteObjectKeyFrame.Value>
+                                        <SolidColorBrush Color="#FF909090"/> <!-- Muted border -->
+                                    </DiscreteObjectKeyFrame.Value>
+                                </DiscreteObjectKeyFrame>
+                            </ObjectAnimationUsingKeyFrames>
+                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="checkMarkPath" Storyboard.TargetProperty="Stroke">
+                                <DiscreteObjectKeyFrame KeyTime="0">
+                                    <DiscreteObjectKeyFrame.Value>
+                                        <SolidColorBrush Color="#FF909090"/> <!-- Muted checkmark -->
+                                    </DiscreteObjectKeyFrame.Value>
+                                </DiscreteObjectKeyFrame>
+                            </ObjectAnimationUsingKeyFrames>
+                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="contentPresenter" Storyboard.TargetProperty="(TextElement.Foreground)">
+                                 <DiscreteObjectKeyFrame KeyTime="0">
+                                    <DiscreteObjectKeyFrame.Value>
+                                        <SolidColorBrush Color="#FF909090"/> <!-- Muted text -->
+                                    </DiscreteObjectKeyFrame.Value>
+                                </DiscreteObjectKeyFrame>
+                            </ObjectAnimationUsingKeyFrames>
+                            <DoubleAnimation Storyboard.TargetName="checkBoxBorder" Storyboard.TargetProperty="Opacity" To="0.7" Duration="0"/>
+                        </Storyboard>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateManager.VisualStateGroups>
+            <Border x:Name="checkBoxBorder" 
+                    Width="18" Height="18" 
+                    BorderThickness="1" 
+                    BorderBrush="{StaticResource DarkTextBrush}" 
+                    Background="Transparent"
+                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+            <Path x:Name="checkMarkPath" 
+                  Data="M6,11 L10,15 L16,7" 
+                  Stroke="{StaticResource DarkTextBrush}" 
+                  StrokeThickness="2" 
+                  Visibility="Collapsed"
+                  VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <ContentPresenter x:Name="contentPresenter" 
+                              Content="{TemplateBinding Content}" 
+                              Margin="23,0,0,0" 
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" 
+                              TextElement.Foreground="{TemplateBinding Foreground}"/>
+        </Grid>
+    </ControlTemplate>
+
     <Style x:Key="BaseCheckBoxStyle" TargetType="CheckBox">
         <Setter Property="FontSize" Value="16" />
         <Setter Property="Focusable" Value="False" />
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Foreground" Value="{StaticResource DarkTextBrush}" />
-        <Setter Property="Padding" Value="5,0,0,0" />
-        <Setter Property="VisualStateManager.VisualStateGroups">
-            <VisualStateGroup x:Name="CommonStates">
-                <VisualState x:Name="Normal" />
-                <VisualState x:Name="MouseOver" />
-                <VisualState x:Name="Pressed" />
-                <VisualState x:Name="Disabled">
-                    <Storyboard>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(TextElement.Foreground)">
-                            <DiscreteObjectKeyFrame KeyTime="0">
-                                <DiscreteObjectKeyFrame.Value>
-                                    <SolidColorBrush Color="LightGray"/>
-                                </DiscreteObjectKeyFrame.Value>
-                            </DiscreteObjectKeyFrame>
-                        </ObjectAnimationUsingKeyFrames>
-                    </Storyboard>
-                </VisualState>
-            </VisualStateGroup>
-        </Setter>
+        <Setter Property="Padding" Value="5,0,0,0" /> <!-- This padding is for the content within the CheckBox style itself, not the template's ContentPresenter margin -->
+        <!-- Apply the new BaseCheckBoxTemplate -->
+        <Setter Property="Template" Value="{StaticResource BaseCheckBoxTemplate}"/>
+        <!-- VisualStateManager.VisualStateGroups removed from here, now defined in the template -->
     </Style>
 
     <Style x:Key="BaseBorderStyle" TargetType="Border">
@@ -153,24 +217,74 @@
         <Setter Property="Margin" Value="2"/>
     </Style>
 
+    <!-- BaseListBoxItemTemplate Definition -->
+    <ControlTemplate x:Key="BaseListBoxItemTemplate" TargetType="ListBoxItem">
+        <Border x:Name="templateRootBorder" 
+                Background="{TemplateBinding Background}" 
+                BorderBrush="{TemplateBinding BorderBrush}" 
+                BorderThickness="{TemplateBinding BorderThickness}" 
+                Padding="{TemplateBinding Padding}">
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal" />
+                    <VisualState x:Name="MouseOver">
+                        <Storyboard>
+                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="templateRootBorder" Storyboard.TargetProperty="Background">
+                                <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource ListItemSelectedBackgroundBrush}"/>
+                            </ObjectAnimationUsingKeyFrames>
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="Disabled">
+                        <Storyboard>
+                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="templateRootBorder" Storyboard.TargetProperty="Opacity">
+                                <DiscreteObjectKeyFrame KeyTime="0" Value="0.5"/>
+                            </ObjectAnimationUsingKeyFrames>
+                        </Storyboard>
+                    </VisualState>
+                </VisualStateGroup>
+                <VisualStateGroup x:Name="SelectionStates">
+                    <VisualState x:Name="Unselected" />
+                    <VisualState x:Name="Selected">
+                        <Storyboard>
+                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="templateRootBorder" Storyboard.TargetProperty="Background">
+                                <DiscreteObjectKeyFrame KeyTime="0">
+                                    <DiscreteObjectKeyFrame.Value>
+                                        <SolidColorBrush Color="{Binding Source={StaticResource AccentBrush}, Path=Color}" Opacity="0.3"/>
+                                    </DiscreteObjectKeyFrame.Value>
+                                </DiscreteObjectKeyFrame>
+                            </ObjectAnimationUsingKeyFrames>
+                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="templateRootBorder" Storyboard.TargetProperty="(TextElement.Foreground)">
+                                 <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource LightTextBrush}"/>
+                            </ObjectAnimationUsingKeyFrames>
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="SelectedUnfocused">
+                         <Storyboard>
+                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="templateRootBorder" Storyboard.TargetProperty="Background">
+                                <DiscreteObjectKeyFrame KeyTime="0">
+                                   <SolidColorBrush Color="{Binding Source={StaticResource AccentBrush}, Path=Color}" Opacity="0.2"/>
+                                </DiscreteObjectKeyFrame>
+                            </ObjectAnimationUsingKeyFrames>
+                             <ObjectAnimationUsingKeyFrames Storyboard.TargetName="templateRootBorder" Storyboard.TargetProperty="(TextElement.Foreground)">
+                                 <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource DarkTextBrush}"/>
+                            </ObjectAnimationUsingKeyFrames>
+                        </Storyboard>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateManager.VisualStateGroups>
+            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" 
+                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+        </Border>
+    </ControlTemplate>
+
     <!-- ListItemContainer Style -->
     <Style x:Key="ListItemContainerStyle" TargetType="ListBoxItem">
         <Setter Property="Background" Value="{StaticResource ListItemBackgroundBrush}"/>
         <Setter Property="Padding" Value="3"/>
-        <Setter Property="VisualStateManager.VisualStateGroups">
-            <VisualStateGroup x:Name="CommonStates">
-                <VisualState x:Name="Normal" />
-                <VisualState x:Name="MouseOver">
-                    <Storyboard>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(Panel.Background)">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource ListItemSelectedBackgroundBrush}"/>
-                        </ObjectAnimationUsingKeyFrames>
-                    </Storyboard>
-                </VisualState>
-                <VisualState x:Name="Disabled" />
-                 <!-- Selected states can be added here if needed later -->
-            </VisualStateGroup>
-        </Setter>
+        <!-- Apply the new BaseListBoxItemTemplate -->
+        <Setter Property="Template" Value="{StaticResource BaseListBoxItemTemplate}"/>
+        <!-- VisualStateManager.VisualStateGroups removed from here, now defined in the template -->
     </Style>
 
     <!-- Header TextBlock Style -->

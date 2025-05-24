@@ -14,7 +14,7 @@ namespace Project_One.Controls;
 
 public partial class ThirdCanvas
 {
-    private const string TrackPath = @"D:\FreeC\#Coding\C#\Project One\Project One\Curves\curve008.crv";
+    private const string TrackPath = "C:\\Coding\\C#\\Project One\\Project One\\Curves\\curve001.crv";
     private readonly Stopwatch _lastUpdate = new();
     private readonly PopulationManager _populationManager;
     private bool _evolution = true;
@@ -70,7 +70,7 @@ public partial class ThirdCanvas
 
         var bestFitness = _populationManager.Population[0].Fitness;
         var iteration = 0;
-        const int minIterations = 10;
+        const int minIterations = 50;
         var iterationsWithoutImprovement = 0;
         const int minIterationsWithoutImprovement = 10;
         var iterationsWithoutSolution = 0;

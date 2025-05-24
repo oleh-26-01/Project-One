@@ -49,15 +49,15 @@ public class PopulationManager
         var start = Random.Next(0, MathExtensions.PseudoRandomCarActions.Length - genome.Genes.Length);
         Array.Copy(MathExtensions.PseudoRandomCarActions, start, genome.Genes, 0, genome.Genes.Length);
 
-        if (setOrigin) genome.Origin = Config.Origin.Random;
+        if (setOrigin) genome.Origin = Config.OriginsKeys["Random"];
     }
 
-    public static void FillRandomGeneration(Genome[] population, Car progenitorCar, int evolutionStep, bool setOrigin = true)
+    public void FillRandomGeneration(Genome[] population, Genome progenitorGenome, bool setOrigin = true)
     {
         foreach (var genome in population)
         {
-            progenitorCar.CopyStateTo(genome.Car);
-            genome.EvolutionStep = evolutionStep;
+            _progenitorCar.CopyStateTo(genome.Car);
+            genome.EvolutionStep = EvolutionStep;
             FillWithRandomGenes(genome, setOrigin);
         }
     }
@@ -92,7 +92,7 @@ public class PopulationManager
             genome.Values[index] = (short)Random.NextInt64(1, Math.Max(1, Generation / 2));
         }
 
-        if (setOrigin) genome.Origin = Config.Origin.Mutate;
+        if (setOrigin) genome.Origin = Config.OriginsKeys["Mutate"];
     }
 
     /// <summary> Cross over two genomes to create two new genomes. </summary>
@@ -120,8 +120,8 @@ public class PopulationManager
 
         if (setOrigin)
         {
-            child1.Origin = Config.Origin.Crossover;
-            child2.Origin = Config.Origin.Crossover;
+            child1.Origin = Config.OriginsKeys["Crossover"];
+            child2.Origin = Config.OriginsKeys["Crossover"];
         }
     }
 
@@ -150,8 +150,8 @@ public class PopulationManager
 
         if (setOrigin)
         {
-            child1.Origin = Config.Origin.RandomCrossover;
-            child2.Origin = Config.Origin.RandomCrossover;
+            child1.Origin = Config.OriginsKeys["RandomCrossover"];
+            child2.Origin = Config.OriginsKeys["RandomCrossover"];
         }
     }
 
@@ -171,7 +171,7 @@ public class PopulationManager
                 child.Values[i] = parent2.Values[i];
             }
 
-        if (setOrigin) child.Origin = Config.Origin.ValueCrossover;
+        if (setOrigin) child.Origin = Config.OriginsKeys["ValueCrossover"];
     }
 
     public static void SmoothCrossGenomes(Genome parent1, Genome parent2, Genome child, bool setOrigin = false)
@@ -191,7 +191,7 @@ public class PopulationManager
             child.Genes[i] = Config.SumToAction[sum];
         }
 
-        if (setOrigin) child.Origin = Config.Origin.SmoothCrossover;
+        if (setOrigin) child.Origin = Config.OriginsKeys["SmoothCrossover"];
     }
 
     public string AnalyzeGeneration(bool makeReport = false, bool print = false)
@@ -215,9 +215,7 @@ public class PopulationManager
             maxReport[i] = float.MinValue;
         }
 
-        // var originReport = new float[Config.OriginsKeys.Count];
-        var originReport = new Dictionary<Config.Origin, int>();
-        foreach (var origin in Enum.GetValues<Config.Origin>()) originReport[origin] = 0;
+        var originReport = new float[Config.OriginsKeys.Count];
 
         for (var i = 0; i < Population.Length * Config.BestGenomesRate; i++) originReport[Population[i].Origin] += 1;
 
@@ -276,11 +274,11 @@ public class PopulationManager
                 if (EvolutionStep + Config.StepWidth + 1 == StepsCount)
                     return false;
 
-                FillRandomGeneration(Population, _progenitorCar, EvolutionStep);
+                FillRandomGeneration(Population, GetProgenitorGenome());
                 EvolutionStep++;
                 break;
             case 2:
-                FillRandomGeneration(Population, _progenitorCar, EvolutionStep);
+                FillRandomGeneration(Population, GetProgenitorGenome());
                 break;
         }
 
@@ -289,10 +287,7 @@ public class PopulationManager
 
         // Set origin for best genomes
         for (var i = shift; i < shift + bestSize; i++)
-        {
-            for (var j = 0; j < Population[i].Values.Length; j++) Population[i].Values[j] += 1;
-            Population[i].Origin = Config.Origin.Best;
-        }
+            Population[i].Origin = Config.OriginsKeys["Best"];
 
         shift += bestSize;
 
@@ -326,8 +321,8 @@ public class PopulationManager
 
                 switch (c)
                 {
-                    case 0: CrossOverGenomes(parent1, parent2, child1, child2!, true); break;
-                    case 1: RandomCrossGenomes(parent1, parent2, child1, child2!, true); break;
+                    case 0: CrossOverGenomes(parent1, parent2, child1, child2, true); break;
+                    case 1: RandomCrossGenomes(parent1, parent2, child1, child2, true); break;
                     case 2: ValueCrossGenomes(parent1, parent2, child1, true); break;
                     case 3: SmoothCrossGenomes(parent1, parent2, child1, true); break;
                 }

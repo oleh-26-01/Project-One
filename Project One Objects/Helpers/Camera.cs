@@ -49,7 +49,7 @@ public class Camera
 
     public bool IsFollowing => _followPositionGetter != null;
 
-    public void Follow(Func<Vector2> positionGetter)
+    public void Follow(Func<Vector2>? positionGetter)
     {
         _followPositionGetter = positionGetter;
     }
