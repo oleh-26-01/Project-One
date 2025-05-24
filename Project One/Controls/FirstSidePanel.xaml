@@ -8,39 +8,48 @@
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <SolidColorBrush x:Key="NotSelectedCurveViewModel" Color="WhiteSmoke" />
-        <SolidColorBrush x:Key="SelectedCurveViewModel" Color="LightGray" />
-        <helpers:BoolToColorConverter x:Key="BoolToColorConverter"
-                                    NotSelectedBrush="{StaticResource NotSelectedCurveViewModel}"
-                                    SelectedBrush="{StaticResource SelectedCurveViewModel}" />
-        <DataTemplate x:Key="CurveListItemTemplate"
-                      DataType="{x:Type local:CurveViewModel}">
-            <Border BorderThickness="0 0 0 1" BorderBrush="Black">
-                <Grid ShowGridLines="False"
-                      Background="{Binding IsSelected, Converter={StaticResource BoolToColorConverter}}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="1*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Themes/GlobalStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
 
-                    <TextBlock Grid.Column="0" Grid.Row="0" Text="{Binding ShortInfo}"
-                               FontSize="16" Margin="4 3 2 2" />
-                    <Button Grid.Column="1" Grid.Row="0" Focusable="False" Click="Select_OnClick"
-                            Foreground="#CC9900" FontSize="16" FontWeight="SemiBold"
-                            Content="Select" Margin="3 3 0 2" />
-                    <Button Grid.Column="2" Focusable="False" Click="Delete_OnClick"
-                            Foreground="#CC0000" FontSize="16" FontWeight="SemiBold"
-                            Content="🗑️" Margin="3" />
-                </Grid>
-            </Border>
-        </DataTemplate>
+            <SolidColorBrush x:Key="NotSelectedCurveViewModel" Color="{StaticResource ListItemBackgroundBrush}" />
+            <SolidColorBrush x:Key="SelectedCurveViewModel" Color="{StaticResource ListItemSelectedBackgroundBrush}" />
+            <helpers:BoolToColorConverter x:Key="BoolToColorConverter"
+                                        NotSelectedBrush="{StaticResource NotSelectedCurveViewModel}"
+                                        SelectedBrush="{StaticResource SelectedCurveViewModel}" />
+            <DataTemplate x:Key="CurveListItemTemplate"
+                          DataType="{x:Type local:CurveViewModel}">
+                <Border Style="{StaticResource BaseBorderStyle}">
+                    <Grid ShowGridLines="False"
+                          Background="{Binding IsSelected, Converter={StaticResource BoolToColorConverter}}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0" Grid.Row="0" Text="{Binding ShortInfo}"
+                                   Style="{StaticResource BaseTextBlockStyle}" />
+                        <Button Grid.Column="1" Grid.Row="0" Focusable="False" Click="Select_OnClick"
+                                Style="{StaticResource AccentButtonStyle}"
+                                Content="Select" />
+                        <Button Grid.Column="2" Focusable="False" Click="Delete_OnClick"
+                                Style="{StaticResource DestructiveButtonStyle}">
+                            <Button.Content>
+                                <Path Data="M9,3V4H4V6H5V19C5,20.1 6,21 7,21H17C18.1,21 19,20.1 19,19V6H20V4H15V3H9M7,6H17V19H7V6M9,8V17H11V8H9M13,8V17H15V8H13Z" Fill="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Width="14" Height="14" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Button.Content>
+                        </Button>
+                    </Grid>
+                </Border>
+            </DataTemplate>
+        </ResourceDictionary>
     </UserControl.Resources>
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <!--<ScrollViewer.Resources>
                     <system:Double x:Key="{x:Static SystemParameters.VerticalScrollBarWidthKey}">10</system:Double>
                 </ScrollViewer.Resources>-->
-        <ItemsControl x:Name="CurvesList" Focusable="False" Background="WhiteSmoke">
+        <ItemsControl x:Name="CurvesList" Focusable="False" Background="{StaticResource ListItemBackgroundBrush}">
             <ItemsControl.ItemTemplate>
                 <StaticResource ResourceKey="CurveListItemTemplate" />
             </ItemsControl.ItemTemplate>
