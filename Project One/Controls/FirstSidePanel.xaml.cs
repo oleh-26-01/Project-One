@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -48,7 +49,14 @@ public partial class FirstSidePanel
     public void Update()
     {
         _curveViewModels.Clear();
-        var files = Directory.GetFiles(FilesPath);
+
+        if (string.IsNullOrEmpty(_filesPath))
+            throw new InvalidOperationException("_filesPath is null or empty.");
+
+        if (!Directory.Exists(_filesPath))
+            throw new DirectoryNotFoundException($"Directory not found: {_filesPath}");
+
+        var files = Directory.GetFiles(_filesPath);
         foreach (var file in files)
         {
             if (!file.EndsWith(FilesType)) continue;

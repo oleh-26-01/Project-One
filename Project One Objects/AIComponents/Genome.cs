@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Perfolizer.Mathematics.Randomization;
 using Project_One_Objects.Environment;
 
 namespace Project_One_Objects.AIComponents;
@@ -56,7 +57,7 @@ public class Genome
     public Track Track { get; }
     public int[] Genes { get; set; }
     public short[] Values { get; set; }
-    public int Origin { get; set; }
+    public Config.Origin Origin { get; set; }
 
     public float TickRate { get; }
     public float TickTime => 1 / TickRate;
@@ -81,7 +82,7 @@ public class Genome
             //var size = (int)(_fullDistance / (Car.MaxSpeed * TickTime / 4));
             Genes = new int[size];
             Values = new short[size];
-            for (var i = 0; i < Values.Length; i++) Values[i] = 1;
+            //for (var i = 0; i < Values.Length; i++) Values[i] = 1;
         }
     }
 
@@ -147,7 +148,7 @@ public class Genome
         var timePoints = (double)_currentGene / Genes.Length;
         var avgSpeedPoints = (double)AvgSpeed / Car.MaxSpeed;
 
-        return distancePoints + avgSpeedPoints * (OnNextCheckpoint ? 1 : 0) - timePoints;
+        return distancePoints + avgSpeedPoints * (OnNextCheckpoint ? 1 : 0) - timePoints * 0;
     }
 
     /// <summary> Get information about genome. </summary>

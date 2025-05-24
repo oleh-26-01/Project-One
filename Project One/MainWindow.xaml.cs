@@ -1,12 +1,16 @@
-﻿using System.Windows;
+﻿using System;
+using System.IO;
+using Project_One.Controls;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Project_One.Drawing.Wrappers;
 
 namespace Project_One;
 
 public partial class MainWindow
 {
-    private const string FilesPath = "C:\\Coding\\C#\\Project One\\Project One\\Curves\\";
+    private const string FilesPath = "D:\\FreeC\\#Coding\\C#\\Project One\\Project One\\Curves\\";
     private readonly string[] _parts = { "First", "Second", "Third" };
     private int _partIndex;
 
@@ -27,7 +31,7 @@ public partial class MainWindow
         SecondSidePanel.Init(SecondCanvas, FilesPath);
 
         ThirdCanvas.Init();
-        Close();
+        //Close();
         ThirdTopPanel.Init(ThirdCanvas, ThirdSidePanel);
 
         ThirdSidePanel.Init(ThirdCanvas, FilesPath);
