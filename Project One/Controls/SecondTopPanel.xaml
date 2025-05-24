@@ -22,53 +22,69 @@
             <ColumnDefinition Width="2*" />
             <ColumnDefinition Width="1*" />
         </Grid.ColumnDefinitions>
-        <Grid Grid.Column="0" Background="{StaticResource ListItemBackgroundBrush}" Margin="0,0,1,0">
-            <CheckBox x:Name="FollowCarCheckBox" 
-                      Style="{StaticResource BaseCheckBoxStyle}"
-                      Content="Follow Car" IsChecked="True" 
-                      FlowDirection="RightToLeft"
-                      HorizontalAlignment="Center"/>
-        </Grid>
-        <Grid Grid.Column="1" Background="{StaticResource ListItemBackgroundBrush}" Margin="0,0,1,0">
-            <CheckBox x:Name="ShowVisionCheckBox" 
-                      Style="{StaticResource BaseCheckBoxStyle}"
-                      Content="Show Intersections" IsChecked="True" 
-                      FlowDirection="RightToLeft"
-                      HorizontalAlignment="Center"/>
-        </Grid>
 
-        <Grid Grid.Column="2" Background="{StaticResource ListItemBackgroundBrush}" Margin="0,0,1,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
+        <Border Style="{StaticResource BaseBorderStyle}" Grid.Column="0" Grid.ColumnSpan="2">
+            <Grid> <!-- Inner Grid for CheckBoxes -->
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.5*" /> <!-- Proportionate to original Grid Column 0 -->
+                    <ColumnDefinition Width="2*" />   <!-- Proportionate to original Grid Column 1 -->
+                </Grid.ColumnDefinitions>
+                <!-- Original Grid for FollowCarCheckBox, now in Border's inner Grid, Column 0 -->
+                <Grid Grid.Column="0" Background="{StaticResource ListItemBackgroundBrush}">
+                    <CheckBox x:Name="FollowCarCheckBox" 
+                              Style="{StaticResource BaseCheckBoxStyle}"
+                              Content="Follow Car" IsChecked="True" 
+                              FlowDirection="RightToLeft"
+                              HorizontalAlignment="Center"/>
+                </Grid>
+                <!-- Original Grid for ShowVisionCheckBox, now in Border's inner Grid, Column 1 -->
+                <Grid Grid.Column="1" Background="{StaticResource ListItemBackgroundBrush}">
+                    <CheckBox x:Name="ShowVisionCheckBox" 
+                              Style="{StaticResource BaseCheckBoxStyle}"
+                              Content="Show Intersections" IsChecked="True" 
+                              FlowDirection="RightToLeft"
+                              HorizontalAlignment="Center"/>
+                </Grid>
+            </Grid>
+        </Border>
 
-            <TextBlock Grid.Column="0" Text="Car Direction: " 
-                       Style="{StaticResource BaseTextBlockStyle}"
-                       HorizontalAlignment="Center"/>
-            <TextBlock Grid.Column="1" x:Name="CarDirectionLabel" 
-                       Style="{StaticResource BaseTextBlockStyle}" 
-                       Text="Forward"
-                       Foreground="{StaticResource AccentBrush}"
-                       HorizontalAlignment="Center"/>
-        </Grid>
+        <!-- Original Grid for Car Direction, now wrapped in Border, in main Grid.Column="2" -->
+        <Border Style="{StaticResource BaseBorderStyle}" Grid.Column="2">
+            <Grid Background="{StaticResource ListItemBackgroundBrush}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Car Direction: " 
+                           Style="{StaticResource BaseTextBlockStyle}"
+                           HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="1" x:Name="CarDirectionLabel" 
+                           Style="{StaticResource BaseTextBlockStyle}" 
+                           Text="Forward"
+                           Foreground="{StaticResource AccentBrush}"
+                           HorizontalAlignment="Center"/>
+            </Grid>
+        </Border>
 
-        <Grid Grid.Column="3" Background="{StaticResource ListItemBackgroundBrush}" Margin="0,0,1,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
+        <!-- Original Grid for Collision Info, now wrapped in Border, in main Grid.Column="3" -->
+        <Border Style="{StaticResource BaseBorderStyle}" Grid.Column="3">
+            <Grid Background="{StaticResource ListItemBackgroundBrush}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Collision: " 
+                           Style="{StaticResource BaseTextBlockStyle}"
+                           HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="1" x:Name="CollisionLabel" 
+                           Style="{StaticResource BaseTextBlockStyle}" 
+                           Text="None"
+                           Foreground="{StaticResource AccentBrush}"
+                           HorizontalAlignment="Center"/>
+            </Grid>
+        </Border>
 
-            <TextBlock Grid.Column="0" Text="Collision: " 
-                       Style="{StaticResource BaseTextBlockStyle}"
-                       HorizontalAlignment="Center"/>
-            <TextBlock Grid.Column="1" x:Name="CollisionLabel" 
-                       Style="{StaticResource BaseTextBlockStyle}" 
-                       Text="None"
-                       Foreground="{StaticResource AccentBrush}"
-                       HorizontalAlignment="Center"/>
-        </Grid>
-
+        <!-- CpsLabel Grid, now in main Grid.Column="4" -->
         <Grid Grid.Column="4" Background="{StaticResource ListItemBackgroundBrush}" Margin="0 0 1 0">
             <TextBlock x:Name="CpsLabel"
                        Style="{StaticResource BaseTextBlockStyle}"

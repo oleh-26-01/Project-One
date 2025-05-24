@@ -53,12 +53,14 @@
             <Expander.Header>
                 <TextBlock x:Name="ExpanderTracksTextBlock"
                            Text="Tracks" 
-                           Style="{StaticResource BaseTextBlockStyle}" 
-                           FontWeight="SemiBold" />
+                           Style="{StaticResource HeaderTextBlockStyle}" />
             </Expander.Header>
             <Expander.Content>
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <ItemsControl x:Name="TracksList" Focusable="False" Background="{StaticResource ListItemBackgroundBrush}">
+                    <ItemsControl x:Name="TracksList" 
+                                  Focusable="False" 
+                                  Background="{StaticResource ListItemBackgroundBrush}"
+                                  ItemContainerStyle="{StaticResource ListItemContainerStyle}">
                         <ItemsControl.ItemTemplate>
                             <StaticResource ResourceKey="TrackListItemTemplate" />
                         </ItemsControl.ItemTemplate>
@@ -93,8 +95,7 @@
                   Collapsed="SettingsExpanderCollapse">
             <Expander.Header>
                 <TextBlock Text="Settings" 
-                           Style="{StaticResource BaseTextBlockStyle}" 
-                           FontWeight="SemiBold" />
+                           Style="{StaticResource HeaderTextBlockStyle}" />
             </Expander.Header>
 
             <StackPanel>

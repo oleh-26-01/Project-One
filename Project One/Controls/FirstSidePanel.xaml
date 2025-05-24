@@ -49,7 +49,10 @@
         <!--<ScrollViewer.Resources>
                     <system:Double x:Key="{x:Static SystemParameters.VerticalScrollBarWidthKey}">10</system:Double>
                 </ScrollViewer.Resources>-->
-        <ItemsControl x:Name="CurvesList" Focusable="False" Background="{StaticResource ListItemBackgroundBrush}">
+        <ItemsControl x:Name="CurvesList" 
+                      Focusable="False" 
+                      Background="{StaticResource ListItemBackgroundBrush}"
+                      ItemContainerStyle="{StaticResource ListItemContainerStyle}">
             <ItemsControl.ItemTemplate>
                 <StaticResource ResourceKey="CurveListItemTemplate" />
             </ItemsControl.ItemTemplate>

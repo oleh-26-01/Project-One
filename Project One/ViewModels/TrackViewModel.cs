@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Windows.Media;
 
 namespace Project_One;
 
@@ -10,5 +11,8 @@ internal class TrackViewModel
     public bool IsVisible { get; set; }
     public bool IsSelected { get; set; }
     public string DisplayButtonContext => IsSelected ? "❌" : "✔️";
-    public string ButtonBrush => IsSelected ? "#CC0000" : "#339900";
+    // Changed ButtonBrush to return Brush objects instead of strings
+    public Brush ButtonBrush => IsSelected 
+        ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#CC0000")) 
+        : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#339900"));
 }
