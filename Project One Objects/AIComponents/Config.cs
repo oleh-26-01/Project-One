@@ -75,18 +75,16 @@ public static class Config
     public static readonly float MutationRate = 0.03f; // minimum 0.01f
     public static readonly int StepWidth = 3; // minimum 2
 
-    public static readonly Dictionary<int, string> Origins = new()
+    public enum Origin : byte
     {
-        { 0, "Random" },
-        { 1, "Crossover" },
-        { 2, "RandomCrossover" },
-        { 3, "Mutate" },
-        { 4, "Best" },
-        { 5, "ValueCrossover" },
-        { 6, "SmoothCrossover" }
-    };
-
-    public static readonly Dictionary<string, int> OriginsKeys = Origins.ToDictionary(x => x.Value, x => x.Key);
+        Random,
+        Crossover,
+        RandomCrossover,
+        Mutate,
+        Best,
+        ValueCrossover,
+        SmoothCrossover
+    }
 
     public static readonly float BestGenomesRate = 0.3f;
     public static readonly float CrossoverGenomesRate = 0.1f;

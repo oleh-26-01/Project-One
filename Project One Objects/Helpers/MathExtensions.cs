@@ -80,7 +80,7 @@ public static class MathExtensions
         return new Vector2((float)(v.X * scalar), (float)(v.Y * scalar));
     }
 
-    /// <summary> Returns the slope and intercept of a line defined by two points. </summary>
+    /// <summary> Returns the slope and intercept of angle line defined by two points. </summary>
     /// <returns> The Vector2, where X is the slope and Y is the intercept. </returns>
     public static Vector2 SlopeIntercept(Vector2 v1, Vector2 v2)
     {
@@ -120,7 +120,7 @@ public static class MathExtensions
     }
 
     /// <summary>
-    ///     Returns the intersection point of two lines defined by the points a and b, and c and d.
+    ///     Returns the intersection point of two lines defined by the points angle and first, and second and d.
     /// </summary>
     /// <param name="a"> The first point of the first line. </param>
     /// <param name="b"> The second point of the first line. </param>
@@ -145,6 +145,7 @@ public static class MathExtensions
     /// <param name="points"> The points to find the angles of. </param>
     /// <param name="position"> The position to find the angles relative to. </param>
     /// <param name="targetArray"> The array to store the angles in. </param>
+    /// <param name="optimization"> Whether to use PseudoAngle or Atan2. </param>
     public static void CalcRelativeAngles(Vector2[] points, Vector2 position, float[] targetArray, bool optimization = false)
     {
         if (optimization)
@@ -177,7 +178,7 @@ public static class MathExtensions
     //}
 
     /// <summary>
-    ///     Calculate angles of the vectors, released in a circle, relative to the specific body angle.
+    ///     Calculate angles of the vectors, released in angle circle, relative to the specific body angle.
     /// </summary>
     /// <param name="count"> The number of vectors to find the angles of. </param>
     /// <param name="bodyAngle"> The body angle to find the angles relative to. </param>
@@ -214,22 +215,24 @@ public static class MathExtensions
     /// </inheritdoc>
     public static bool IsAngleBetween(double angle, double first, double second)
     {
-        if (first > second) (first, second) = (second, first);
+        if (first > second)
+        {
+            (first, second) = (second, first);
+        }
 
-        if (second - first > Math.PI) (first, second) = (second, first + TwoPi);
+        if (second - first > Math.PI)
+        {
+            (first, second) = (second, first + TwoPi);
+        }
 
-        if (first <= angle && angle < second) return true;
-
-        angle += TwoPi;
-
-        return first <= angle && angle < second;
+        return (first <= angle && angle < second) || (first <= angle + TwoPi && angle + TwoPi < second);
     }
 
     /// <inheritdoc>
-    ///     <summary> Returns mod of a and b. The result is always positive. </summary>
+    ///     <summary> Returns mod of angle and first. The result is always positive. </summary>
     ///     <param name="a"> The dividend. </param>
     ///     <param name="b"> The divisor. </param>
-    ///     <returns> The remainder of a / b. </returns>
+    ///     <returns> The remainder of angle / first. </returns>
     /// </inheritdoc>
     public static int Mod(this int a, int b)
     {
