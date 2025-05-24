@@ -55,48 +55,38 @@ public partial class FirstTopPanel
     public void DrawCurve_OnChecked(object sender, RoutedEventArgs e)
     {
         _curveEraser.SetVisibility(false);
-        if (OnCurveAction != Strings.ChangingOptAngleAction) OnCurveAction = Strings.DrawAction;
+        // OnCurveAction will be set by ApplyAngleChangesAndUpdateUi
+        ApplyAngleChangesAndUpdateUi();
     }
 
     public void EraseCurve_OnChecked(object sender, RoutedEventArgs e)
     {
         _curveEraser.SetVisibility(true);
-        if (OnCurveAction != Strings.ChangingOptAngleAction) OnCurveAction = Strings.EraseAction;
+        // OnCurveAction will be set by ApplyAngleChangesAndUpdateUi
+        ApplyAngleChangesAndUpdateUi();
     }
 
     private void CurveOptAngle_OnTextChanged(object sender, TextChangedEventArgs e)
     {
         CurveOptAngleLabel.Foreground = Brushes.Red;
-        ConfirmOptAngle.Foreground = Brushes.Red;
+        // ConfirmOptAngle.Foreground = Brushes.Red; // Button is being removed
         OnCurveAction = Strings.ChangingOptAngleAction;
 
         if (!double.TryParse(CurveOptAngle.Text, out var value)) return;
 
         value = Math.Clamp(value, TextBoxMinValue, TextBoxMaxValue);
         _curve.OptAngle = value.ToRad();
-        _curve.ApplyAngleToCurve(_curve.OptAngle);
+        _curve.ApplyAngleToCurve(_curve.OptAngle); // Preview effect
 
         Update();
     }
-
-    private void DecreaseOptAngle_OnClick(object sender, RoutedEventArgs e)
-    {
-        var value = Math.Clamp(_curve.OptAngle.ToDeg() - 1, TextBoxMinValue, TextBoxMaxValue);
-        _curve.OptAngle = value.ToRad();
-        CurveOptAngle.Text = value.ToString(CultureInfo.InvariantCulture);
-    }
-
-    private void IncreaseOptAngle_OnClick(object sender, RoutedEventArgs e)
-    {
-        var value = Math.Clamp(_curve.OptAngle.ToDeg() + 1, TextBoxMinValue, TextBoxMaxValue);
-        _curve.OptAngle = value.ToRad();
-        CurveOptAngle.Text = value.ToString(CultureInfo.InvariantCulture);
-    }
-
-    public void ConfirmOptAngle_OnClick(object sender, RoutedEventArgs e)
+    
+    private void ApplyAngleChangesAndUpdateUi()
     {
         if (DrawCurve.IsChecked is not { } drawCurveIsChecked) return;
 
+        // This check is important to ensure we only apply if text is valid.
+        // The TextChanged event already handles parsing and setting _curve.OptAngle
         if (!double.TryParse(CurveOptAngle.Text, out _)) return;
 
         if (OnCurveAction == Strings.ChangingOptAngleAction) _curve.ApplyChanges();
@@ -105,21 +95,40 @@ public partial class FirstTopPanel
         OnCurveAction = drawCurveIsChecked ? Strings.DrawAction : Strings.EraseAction;
         _curveEraser.SetVisibility(OnCurveAction == Strings.EraseAction);
         CurveOptAngleLabel.Foreground = Brushes.Black;
-        ConfirmOptAngle.Foreground = Brushes.Black;
+        // ConfirmOptAngle.Foreground = Brushes.Black; // Button is being removed
+    }
+
+    private void DecreaseOptAngle_OnClick(object sender, RoutedEventArgs e)
+    {
+        var value = Math.Clamp(_curve.OptAngle.ToDeg() - 1, TextBoxMinValue, TextBoxMaxValue);
+        _curve.OptAngle = value.ToRad(); // Set the new angle
+        CurveOptAngle.Text = value.ToString(CultureInfo.InvariantCulture); // Update TextBox
+        // CurveOptAngle_OnTextChanged will fire and call _curve.ApplyAngleToCurve for preview
+        ApplyAngleChangesAndUpdateUi(); // Apply changes and update UI state
+    }
+
+    private void IncreaseOptAngle_OnClick(object sender, RoutedEventArgs e)
+    {
+        var value = Math.Clamp(_curve.OptAngle.ToDeg() + 1, TextBoxMinValue, TextBoxMaxValue);
+        _curve.OptAngle = value.ToRad(); // Set the new angle
+        CurveOptAngle.Text = value.ToString(CultureInfo.InvariantCulture); // Update TextBox
+        // CurveOptAngle_OnTextChanged will fire and call _curve.ApplyAngleToCurve for preview
+        ApplyAngleChangesAndUpdateUi(); // Apply changes and update UI state
     }
 
     public void NewCurve_OnClick(object sender, RoutedEventArgs e)
     {
         _curve.Clear();
         _curve.OptAngle = Curve.DefaultOptAngle;
-        ConfirmOptAngle_OnClick(sender, e);
+        // CurveOptAngle.Text will be updated by Update() called in ApplyAngleChangesAndUpdateUi
+        ApplyAngleChangesAndUpdateUi();
         _firstSidePanel.SaveCurve(sender, e, true);
-        Update();
+        Update(); // Called to update points count, ensure OptAngle Text is also correct
     }
 
     private void SaveCurve_OnClick(object sender, RoutedEventArgs e)
     {
-        ConfirmOptAngle_OnClick(sender, e);
+        ApplyAngleChangesAndUpdateUi();
         _firstSidePanel.SaveCurve(sender, e, false);
     }
 
@@ -127,11 +136,12 @@ public partial class FirstTopPanel
     {
         _curve.Clear();
         _curve.OptAngle = Curve.DefaultOptAngle;
-        Update();
-        ConfirmOptAngle_OnClick(sender, e);
+        // CurveOptAngle.Text will be updated by Update() called in ApplyAngleChangesAndUpdateUi
+        ApplyAngleChangesAndUpdateUi();
+        Update(); // Called to update points count, ensure OptAngle Text is also correct
 
-        OnCurveAction = Strings.DrawAction;
-        DrawCurve.IsChecked = true;
-        _curveEraser.SetVisibility(false);
+        // Specific logic from old ConfirmOptAngle_OnClick related to ClearCurve
+        DrawCurve.IsChecked = true; // This will trigger DrawCurve_OnChecked, which calls ApplyAngleChangesAndUpdateUi
+        // _curveEraser.SetVisibility(false); // This is handled by DrawCurve_OnChecked
     }
 }

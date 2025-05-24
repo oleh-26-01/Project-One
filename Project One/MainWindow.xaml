@@ -9,8 +9,13 @@
         Title="MainWindow" Height="720" Width="1280"
         UseLayoutRounding="True">
     <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/GlobalStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Window.Resources>
-    <Grid x:Name="WindowGrid" ShowGridLines="False" Focusable="True" Background="DarkSlateGray">
+    <Grid x:Name="WindowGrid" ShowGridLines="False" Focusable="True" Background="{StaticResource PrimaryBrush}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="8*" />
             <ColumnDefinition Width="2*" MinWidth="250" />
@@ -23,12 +28,13 @@
 
         <Grid Grid.Column="0" Grid.Row="0" x:Name="TopPanel"
               Margin="0 0 0 1">
+            <!-- Background is inherited from WindowGrid or set by UserControl -->
             <controls:FirstTopPanel x:Name="FirstTopPanel"  Visibility="Visible" />
             <controls:SecondTopPanel x:Name="SecondTopPanel" Visibility="Hidden" />
             <controls:ThirdTopPanel x:Name="ThirdTopPanel" Visibility="Hidden" />
         </Grid>
 
-        <Grid Grid.Column="1" Grid.Row="0" Background="WhiteSmoke"
+        <Grid Grid.Column="1" Grid.Row="0" Background="{StaticResource ListItemBackgroundBrush}"
               Margin="0 0 0 1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*" />
@@ -38,27 +44,29 @@
             </Grid.ColumnDefinitions>
 
             <Button Grid.Column="0" Content="Prev" x:Name="PrevPartControl"
-                    Cursor="Hand" Click="ChangePart" Focusable="False"
-                    Margin="1" FontSize="14" />
-            <TextBlock Grid.Column="1" FontSize="18"
+                    Cursor="Hand" Click="ChangePart"
+                    Style="{StaticResource BaseButtonStyle}" />
+            <TextBlock Grid.Column="1"
+                       Style="{StaticResource BaseTextBlockStyle}"
                        HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
                        x:Name="PartTitle">
                 First Part
             </TextBlock>
             <Button Grid.Column="2" Content="Next" x:Name="NextPartControl"
-                    Cursor="Hand" Click="ChangePart" Focusable="False"
-                    Margin="1" FontSize="14" />
+                    Cursor="Hand" Click="ChangePart"
+                    Style="{StaticResource BaseButtonStyle}" />
         </Grid>
 
         <Grid Grid.Column="0" Grid.Row="1" x:Name="CanvasGrid"
               Margin="0 0 1 0">
+            <!-- Background is inherited from WindowGrid or set by UserControl -->
             <controls:FirstCanvas x:Name="FirstCanvas" />
             <controls:SecondCanvas x:Name="SecondCanvas" Visibility="Hidden" />
             <controls:ThirdCanvas x:Name="ThirdCanvas" Visibility="Hidden" />
         </Grid>
 
         <Grid Grid.Column="1" Grid.Row="1" x:Name="SidePanel">
+            <!-- Background is inherited from WindowGrid or set by UserControl -->
             <controls:FirstSidePanel x:Name="FirstSidePanel" />
             <controls:SecondSidePanel x:Name="SecondSidePanel" Visibility="Hidden" />
             <controls:ThirdSidePanel x:Name="ThirdSidePanel" Visibility="Hidden" />
