@@ -66,8 +66,8 @@ public partial class FirstTopPanel
 
     private void CurveOptAngle_OnTextChanged(object sender, TextChangedEventArgs e)
     {
-        CurveOptAngleLabel.Foreground = Brushes.Red;
-        ConfirmOptAngle.Foreground = Brushes.Red;
+        CurveOptAngleLabel.Foreground = Application.Current.Resources["AccentDangerColorBrush"] as SolidColorBrush;
+        ConfirmOptAngle.Foreground = Application.Current.Resources["AccentDangerColorBrush"] as SolidColorBrush;
         OnCurveAction = Strings.ChangingOptAngleAction;
 
         if (!double.TryParse(CurveOptAngle.Text, out var value)) return;
@@ -104,8 +104,8 @@ public partial class FirstTopPanel
         FocusManager.SetFocusedElement(FocusManager.GetFocusScope(CurveOptAngle), _window);
         OnCurveAction = drawCurveIsChecked ? Strings.DrawAction : Strings.EraseAction;
         _curveEraser.SetVisibility(OnCurveAction == Strings.EraseAction);
-        CurveOptAngleLabel.Foreground = Brushes.Black;
-        ConfirmOptAngle.Foreground = Brushes.Black;
+        CurveOptAngleLabel.Foreground = Application.Current.Resources["TextColorBrush"] as SolidColorBrush;
+        ConfirmOptAngle.Foreground = Application.Current.Resources["TextColorBrush"] as SolidColorBrush;
     }
 
     public void NewCurve_OnClick(object sender, RoutedEventArgs e)

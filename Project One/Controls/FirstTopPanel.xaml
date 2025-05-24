@@ -6,25 +6,10 @@
              mc:Ignorable="d"
              d:DesignHeight="33" d:DesignWidth="1010">
     <UserControl.Resources>
-        <Style TargetType="RadioButton" x:Key="RadioButtonStyle">
-            <Setter Property="FontSize" Value="16" />
-            <Setter Property="Focusable" Value="False" />
-            <Setter Property="Margin" Value="3,0,3,0" />
-            <Setter Property="HorizontalAlignment" Value="Center" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-        </Style>
-        <Style TargetType="Button" x:Key="ButtonStyle">
-            <Setter Property="FontSize" Value="16" />
-            <Setter Property="Focusable" Value="False" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-        </Style>
-        <Style TargetType="Grid" x:Key="GridStyle">
-            <Setter Property="Margin" Value="0,0,1,0" />
-            <Setter Property="Background" Value="WhiteSmoke" />
-        </Style>
+        <!-- Local styles removed, using global styles from App.xaml -->
     </UserControl.Resources>
 
-    <Grid ShowGridLines="False" Background="DarkSlateGray">
+    <Grid ShowGridLines="False">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*" MinWidth="130" />
             <ColumnDefinition Width="3.4*" MinWidth="195" />
@@ -33,27 +18,28 @@
             <ColumnDefinition Width="3.2*" />
         </Grid.ColumnDefinitions>
 
-        <Grid Grid.Column="0" Style="{StaticResource GridStyle}">
+        <Grid Grid.Column="0" Background="{StaticResource SecondaryColorBrush}" Margin="0,0,1,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
             <RadioButton Grid.Column="0" x:Name="DrawCurve" 
-                         Style="{StaticResource RadioButtonStyle}"
+                         Style="{StaticResource BaseRadioButtonStyle}"
                          Content="Draw" IsChecked="True" />
             <RadioButton Grid.Column="1" x:Name="EraseCurve" 
-                         Style="{StaticResource RadioButtonStyle}"
+                         Style="{StaticResource BaseRadioButtonStyle}"
                          Content="Erase" />
         </Grid>
 
-        <Grid Grid.Column="1" Style="{StaticResource GridStyle}">
+        <Grid Grid.Column="1" Background="{StaticResource SecondaryColorBrush}" Margin="0,0,1,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*" />
                 <ColumnDefinition Width="5*" />
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Column="0" x:Name="CurveOptAngleLabel" Content="OptAngle:" FontSize="16" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+            <Label Grid.Column="0" x:Name="CurveOptAngleLabel" Content="OptAngle:" 
+                   Style="{StaticResource BaseLabelStyle}" HorizontalContentAlignment="Center" />
             <Grid Grid.Column="1" Margin="0,3,3,3">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*" />
@@ -64,25 +50,22 @@
 
                 <Button Grid.Column="0" x:Name="DecreaseOptAngle" 
                         Click="DecreaseOptAngle_OnClick" Content="-" 
-                        Style="{StaticResource ButtonStyle}"
-                        VerticalContentAlignment="Stretch" />
+                        Style="{StaticResource BaseButtonStyle}" Margin="2,5,2,5" />
                 <TextBox Grid.Column="1" x:Name="CurveOptAngle" 
-                         FontSize="16" BorderThickness="0 1 0 1" 
-                         HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+                         Style="{StaticResource BaseTextBoxStyle}" />
                 <Button Grid.Column="2" x:Name="IncreaseOptAngle" 
                         Click="IncreaseOptAngle_OnClick" Content="+" 
-                        Style="{StaticResource ButtonStyle}"
-                        VerticalContentAlignment="Stretch" />
+                        Style="{StaticResource BaseButtonStyle}" Margin="2,5,2,5" />
                 <Button Grid.Column="3" x:Name="ConfirmOptAngle" 
                         Click="ConfirmOptAngle_OnClick" Content="✓" 
-                        Style="{StaticResource ButtonStyle}"
-                        Margin="3 0 0 0" />
+                        Style="{StaticResource BaseButtonStyle}" Margin="2,5,5,5" />
             </Grid>
         </Grid>
 
-        <Label Grid.Column="2" x:Name="CurvePointsLabel" Background="WhiteSmoke" FontSize="16" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,1,0" />
+        <Label Grid.Column="2" x:Name="CurvePointsLabel" Style="{StaticResource BaseLabelStyle}" 
+               Background="{StaticResource SecondaryColorBrush}" HorizontalContentAlignment="Center" Margin="0,0,1,0" />
 
-        <Grid Grid.Column="3" Style="{StaticResource GridStyle}">
+        <Grid Grid.Column="3" Background="{StaticResource SecondaryColorBrush}" Margin="0,0,1,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />
@@ -90,19 +73,13 @@
             </Grid.ColumnDefinitions>
 
             <Button Grid.Column="0" x:Name="NewCurve" Click="NewCurve_OnClick" 
-                    Content="New" Foreground="#CC9900" 
-                    Style="{StaticResource ButtonStyle}"
-                    Margin="3" />
+                    Content="New" Style="{StaticResource WarningButtonStyle}" />
             <Button Grid.Column="1" x:Name="SaveCurve" Click="SaveCurve_OnClick" 
-                    Content="Save" Foreground="#339900" 
-                    Style="{StaticResource ButtonStyle}"
-                    Margin="0 3 3 3" />
+                    Content="Save" Style="{StaticResource SuccessButtonStyle}" />
             <Button Grid.Column="2" x:Name="ClearCurve" Click="ClearCurve_OnClick" 
-                    Content="Clear" Foreground="#CC0000"
-                    Style="{StaticResource ButtonStyle}"
-                    Margin="0 3 3 3" />
+                    Content="Clear" Style="{StaticResource DangerButtonStyle}" />
         </Grid>
 
-        <Grid Grid.Column="4" Style="{StaticResource GridStyle}" />
+        <Grid Grid.Column="4" Background="{StaticResource SecondaryColorBrush}" /> <!-- Removed margin, it's likely for spacing the panel itself -->
     </Grid>
 </UserControl>

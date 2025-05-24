@@ -7,10 +7,11 @@
         xmlns:controls="clr-namespace:Project_One.Controls"
         mc:Ignorable="d"
         Title="MainWindow" Height="720" Width="1280"
-        UseLayoutRounding="True">
+        UseLayoutRounding="True"
+        Background="{StaticResource BackgroundColorBrush}">
     <Window.Resources>
     </Window.Resources>
-    <Grid x:Name="WindowGrid" ShowGridLines="False" Focusable="True" Background="DarkSlateGray">
+    <Grid x:Name="WindowGrid" ShowGridLines="False" Focusable="True">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="8*" />
             <ColumnDefinition Width="2*" MinWidth="250" />
@@ -28,27 +29,28 @@
             <controls:ThirdTopPanel x:Name="ThirdTopPanel" Visibility="Hidden" />
         </Grid>
 
-        <Grid Grid.Column="1" Grid.Row="0" Background="WhiteSmoke"
+        <Grid Grid.Column="1" Grid.Row="0" Background="{StaticResource SecondaryColorBrush}"
               Margin="0 0 0 1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*" />
                 <ColumnDefinition Width="5*" />
                 <ColumnDefinition Width="1*" />
-                <ColumnDefinition Width="0*" />
             </Grid.ColumnDefinitions>
 
             <Button Grid.Column="0" Content="Prev" x:Name="PrevPartControl"
-                    Cursor="Hand" Click="ChangePart" Focusable="False"
-                    Margin="1" FontSize="14" />
-            <TextBlock Grid.Column="1" FontSize="18"
+                    Style="{StaticResource BaseButtonStyle}" Margin="5,5,0,5"
+                    Click="ChangePart" Focusable="False" />
+            <TextBlock Grid.Column="1"
+                       Style="{StaticResource BaseTextBlockStyle}"
+                       FontSize="{StaticResource FontSizeLarge}"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
                        x:Name="PartTitle">
                 First Part
             </TextBlock>
             <Button Grid.Column="2" Content="Next" x:Name="NextPartControl"
-                    Cursor="Hand" Click="ChangePart" Focusable="False"
-                    Margin="1" FontSize="14" />
+                    Style="{StaticResource BaseButtonStyle}" Margin="0,5,5,5"
+                    Click="ChangePart" Focusable="False" />
         </Grid>
 
         <Grid Grid.Column="0" Grid.Row="1" x:Name="CanvasGrid"

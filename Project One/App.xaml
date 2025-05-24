@@ -1,8 +1,118 @@
-﻿<Application x:Class="Project_One.App"
+<Application x:Class="Project_One.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- More resource dictionaries can be merged here if needed -->
+            </ResourceDictionary.MergedDictionaries>
 
+            <!-- Color Palette -->
+            <SolidColorBrush x:Key="PrimaryColorBrush" Color="#007ACC"/> <!-- Modern Blue -->
+            <SolidColorBrush x:Key="SecondaryColorBrush" Color="#E0E0E0"/> <!-- Light Gray -->
+            <SolidColorBrush x:Key="AccentSuccessColorBrush" Color="#28A745"/> <!-- Clear Green -->
+            <SolidColorBrush x:Key="AccentDangerColorBrush" Color="#DC3545"/> <!-- Clear Red -->
+            <SolidColorBrush x:Key="AccentWarningColorBrush" Color="#FFC107"/> <!-- Amber -->
+            <SolidColorBrush x:Key="BackgroundColorBrush" Color="#F5F5F5"/> <!-- Off-White -->
+            <SolidColorBrush x:Key="TextColorBrush" Color="#333333"/> <!-- Dark Gray -->
+            <SolidColorBrush x:Key="LightTextColorBrush" Color="#FFFFFF"/> <!-- White for dark backgrounds -->
+
+            <!-- Typography -->
+            <FontFamily x:Key="BaseFontFamily">Segoe UI</FontFamily>
+            <sys:Double x:Key="FontSizeSmall">10</sys:Double>
+            <sys:Double x:Key="FontSizeNormal">12</sys:Double>
+            <sys:Double x:Key="FontSizeMedium">14</sys:Double>
+            <sys:Double x:Key="FontSizeLarge">16</sys:Double>
+            <sys:Double x:Key="FontSizeTitle">20</sys:Double>
+
+            <!-- Base Control Styles -->
+            <Style x:Key="BaseTextBlockStyle" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource BaseFontFamily}"/>
+                <Setter Property="FontSize" Value="{StaticResource FontSizeNormal}"/>
+                <Setter Property="Foreground" Value="{StaticResource TextColorBrush}"/>
+            </Style>
+
+            <Style x:Key="BaseLabelStyle" TargetType="Label">
+                <Setter Property="FontFamily" Value="{StaticResource BaseFontFamily}"/>
+                <Setter Property="FontSize" Value="{StaticResource FontSizeNormal}"/>
+                <Setter Property="Foreground" Value="{StaticResource TextColorBrush}"/>
+            </Style>
+
+            <!-- Button Styles -->
+            <Style x:Key="BaseButtonStyle" TargetType="Button">
+                <Setter Property="FontFamily" Value="{StaticResource BaseFontFamily}"/>
+                <Setter Property="FontSize" Value="{StaticResource FontSizeNormal}"/>
+                <Setter Property="Padding" Value="10,5"/>
+                <Setter Property="Margin" Value="5"/>
+                <Setter Property="Background" Value="{StaticResource PrimaryColorBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource LightTextColorBrush}"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" CornerRadius="3">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="SuccessButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
+                <Setter Property="Background" Value="{StaticResource AccentSuccessColorBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource LightTextColorBrush}"/>
+            </Style>
+            <Style x:Key="DangerButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
+                <Setter Property="Background" Value="{StaticResource AccentDangerColorBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource LightTextColorBrush}"/>
+            </Style>
+            <Style x:Key="WarningButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
+                <Setter Property="Background" Value="{StaticResource AccentWarningColorBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource TextColorBrush}"/> <!-- Dark text for better contrast on yellow -->
+            </Style>
+
+            <!-- RadioButton Style -->
+            <Style x:Key="BaseRadioButtonStyle" TargetType="RadioButton">
+                <Setter Property="FontFamily" Value="{StaticResource BaseFontFamily}"/>
+                <Setter Property="FontSize" Value="{StaticResource FontSizeNormal}"/>
+                <Setter Property="Foreground" Value="{StaticResource TextColorBrush}"/>
+                <Setter Property="Margin" Value="5"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+            </Style>
+
+            <!-- CheckBox Style -->
+            <Style x:Key="BaseCheckBoxStyle" TargetType="CheckBox">
+                <Setter Property="FontFamily" Value="{StaticResource BaseFontFamily}"/>
+                <Setter Property="FontSize" Value="{StaticResource FontSizeNormal}"/>
+                <Setter Property="Foreground" Value="{StaticResource TextColorBrush}"/>
+                <Setter Property="Margin" Value="5"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+            </Style>
+
+            <!-- TextBox Style -->
+            <Style x:Key="BaseTextBoxStyle" TargetType="TextBox">
+                <Setter Property="FontFamily" Value="{StaticResource BaseFontFamily}"/>
+                <Setter Property="FontSize" Value="{StaticResource FontSizeNormal}"/>
+                <Setter Property="Foreground" Value="{StaticResource TextColorBrush}"/>
+                <Setter Property="Background" Value="{StaticResource LightTextColorBrush}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource SecondaryColorBrush}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Padding" Value="5"/>
+                <Setter Property="Margin" Value="5"/>
+                <Setter Property="Validation.ErrorTemplate">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <StackPanel>
+                                <AdornedElementPlaceholder/>
+                                <TextBlock Text="{Binding [0].ErrorContent}" Foreground="{StaticResource AccentDangerColorBrush}" FontSize="{StaticResource FontSizeSmall}"/>
+                            </StackPanel>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

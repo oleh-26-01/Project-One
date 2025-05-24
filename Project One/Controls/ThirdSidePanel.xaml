@@ -8,33 +8,33 @@
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="200">
     <UserControl.Resources>
-        <SolidColorBrush x:Key="NotSelectedTrackViewModel" Color="WhiteSmoke" />
-        <SolidColorBrush x:Key="SelectedTrackViewModel" Color="LightGray" />
         <helpers:BoolToColorConverter x:Key="BoolToColorConverter"
-                                         NotSelectedBrush="{StaticResource NotSelectedTrackViewModel}"
-                                         SelectedBrush="{StaticResource SelectedTrackViewModel}" />
-        <DataTemplate x:Key="TrackListItemTemplate"
-                      DataType="{x:Type projectOne:TrackViewModel}">
-            <Border BorderThickness="0 1 0 0" BorderBrush="Black">
+                                         NotSelectedBrush="{StaticResource BackgroundColorBrush}"
+                                         SelectedBrush="{StaticResource AccentWarningColorBrush}" />
+        <!-- Assuming this DataTemplate is for the TracksList ItemsControl -->
+        <DataTemplate x:Key="TrackListItemTemplate" 
+                      DataType="{x:Type projectOne:TrackViewModel}"> <!-- DataType might need correction if this panel is for Genomes -->
+            <Border BorderThickness="0 1 0 0" BorderBrush="{StaticResource SecondaryColorBrush}">
                 <Grid ShowGridLines="False"
                       Background="{Binding IsVisible, Converter={StaticResource BoolToColorConverter}}"
-                      Margin="0 0 0 0">
+                      Margin="0 0 0 0"> <!-- IsVisible binding kept, might need to be IsSelected -->
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="2*" />
                         <ColumnDefinition Width="1*" />
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Grid.Column="0" Text="{Binding ShortInfo}"
-                               FontSize="16" Margin="4 2 2 2" />
+                               Style="{StaticResource BaseTextBlockStyle}" FontSize="{StaticResource FontSizeMedium}"
+                               TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" VerticalAlignment="Center" />
                     <Button Grid.Column="1" Focusable="False" Click="Select_OnClick"
-                            Foreground="#CC9900" FontSize="16" FontWeight="SemiBold"
-                            Content="Select" Margin="3" />
+                            Style="{StaticResource WarningButtonStyle}" Margin="2"
+                            Content="Select" />
                 </Grid>
             </Border>
         </DataTemplate>
     </UserControl.Resources>
 
-    <Grid x:Name="GridContent" Background="WhiteSmoke" MouseMove="GridContent_OnMouseMove">
+    <Grid x:Name="GridContent" Background="{StaticResource BackgroundColorBrush}" MouseMove="GridContent_OnMouseMove">
         <Grid.RowDefinitions>
             <RowDefinition Height="0.5*" />
             <RowDefinition Height="10" />
@@ -44,14 +44,15 @@
         <Expander Grid.Row="0" IsExpanded="True" 
                   Expanded="ExpanderExpand"
                   Collapsed="TracksExpanderCollapse"
-                  x:Name="TracksExpander">
+                  x:Name="TracksExpander"
+                  Background="{StaticResource BackgroundColorBrush}">
             <Expander.Header>
                 <TextBlock x:Name="ExpanderTracksTextBlock"
-                    Text="Tracks" FontSize="16" FontWeight="SemiBold" />
+                           Text="Tracks" Style="{StaticResource BaseTextBlockStyle}" FontSize="{StaticResource FontSizeLarge}" />
             </Expander.Header>
             <Expander.Content>
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <ItemsControl x:Name="TracksList" Focusable="False">
+                    <ItemsControl x:Name="TracksList" Focusable="False" Background="{StaticResource SecondaryColorBrush}">
                         <ItemsControl.ItemTemplate>
                             <StaticResource ResourceKey="TrackListItemTemplate" />
                         </ItemsControl.ItemTemplate>
@@ -63,7 +64,7 @@
         <!-- add line -->
         <Grid Grid.Row="1" x:Name="ExpanderControlStackPanel"
                     Cursor="Hand"
-                    Background="LightGray"
+                    Background="{StaticResource SecondaryColorBrush}"
                     PreviewMouseDown="StackPanelMouseClick"
                     PreviewMouseUp="StackPanelMouseClick">
             <Grid.RowDefinitions>
@@ -78,19 +79,20 @@
                 <ColumnDefinition Width="0.1*"/>
             </Grid.ColumnDefinitions>
 
-            <Rectangle Grid.Row="1" Grid.Column="1" Fill="Black" Height="1" />
+            <Rectangle Grid.Row="1" Grid.Column="1" Fill="{StaticResource TextColorBrush}" Height="1" />
         </Grid>
 
         <Expander Grid.Row="2" IsExpanded="True" x:Name="SettingsExpander"
                   Expanded="ExpanderExpand"
-                  Collapsed="SettingsExpanderCollapse">
+                  Collapsed="SettingsExpanderCollapse"
+                  Background="{StaticResource BackgroundColorBrush}">
             <Expander.Header>
-                <TextBlock Text="Settings" FontSize="16" FontWeight="SemiBold"></TextBlock>
+                <TextBlock Text="Settings" Style="{StaticResource BaseTextBlockStyle}" FontSize="{StaticResource FontSizeLarge}" />
             </Expander.Header>
 
-            <StackPanel>
-                <TextBlock Text="Some text" />
-                <Button Content="Some button" />
+            <StackPanel Margin="5">
+                <TextBlock Text="Some text" Style="{StaticResource BaseTextBlockStyle}" Margin="0,0,0,5"/>
+                <Button Content="Some button" Style="{StaticResource BaseButtonStyle}" />
             </StackPanel>
         </Expander>
     </Grid>

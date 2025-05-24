@@ -112,11 +112,15 @@ public partial class SecondCanvas : UserControl
 
                         var isLookingForward = Car.IsLookingForward();
                         _carDirectionLabel.Content = isLookingForward ? Strings.Forward : Strings.Backward;
-                        _carDirectionLabel.Foreground = isLookingForward ? Brushes.Blue : Brushes.Red;
+                        _carDirectionLabel.Foreground = isLookingForward 
+                            ? Application.Current.Resources["PrimaryColorBrush"] as SolidColorBrush
+                            : Application.Current.Resources["AccentDangerColorBrush"] as SolidColorBrush;
 
                         var isCollision = Car.IsCollision();
                         _collisionLabel.Content = isCollision ? Strings.Collision : Strings.NoCollision;
-                        _collisionLabel.Foreground = isCollision ? Brushes.Red : Brushes.Green;
+                        _collisionLabel.Foreground = isCollision 
+                            ? Application.Current.Resources["AccentDangerColorBrush"] as SolidColorBrush
+                            : Application.Current.Resources["AccentSuccessColorBrush"] as SolidColorBrush;
                     }
                 });
             });

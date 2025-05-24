@@ -7,22 +7,7 @@
              mc:Ignorable="d"
              d:DesignHeight="33" d:DesignWidth="1010">
     <UserControl.Resources>
-        <Style x:Key="ButtonStyle" TargetType="Button">
-            <Setter Property="Focusable" Value="False" />
-            <Setter Property="FontSize" Value="16" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Margin" Value="0 3 3 3" />
-        </Style>
-
-        <Style x:Key="LabelStyle" TargetType="Label">
-            <Setter Property="Background" Value="WhiteSmoke" />
-            <Setter Property="FontSize" Value="16" />
-            <Setter Property="Focusable" Value="False" />
-            <Setter Property="HorizontalContentAlignment" Value="Center" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="Margin" Value="0 0 1 0" />
-        </Style>
-
+        <!-- Local ButtonStyle and LabelStyle removed -->
         <DataTemplate x:Key="EvolutionTemplate" DataType="{x:Type viewModels:EvolutionViewModel}">
             <Grid ShowGridLines="False">
                 <Grid.ColumnDefinitions>
@@ -30,7 +15,7 @@
                     <ColumnDefinition Width="2.25*" />
                 </Grid.ColumnDefinitions>
                 <Grid Grid.Column="0" x:Name="ControlGrid" 
-                      Background="WhiteSmoke" Margin="0 0 1 0">
+                      Background="{StaticResource SecondaryColorBrush}" Margin="0 0 1 0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
                         <ColumnDefinition />
@@ -39,17 +24,14 @@
 
                     <Button Grid.Column="0" x:Name="ActionButton"
                             Content="{Binding ActionButtonContext}" 
-                            Style="{StaticResource ButtonStyle}" 
-                            Foreground="{Binding ActionButtonBackground}"
-                            Margin="3"/>
+                            Style="{StaticResource BaseButtonStyle}" 
+                            Foreground="{Binding ActionButtonBackground}"/>
                     <Button Grid.Column="1" x:Name="SaveButton"
-                            Content="Save" Style="{StaticResource ButtonStyle}" 
-                            Foreground="#339900" />
+                            Content="Save" Style="{StaticResource SuccessButtonStyle}" />
                     <Button Grid.Column="2" x:Name="ResetButton"
-                            Content="Reset" Style="{StaticResource ButtonStyle}" 
-                            Foreground="#CC0000"/>
+                            Content="Reset" Style="{StaticResource DangerButtonStyle}" />
                 </Grid>
-                <Grid Grid.Column="1" x:Name="InfoGrid">
+                <Grid Grid.Column="1" x:Name="InfoGrid" Background="{StaticResource SecondaryColorBrush}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
                         <ColumnDefinition />
@@ -59,33 +41,33 @@
 
                     <Label Grid.Column="0" x:Name="ProgressLabel" 
                            Content="{Binding ProgressInfo}" 
-                           Style="{StaticResource LabelStyle}" />
+                           Style="{StaticResource BaseLabelStyle}" HorizontalContentAlignment="Center" />
                     <Label Grid.Column="1" x:Name="CurrentValueLabel" 
                            Content="{Binding CurrentValueInfo}" 
-                           Style="{StaticResource LabelStyle}" 
+                           Style="{StaticResource BaseLabelStyle}" HorizontalContentAlignment="Center" 
                            ToolTip="{Binding ValueToolTip}"/>
                     <Label Grid.Column="2" x:Name="TimeSpendLabel" 
                            Content="{Binding TimeSpendInfo}" 
-                           Style="{StaticResource LabelStyle}" />
+                           Style="{StaticResource BaseLabelStyle}" HorizontalContentAlignment="Center" />
                     <Label Grid.Column="3" x:Name="SaveValueLabel" 
                            Content="{Binding SaveValueInfo}" 
-                           Style="{StaticResource LabelStyle}" 
+                           Style="{StaticResource BaseLabelStyle}" HorizontalContentAlignment="Center" 
                            ToolTip="{Binding ValueToolTip}"/>
                 </Grid>
             </Grid>
         </DataTemplate>
     </UserControl.Resources>
 
-    <Grid ShowGridLines="False" Background="DarkSlateGray">
+    <Grid ShowGridLines="False">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1.5*" />
             <ColumnDefinition Width="7*" />
         </Grid.ColumnDefinitions>
 
-        <Grid Grid.Column="0" Background="WhiteSmoke" Margin="0,0,1,0">
+        <Grid Grid.Column="0" Background="{StaticResource SecondaryColorBrush}" Margin="0,0,1,0">
             <CheckBox x:Name="FollowCarCheckBox" Content="Follow Car" IsChecked="True"
-                      FlowDirection="RightToLeft" FontSize="16" Focusable="False"
-                      HorizontalAlignment="Center" VerticalContentAlignment="Center" />
+                      Style="{StaticResource BaseCheckBoxStyle}" FlowDirection="RightToLeft"
+                      HorizontalAlignment="Center" />
         </Grid>
         <Grid Grid.Column="1">
             <ContentControl ContentTemplate="{StaticResource EvolutionTemplate}">
